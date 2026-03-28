@@ -31,6 +31,7 @@
   </div>
 </template>
 <script setup>
+import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
 

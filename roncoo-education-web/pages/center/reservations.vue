@@ -17,12 +17,10 @@
     <el-table-column prop="gmtCreate" label="创建时间" width="180" />
     <el-table-column label="操作" width="180">
       <template #default="{ row }">
-        <!-- 教员：确认/拒绝待确认的预约 -->
         <template v-if="userStore.isTutor && row.resStatus === 0">
           <el-button size="small" type="success" @click="handleConfirm(row.id)">确认</el-button>
           <el-button size="small" type="danger" @click="handleCancel(row.id)">拒绝</el-button>
         </template>
-        <!-- 学员：取消待确认的预约 -->
         <template v-if="userStore.isStudent && row.resStatus === 0">
           <el-button size="small" type="danger" @click="handleCancel(row.id)">取消</el-button>
         </template>
@@ -36,6 +34,7 @@
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 
 definePageMeta({ layout: 'center' })
@@ -58,15 +57,19 @@ const load = async () => {
 }
 
 const handleConfirm = async (id) => {
-  const res = await put('/user/auth/reservation/confirm?id=' + id)
-  if (res.code === 200) { ElMessage.success('已确认'); await load() }
-  else ElMessage.error(res.msg)
+  try {
+    const res = await put('/user/auth/reservation/confirm?id=' + id, {})
+    if (res.code === 200) { ElMessage.success('已确认'); await load() }
+    else { ElMessage.error(res.msg || '操作失败') }
+  } catch (e) { console.error(e); ElMessage.error('网络错误') }
 }
 
 const handleCancel = async (id) => {
-  const res = await put('/user/auth/reservation/cancel?id=' + id)
-  if (res.code === 200) { ElMessage.success('已取消'); await load() }
-  else ElMessage.error(res.msg)
+  try {
+    const res = await put('/user/auth/reservation/cancel?id=' + id, {})
+    if (res.code === 200) { ElMessage.success('已取消'); await load() }
+    else { ElMessage.error(res.msg || '操作失败') }
+  } catch (e) { console.error(e); ElMessage.error('网络错误') }
 }
 
 onMounted(() => { load() })

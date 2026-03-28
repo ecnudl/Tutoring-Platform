@@ -29,6 +29,7 @@
 </div>
 </template>
 <script setup>
+import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
 definePageMeta({ layout: 'center' })
 const { post } = useApi()

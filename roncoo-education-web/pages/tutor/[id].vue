@@ -64,6 +64,7 @@
   </div>
 </template>
 <script setup>
+import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
 

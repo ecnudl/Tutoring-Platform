@@ -37,6 +37,7 @@
 </div>
 </template>
 <script setup>
+import { ElMessage } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { useDictStore } from '~/stores/dict'
 
