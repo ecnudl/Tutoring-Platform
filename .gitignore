@@ -1,0 +1,21 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build
+**/target/
+**/node_modules/
+**/.output/
+**/.nuxt/
+**/dist/
+
+# Environment
+.env
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+roncoo-education/distribution/resource/*.tar.gz
+roncoo-education/distribution/resource/*.gz
