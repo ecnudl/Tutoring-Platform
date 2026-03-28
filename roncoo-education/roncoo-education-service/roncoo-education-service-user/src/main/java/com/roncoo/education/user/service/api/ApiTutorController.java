@@ -37,7 +37,7 @@ public class ApiTutorController {
     @ApiOperation(value = "教员详情", notes = "教员详情查看")
     @ApiImplicitParam(name = "id", value = "主键ID", dataTypeClass = Long.class, paramType = "query", required = true)
     @GetMapping(value = "/view")
-    public Result<TutorViewResp> view(@RequestParam Long id) {
+    public Result<?> view(@RequestParam Long id) {
         return biz.view(id);
     }
 

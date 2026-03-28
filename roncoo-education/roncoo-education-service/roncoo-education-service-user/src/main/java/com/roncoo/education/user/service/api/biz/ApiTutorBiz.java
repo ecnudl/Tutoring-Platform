@@ -48,7 +48,7 @@ public class ApiTutorBiz extends BaseBiz {
         return Result.success(PageUtil.transform(page, TutorSearchResp.class));
     }
 
-    public Result<TutorViewResp> view(Long id) {
+    public Result<?> view(Long id) {
         TutorProfile profile = tutorProfileDao.getById(id);
         if (profile == null) {
             return Result.error("教员不存在");
@@ -62,6 +62,7 @@ public class ApiTutorBiz extends BaseBiz {
         update.setId(id);
         update.setViewCount(profile.getViewCount() == null ? 1 : profile.getViewCount() + 1);
         tutorProfileDao.updateById(update);
-        return Result.success(BeanUtil.copyProperties(profile, TutorViewResp.class));
+        // 直接返回 entity，确保 userId 等字段不丢失
+        return Result.success(profile);
     }
 }
