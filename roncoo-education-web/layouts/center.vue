@@ -30,6 +30,7 @@
           <template v-if="userStore.isStudent">
             <el-menu-item index="/center/requirements">我的需求</el-menu-item>
             <el-menu-item index="/center/requirement-new">发布需求</el-menu-item>
+            <el-menu-item index="/center/shortlist">备选老师</el-menu-item>
           </template>
           <el-menu-item index="/center/reservations">我的预约</el-menu-item>
           <el-menu-item index="/center/password">修改密码</el-menu-item>

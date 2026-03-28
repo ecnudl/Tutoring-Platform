@@ -28,6 +28,9 @@ public class TutorViewResp implements Serializable {
     @ApiModelProperty(value = "主键")
     private Long id;
 
+    @ApiModelProperty(value = "用户ID")
+    private Long userId;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime gmtCreate;
