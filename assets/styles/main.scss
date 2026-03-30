@@ -1,0 +1,36 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; background: #f5f7fa; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+a { text-decoration: none; color: inherit; }
+.page-title { font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #1a1a1a; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  .container { padding: 0 12px; }
+  .page-title { font-size: 20px; margin-bottom: 14px; }
+  .card-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Element Plus 表格横向滚动 */
+  .el-table { font-size: 13px; }
+  .el-descriptions { font-size: 13px; }
+
+  /* 表单适配 */
+  .el-form--inline .el-form-item { display: block; margin-right: 0; margin-bottom: 12px; }
+  .el-input-number { width: 100% !important; }
+}
+
+@media (max-width: 480px) {
+  .page-title { font-size: 18px; }
+}
+
+/* ========== 个人中心页面通用适配 ========== */
+@media (max-width: 768px) {
+  /* 表格横向滚动 */
+  .el-table { overflow-x: auto; }
+  /* 表单 label 堆叠 */
+  .center-content .el-form-item { margin-bottom: 14px; }
+  .center-content .el-form--inline .el-form-item { display: block; width: 100%; }
+  /* 卡片减少 padding */
+  .center-content .el-card__body { padding: 14px; }
+}
