@@ -33,6 +33,7 @@
         <template v-if="userStore.isStudent">
           <NuxtLink to="/center/requirements" :class="{ active: $route.path === '/center/requirements' }">需求</NuxtLink>
           <NuxtLink to="/center/shortlist" :class="{ active: $route.path === '/center/shortlist' }">备选</NuxtLink>
+          <NuxtLink to="/center/received-applications" :class="{ active: $route.path === '/center/received-applications' }">收到申请</NuxtLink>
         </template>
         <NuxtLink to="/center/reservations" :class="{ active: $route.path === '/center/reservations' }">预约</NuxtLink>
         <NuxtLink to="/center/password" :class="{ active: $route.path === '/center/password' }">密码</NuxtLink>
@@ -54,6 +55,7 @@
             <el-menu-item index="/center/requirements">我的需求</el-menu-item>
             <el-menu-item index="/center/requirement-new">发布需求</el-menu-item>
             <el-menu-item index="/center/shortlist">备选老师</el-menu-item>
+            <el-menu-item index="/center/received-applications">收到的申请</el-menu-item>
           </template>
           <el-menu-item index="/center/reservations">我的预约</el-menu-item>
           <el-menu-item index="/center/password">修改密码</el-menu-item>
