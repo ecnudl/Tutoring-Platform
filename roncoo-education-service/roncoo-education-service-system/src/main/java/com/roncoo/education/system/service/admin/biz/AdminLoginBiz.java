@@ -101,4 +101,38 @@ public class AdminLoginBiz {
         return Result.success(resp);
     }
 
+    /**
+     * 简化登录（开发环境，明文密码，无需验证码）
+     */
+    public Result<AdminSysUserLoginResp> loginSimple(String mobile, String password) {
+        if (!StringUtils.hasText(mobile) || !StringUtils.hasText(password)) {
+            return Result.error("账号和密码不能为空");
+        }
+        SysUser sysUser = sysUserDao.getByMobile(mobile);
+        if (sysUser == null) {
+            return Result.error("用户不存在");
+        }
+        if (!StatusIdEnum.YES.getCode().equals(sysUser.getStatusId())) {
+            return Result.error("账号不可用");
+        }
+        if (!Sha1Util.getSign(sysUser.getMobileSalt() + password).equals(sysUser.getMobilePsw())) {
+            return Result.error("账号或密码不正确");
+        }
+
+        AdminSysUserLoginResp resp = new AdminSysUserLoginResp();
+        resp.setMobile(sysUser.getMobile());
+        resp.setRealName(sysUser.getRealName());
+        resp.setToken(JwtUtil.create(sysUser.getId(), JwtUtil.DATE));
+        cacheRedis.set(resp.getToken(), sysUser.getId(), 1, TimeUnit.DAYS);
+
+        List<SysMenu> sysMenus = sysUserCommonBiz.listMenu(sysUser.getId());
+        resp.setRouterList(sysUserCommonBiz.routerList(sysMenus));
+        resp.setMenuList(sysUserCommonBiz.menuList(sysMenus));
+        resp.setPermissionList(sysMenus.stream().filter(item -> StringUtils.hasText(item.getPermission())).map(SysMenu::getPermission).collect(Collectors.toList()));
+        List<String> apis = sysMenus.stream().filter(item -> StringUtils.hasText(item.getApis())).map(SysMenu::getApis).collect(Collectors.toList());
+        cacheRedis.set(Constants.RedisPre.ADMIN_APIS.concat(sysUser.getId().toString()), apis, 1, TimeUnit.DAYS);
+
+        return Result.success(resp);
+    }
+
 }

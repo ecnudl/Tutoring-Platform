@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roncoo.education.user.dao.impl.mapper.TutorAuditRecordMapper">
+    <resultMap id="BaseResultMap" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="status_id" jdbcType="TINYINT" property="statusId"/>
+        <result column="tutor_id" jdbcType="BIGINT" property="tutorId"/>
+        <result column="auditor_id" jdbcType="BIGINT" property="auditorId"/>
+        <result column="audit_action" jdbcType="TINYINT" property="auditAction"/>
+        <result column="audit_remark" jdbcType="VARCHAR" property="auditRemark"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, gmt_create, gmt_modified, status_id, tutor_id, auditor_id, audit_action, audit_remark
+    </sql>
+    <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecordExample"
+            resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from tutor_audit_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <if test="limitStart >= 0">
+            limit ${limitStart} , ${pageSize}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tutor_audit_record
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from tutor_audit_record
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecordExample">
+        delete from tutor_audit_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord">
+        insert into tutor_audit_record (id, gmt_create, gmt_modified,
+                                        status_id, tutor_id, auditor_id,
+                                        audit_action, audit_remark)
+        values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP},
+                #{statusId,jdbcType=TINYINT}, #{tutorId,jdbcType=BIGINT}, #{auditorId,jdbcType=BIGINT},
+                #{auditAction,jdbcType=TINYINT}, #{auditRemark,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord">
+        insert into tutor_audit_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified,
+            </if>
+            <if test="statusId != null">
+                status_id,
+            </if>
+            <if test="tutorId != null">
+                tutor_id,
+            </if>
+            <if test="auditorId != null">
+                auditor_id,
+            </if>
+            <if test="auditAction != null">
+                audit_action,
+            </if>
+            <if test="auditRemark != null">
+                audit_remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+            <if test="statusId != null">
+                #{statusId,jdbcType=TINYINT},
+            </if>
+            <if test="tutorId != null">
+                #{tutorId,jdbcType=BIGINT},
+            </if>
+            <if test="auditorId != null">
+                #{auditorId,jdbcType=BIGINT},
+            </if>
+            <if test="auditAction != null">
+                #{auditAction,jdbcType=TINYINT},
+            </if>
+            <if test="auditRemark != null">
+                #{auditRemark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecordExample"
+            resultType="java.lang.Integer">
+        select count(*) from tutor_audit_record
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update tutor_audit_record
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.gmtCreate != null">
+                gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.gmtModified != null">
+                gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.statusId != null">
+                status_id = #{record.statusId,jdbcType=TINYINT},
+            </if>
+            <if test="record.tutorId != null">
+                tutor_id = #{record.tutorId,jdbcType=BIGINT},
+            </if>
+            <if test="record.auditorId != null">
+                auditor_id = #{record.auditorId,jdbcType=BIGINT},
+            </if>
+            <if test="record.auditAction != null">
+                audit_action = #{record.auditAction,jdbcType=TINYINT},
+            </if>
+            <if test="record.auditRemark != null">
+                audit_remark = #{record.auditRemark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update tutor_audit_record
+        set id = #{record.id,jdbcType=BIGINT},
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+        gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+        status_id = #{record.statusId,jdbcType=TINYINT},
+        tutor_id = #{record.tutorId,jdbcType=BIGINT},
+        auditor_id = #{record.auditorId,jdbcType=BIGINT},
+        audit_action = #{record.auditAction,jdbcType=TINYINT},
+        audit_remark = #{record.auditRemark,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord">
+        update tutor_audit_record
+        <set>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+            <if test="statusId != null">
+                status_id = #{statusId,jdbcType=TINYINT},
+            </if>
+            <if test="tutorId != null">
+                tutor_id = #{tutorId,jdbcType=BIGINT},
+            </if>
+            <if test="auditorId != null">
+                auditor_id = #{auditorId,jdbcType=BIGINT},
+            </if>
+            <if test="auditAction != null">
+                audit_action = #{auditAction,jdbcType=TINYINT},
+            </if>
+            <if test="auditRemark != null">
+                audit_remark = #{auditRemark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord">
+        update tutor_audit_record
+        set gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+            status_id = #{statusId,jdbcType=TINYINT},
+            tutor_id = #{tutorId,jdbcType=BIGINT},
+            auditor_id = #{auditorId,jdbcType=BIGINT},
+            audit_action = #{auditAction,jdbcType=TINYINT},
+            audit_remark = #{auditRemark,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

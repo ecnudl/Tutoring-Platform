@@ -32,7 +32,8 @@ public class AdminGlobalFilter implements GlobalFilter, Ordered {
      * admin不需要token校验的接口
      */
     private static final List<String> EXCLUDE_TOKEN_URL = List.of(
-            "/system/admin/login/password"
+            "/system/admin/login/password",
+            "/system/admin/login/simple"
     );
 
     /**

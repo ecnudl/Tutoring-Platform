@@ -41,6 +41,8 @@ public class Users implements Serializable {
 
     private Integer registerSource;
 
+    private Integer userType;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -187,6 +189,14 @@ public class Users implements Serializable {
         this.registerSource = registerSource;
     }
 
+    public Integer getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Integer userType) {
+        this.userType = userType;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -211,6 +221,7 @@ public class Users implements Serializable {
         sb.append(", province=").append(province);
         sb.append(", country=").append(country);
         sb.append(", registerSource=").append(registerSource);
+        sb.append(", userType=").append(userType);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

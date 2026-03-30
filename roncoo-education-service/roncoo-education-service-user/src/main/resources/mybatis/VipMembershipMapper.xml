@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roncoo.education.user.dao.impl.mapper.VipMembershipMapper">
+    <resultMap id="BaseResultMap" type="com.roncoo.education.user.dao.impl.mapper.entity.VipMembership">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="status_id" jdbcType="TINYINT" property="statusId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="vip_level" jdbcType="TINYINT" property="vipLevel"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="operator_id" jdbcType="BIGINT" property="operatorId"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">and ${criterion.condition}</when>
+                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+                                <when test="criterion.listValue">and ${criterion.condition}<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach></when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">and ${criterion.condition}</when>
+                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+                                <when test="criterion.listValue">and ${criterion.condition}<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach></when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, vip_level, start_time, end_time, operator_id, remark</sql>
+
+    <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembershipExample" resultMap="BaseResultMap">
+        select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from vip_membership
+        <if test="_parameter != null"><include refid="Example_Where_Clause"/></if>
+        <if test="orderByClause != null">order by ${orderByClause}</if>
+        <if test="limitStart >= 0">limit ${limitStart}, ${pageSize}</if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from vip_membership where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from vip_membership where id = #{id,jdbcType=BIGINT}</delete>
+    <delete id="deleteByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembershipExample">delete from vip_membership <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></delete>
+    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembership">insert into vip_membership (id, gmt_create, gmt_modified, status_id, user_id, vip_level, start_time, end_time, operator_id, remark) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}, #{vipLevel,jdbcType=TINYINT}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{operatorId,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR})</insert>
+    <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembership">
+        insert into vip_membership
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="gmtCreate != null">gmt_create,</if>
+            <if test="gmtModified != null">gmt_modified,</if>
+            <if test="statusId != null">status_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="vipLevel != null">vip_level,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="remark != null">remark,</if>        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=BIGINT},</if>
+            <if test="gmtCreate != null">#{gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="gmtModified != null">#{gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="statusId != null">#{statusId,jdbcType=TINYINT},</if>
+            <if test="userId != null">#{userId,jdbcType=BIGINT},</if>
+            <if test="vipLevel != null">#{vipLevel,jdbcType=TINYINT},</if>
+            <if test="startTime != null">#{startTime,jdbcType=TIMESTAMP},</if>
+            <if test="endTime != null">#{endTime,jdbcType=TIMESTAMP},</if>
+            <if test="operatorId != null">#{operatorId,jdbcType=BIGINT},</if>
+            <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembershipExample" resultType="java.lang.Integer">select count(*) from vip_membership <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update vip_membership <set>
+            <if test="record.gmtCreate != null">gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="record.gmtModified != null">gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="record.statusId != null">status_id = #{record.statusId,jdbcType=TINYINT},</if>
+            <if test="record.userId != null">user_id = #{record.userId,jdbcType=BIGINT},</if>
+            <if test="record.vipLevel != null">vip_level = #{record.vipLevel,jdbcType=TINYINT},</if>
+            <if test="record.startTime != null">start_time = #{record.startTime,jdbcType=TIMESTAMP},</if>
+            <if test="record.endTime != null">end_time = #{record.endTime,jdbcType=TIMESTAMP},</if>
+            <if test="record.operatorId != null">operator_id = #{record.operatorId,jdbcType=BIGINT},</if>
+            <if test="record.remark != null">remark = #{record.remark,jdbcType=VARCHAR},</if>        </set>
+        <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembership">
+        update vip_membership <set>
+            <if test="gmtCreate != null">gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="gmtModified != null">gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="statusId != null">status_id = #{statusId,jdbcType=TINYINT},</if>
+            <if test="userId != null">user_id = #{userId,jdbcType=BIGINT},</if>
+            <if test="vipLevel != null">vip_level = #{vipLevel,jdbcType=TINYINT},</if>
+            <if test="startTime != null">start_time = #{startTime,jdbcType=TIMESTAMP},</if>
+            <if test="endTime != null">end_time = #{endTime,jdbcType=TIMESTAMP},</if>
+            <if test="operatorId != null">operator_id = #{operatorId,jdbcType=BIGINT},</if>
+            <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.VipMembership">
+        update vip_membership set
+            gmt_create = #{gmtCreate,jdbcType=TIMESTAMP}
+            gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+            status_id = #{statusId,jdbcType=TINYINT}
+            user_id = #{userId,jdbcType=BIGINT}
+            vip_level = #{vipLevel,jdbcType=TINYINT}
+            start_time = #{startTime,jdbcType=TIMESTAMP}
+            end_time = #{endTime,jdbcType=TIMESTAMP}
+            operator_id = #{operatorId,jdbcType=BIGINT}
+            remark = #{remark,jdbcType=VARCHAR}        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

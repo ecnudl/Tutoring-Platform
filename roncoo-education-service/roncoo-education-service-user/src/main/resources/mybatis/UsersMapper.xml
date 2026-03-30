@@ -20,6 +20,7 @@
     <result column="province" jdbcType="VARCHAR" property="province" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="register_source" jdbcType="TINYINT" property="registerSource" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -80,9 +81,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gmt_create, gmt_modified, status_id, mobile, mobile_salt, mobile_psw, nickname, 
-    user_sex, user_age, user_head, remark, union_id, open_id, city, province, country, 
-    register_source
+    id, gmt_create, gmt_modified, status_id, mobile, mobile_salt, mobile_psw, nickname,
+    user_sex, user_age, user_head, remark, union_id, open_id, city, province, country,
+    register_source, user_type
   </sql>
   <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.UsersExample" resultMap="BaseResultMap">
     select
@@ -118,19 +119,21 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.Users">
-    insert into users (id, gmt_create, gmt_modified, 
-      status_id, mobile, mobile_salt, 
-      mobile_psw, nickname, user_sex, 
-      user_age, user_head, remark, 
-      union_id, open_id, city, 
-      province, country, register_source
+    insert into users (id, gmt_create, gmt_modified,
+      status_id, mobile, mobile_salt,
+      mobile_psw, nickname, user_sex,
+      user_age, user_head, remark,
+      union_id, open_id, city,
+      province, country, register_source,
+      user_type
       )
-    values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, 
-      #{statusId,jdbcType=TINYINT}, #{mobile,jdbcType=VARCHAR}, #{mobileSalt,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP},
+      #{statusId,jdbcType=TINYINT}, #{mobile,jdbcType=VARCHAR}, #{mobileSalt,jdbcType=VARCHAR},
       #{mobilePsw,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{userSex,jdbcType=TINYINT},
             #{userAge,jdbcType=DATE}, #{userHead,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
-      #{unionId,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
-      #{province,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{registerSource,jdbcType=TINYINT}
+      #{unionId,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR},
+      #{province,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{registerSource,jdbcType=TINYINT},
+      #{userType,jdbcType=TINYINT}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.Users">
@@ -190,6 +193,9 @@
       <if test="registerSource != null">
         register_source,
       </if>
+      <if test="userType != null">
+        user_type,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -245,6 +251,9 @@
       </if>
       <if test="registerSource != null">
         #{registerSource,jdbcType=TINYINT},
+      </if>
+      <if test="userType != null">
+        #{userType,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -311,6 +320,9 @@
       <if test="record.registerSource != null">
         register_source = #{record.registerSource,jdbcType=TINYINT},
       </if>
+      <if test="record.userType != null">
+        user_type = #{record.userType,jdbcType=TINYINT},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -335,7 +347,8 @@
       city = #{record.city,jdbcType=VARCHAR},
       province = #{record.province,jdbcType=VARCHAR},
       country = #{record.country,jdbcType=VARCHAR},
-      register_source = #{record.registerSource,jdbcType=TINYINT}
+      register_source = #{record.registerSource,jdbcType=TINYINT},
+      user_type = #{record.userType,jdbcType=TINYINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -394,6 +407,9 @@
       <if test="registerSource != null">
         register_source = #{registerSource,jdbcType=TINYINT},
       </if>
+      <if test="userType != null">
+        user_type = #{userType,jdbcType=TINYINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -415,7 +431,8 @@
       city = #{city,jdbcType=VARCHAR},
       province = #{province,jdbcType=VARCHAR},
       country = #{country,jdbcType=VARCHAR},
-      register_source = #{registerSource,jdbcType=TINYINT}
+      register_source = #{registerSource,jdbcType=TINYINT},
+      user_type = #{userType,jdbcType=TINYINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

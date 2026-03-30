@@ -53,4 +53,7 @@ public class RegisterReq implements Serializable {
 
     @ApiModelProperty(value = "操作系统", required = false)
     private String os;
+
+    @ApiModelProperty(value = "用户类型 0未设置 1教员 2学员", required = false)
+    private Integer userType = 0;
 }

@@ -66,6 +66,24 @@ public class ApiUsersController {
     }
 
 
+    /**
+     * 简化注册接口（开发环境，不依赖RSA加密和短信验证码）
+     */
+    @ApiOperation(value = "简化注册", notes = "开发环境，明文密码，无需验证码，必须传userType")
+    @PostMapping(value = "/register/simple")
+    public Result<UsersLoginResp> registerSimple(@RequestBody SimpleRegisterReq req) {
+        return biz.registerSimple(req);
+    }
+
+    /**
+     * 简化登录接口（开发环境，不依赖RSA加密和图形验证码）
+     */
+    @ApiOperation(value = "简化登录", notes = "开发环境，明文密码，无需图形验证码")
+    @PostMapping(value = "/login/simple")
+    public Result<UsersLoginResp> loginSimple(@RequestBody SimpleLoginReq req) {
+        return biz.loginSimple(req);
+    }
+
     @ApiOperation(value = "微信登录，获取授权地址", notes = "返回微信登录授权地址")
     @PostMapping(value = "/wx/login")
     public Result<String> wxLogin(@RequestBody WxLoginReq req) {

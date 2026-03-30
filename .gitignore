@@ -9,3 +9,13 @@
 *.iml
 *.idea
 **.iml
+
+# 环境变量
+.env
+
+# Docker volumes
+mysql_data/
+redis_data/
+nacos_data/
+minio_data/
+logs/

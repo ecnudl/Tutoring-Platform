@@ -22,12 +22,10 @@ import com.roncoo.education.common.sms.SmsFace;
 import com.roncoo.education.common.tools.*;
 import com.roncoo.education.system.feign.interfaces.IFeignSysConfig;
 import com.roncoo.education.system.feign.interfaces.vo.LoginConfig;
-import com.roncoo.education.user.dao.UsersAccountDao;
-import com.roncoo.education.user.dao.UsersDao;
-import com.roncoo.education.user.dao.UsersLogDao;
-import com.roncoo.education.user.dao.impl.mapper.entity.Users;
-import com.roncoo.education.user.dao.impl.mapper.entity.UsersAccount;
-import com.roncoo.education.user.dao.impl.mapper.entity.UsersLog;
+import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
+import com.roncoo.education.common.core.enums.UserTypeEnum;
+import com.roncoo.education.user.dao.*;
+import com.roncoo.education.user.dao.impl.mapper.entity.*;;
 import com.roncoo.education.user.service.api.req.*;
 import com.roncoo.education.user.service.api.resp.UsersLoginResp;
 import com.roncoo.education.user.service.api.resp.WxCodeResp;
@@ -76,6 +74,10 @@ public class ApiUsersBiz extends BaseBiz {
     private final BaseWxBiz baseWxBiz;
     @NotNull
     private final Map<String, SmsFace> smsFaceMap;
+    @NotNull
+    private final TutorProfileDao tutorProfileDao;
+    @NotNull
+    private final StudentProfileDao studentProfileDao;
 
     @Transactional(rollbackFor = Exception.class)
     public Result<UsersLoginResp> register(RegisterReq req) {
@@ -162,6 +164,10 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     private Users register(String mobile, String password, Integer registerSource, String unionId, String openId) {
+        return register(mobile, password, registerSource, unionId, openId, UserTypeEnum.UNSET.getCode());
+    }
+
+    private Users register(String mobile, String password, Integer registerSource, String unionId, String openId, Integer userType) {
         // 用户基本信息
         Users user = new Users();
         user.setMobile(mobile);
@@ -173,6 +179,7 @@ public class ApiUsersBiz extends BaseBiz {
         user.setRegisterSource(registerSource);
         user.setUnionId(unionId);
         user.setOpenId(openId);
+        user.setUserType(userType != null ? userType : UserTypeEnum.UNSET.getCode());
 
         WxOAuth2UserInfo userInfo = null;
         if (StringUtils.hasText(unionId)) {
@@ -198,7 +205,100 @@ public class ApiUsersBiz extends BaseBiz {
         usersAccount.setFreezeAmount(BigDecimal.ZERO);
         usersAccount.setSign(Md5Util.md5(usersAccount.getUserId().toString(), usersAccount.getAvailableAmount().toPlainString(), usersAccount.getFreezeAmount().toPlainString()));
         usersAccountDao.save(usersAccount);
+
+        // 根据 userType 自动创建对应 Profile
+        createProfileForUser(user.getId(), user.getUserType(), mobile);
+
         return user;
+    }
+
+    /**
+     * 根据用户类型自动创建教员或学员资料
+     */
+    private void createProfileForUser(Long userId, Integer userType, String mobile) {
+        if (UserTypeEnum.TUTOR.getCode().equals(userType)) {
+            TutorProfile profile = new TutorProfile();
+            profile.setUserId(userId);
+            profile.setMobile(mobile);
+            profile.setAuditStatus(TutorAuditStatusEnum.DRAFT.getCode());
+            tutorProfileDao.save(profile);
+            log.info("教员资料已创建, userId={}", userId);
+        } else if (UserTypeEnum.STUDENT.getCode().equals(userType)) {
+            StudentProfile profile = new StudentProfile();
+            profile.setUserId(userId);
+            studentProfileDao.save(profile);
+            log.info("学员资料已创建, userId={}", userId);
+        }
+    }
+
+    /**
+     * 简化注册（开发环境，不依赖RSA和短信验证码）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<UsersLoginResp> registerSimple(SimpleRegisterReq req) {
+        // 手机号校验
+        if (!StringUtils.hasText(req.getMobile())) {
+            return Result.error("手机号不能为空");
+        }
+        if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
+            return Result.error("手机号格式不正确");
+        }
+        // 密码校验
+        if (!StringUtils.hasText(req.getPassword())) {
+            return Result.error("密码不能为空");
+        }
+        // userType 校验
+        if (req.getUserType() == null || (!UserTypeEnum.TUTOR.getCode().equals(req.getUserType()) && !UserTypeEnum.STUDENT.getCode().equals(req.getUserType()))) {
+            return Result.error("用户类型不合法，只能为1(教员)或2(学员)");
+        }
+        // 手机号重复校验
+        Users existUser = usersDao.getByMobile(req.getMobile());
+        if (existUser != null) {
+            return Result.error("该手机号已经注册，请更换手机号");
+        }
+
+        // 注册（直接明文密码，内部会SHA1加盐哈希存储）
+        Users user = register(req.getMobile(), req.getPassword(), 1, null, null, req.getUserType());
+
+        // 构建登录响应
+        UsersLog usersLog = new UsersLog();
+        usersLog.setLoginIp("127.0.0.1");
+        return Result.success(login(user.getId(), user.getMobile(), LoginStatusEnum.REGISTER, usersLog));
+    }
+
+    /**
+     * 简化登录（开发环境，不依赖RSA和图形验证码）
+     */
+    public Result<UsersLoginResp> loginSimple(SimpleLoginReq req) {
+        if (!StringUtils.hasText(req.getMobile())) {
+            return Result.error("手机号不能为空");
+        }
+        if (!StringUtils.hasText(req.getPassword())) {
+            return Result.error("密码不能为空");
+        }
+
+        // 用户校验
+        Users user = usersDao.getByMobile(req.getMobile());
+        if (user == null) {
+            return Result.error("账号或者密码不正确");
+        }
+
+        // 状态校验
+        if (user.getStatusId() != null && user.getStatusId() != 1) {
+            return Result.error("账号状态异常，请联系管理员");
+        }
+
+        // 密码校验（明文密码 + salt -> SHA1 比对）
+        if (!DigestUtil.sha1Hex(user.getMobileSalt() + req.getPassword()).equals(user.getMobilePsw())) {
+            UsersLog usersLog = new UsersLog();
+            usersLog.setLoginIp("127.0.0.1");
+            log(user.getId(), LoginStatusEnum.FAIL, usersLog);
+            return Result.error("账号或者密码不正确");
+        }
+
+        UsersLog usersLog = new UsersLog();
+        usersLog.setLoginIp("127.0.0.1");
+        return Result.success(login(user.getId(), user.getMobile(), LoginStatusEnum.SUCCESS, usersLog));
     }
 
     public Result<String> sendCode(SendCodeReq req) {
@@ -390,9 +490,13 @@ public class ApiUsersBiz extends BaseBiz {
         // 日志
         log(userId, loginStatusEnum, usersLog);
 
+        // 查询 userType
+        Users dbUser = usersDao.getById(userId);
+
         UsersLoginResp resp = new UsersLoginResp();
         resp.setMobile(mobile);
         resp.setToken(JwtUtil.create(userId, JwtUtil.DATE));
+        resp.setUserType(dbUser != null ? dbUser.getUserType() : UserTypeEnum.UNSET.getCode());
         // token，放入缓存
         cacheRedis.set(resp.getToken(), userId, 1, TimeUnit.DAYS);
         return resp;

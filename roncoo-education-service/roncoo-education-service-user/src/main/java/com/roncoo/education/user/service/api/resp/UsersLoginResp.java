@@ -25,4 +25,7 @@ public class UsersLoginResp implements Serializable {
      */
     @ApiModelProperty(value = "token，有效期为1天")
     private String token;
+
+    @ApiModelProperty(value = "用户类型 0未设置 1教员 2学员")
+    private Integer userType;
 }

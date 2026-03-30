@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 /**
  * @author fengyw
@@ -29,6 +30,12 @@ public class AdminLoginController {
     @PostMapping(value = "/password")
     public Result<AdminSysUserLoginResp> login(@RequestBody @Valid AdminSysUserLoginReq req) {
         return biz.login(req);
+    }
+
+    @ApiOperation(value = "简化登录", notes = "开发环境，明文密码，无需验证码")
+    @PostMapping(value = "/simple")
+    public Result<AdminSysUserLoginResp> loginSimple(@RequestBody Map<String, String> req) {
+        return biz.loginSimple(req.get("mobile"), req.get("password"));
     }
 
 }

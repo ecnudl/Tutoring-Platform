@@ -12,6 +12,11 @@ import lombok.Getter;
 public enum SmsPlatformEnum {
 
     /**
+     * 模拟短信
+     */
+    MOCK(5, "模拟短信", "mock%", "mockSms"),
+
+    /**
      * 阿里云
      */
     ALI_YUN(2, "阿里云", "aliyun%", "aliyunSms"),
