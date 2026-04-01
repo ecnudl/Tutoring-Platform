@@ -37,6 +37,7 @@
         </template>
         <NuxtLink to="/center/reservations" :class="{ active: $route.path === '/center/reservations' }">预约</NuxtLink>
         <NuxtLink to="/center/password" :class="{ active: $route.path === '/center/password' }">密码</NuxtLink>
+        <NuxtLink to="/center/contact" :class="{ active: $route.path === '/center/contact' }">客服</NuxtLink>
       </div>
     </div>
 
@@ -59,6 +60,7 @@
           </template>
           <el-menu-item index="/center/reservations">我的预约</el-menu-item>
           <el-menu-item index="/center/password">修改密码</el-menu-item>
+          <el-menu-item index="/center/contact">联系客服</el-menu-item>
         </el-menu>
       </aside>
       <main class="center-content"><slot /></main>
