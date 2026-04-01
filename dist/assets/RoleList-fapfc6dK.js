@@ -1,0 +1,1 @@
+import{_ as o,o as s,x as a,b as n,a as r,r as c}from"./index-DhFyHoSK.js";const l={},_={class:"page-container"};function i(p,e){const t=c("el-alert");return s(),a("div",_,[e[0]||(e[0]=n("h2",{class:"page-title"},"角色管理",-1)),r(t,{title:"该功能复用现有系统接口，请参考原系统管理模块",type:"info",closable:!1})])}const d=o(l,[["render",i]]);export{d as default};
