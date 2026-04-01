@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class AuthTutorProfileSaveReq implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
+    private String avatar;
     private String realName;
     private Integer gender;
     private Integer tutorType;

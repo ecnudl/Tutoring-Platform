@@ -72,6 +72,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         // 复制属性到更新对象
         TutorProfile update = new TutorProfile();
         update.setId(profile.getId());
+        update.setAvatar(req.getAvatar());
         update.setRealName(req.getRealName());
         update.setGender(req.getGender());
         update.setTutorType(req.getTutorType());
