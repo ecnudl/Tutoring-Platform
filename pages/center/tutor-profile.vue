@@ -9,6 +9,16 @@
   <el-alert v-if="profile.auditStatus === 3" :title="'审核被驳回：' + (profile.auditRemark || '请修改后重新提交')" type="error" :closable="false" style="margin-bottom:16px" />
 
   <el-form :model="form" label-width="100px" class="tutor-form" v-loading="pageLoading">
+    <el-form-item label="头像">
+      <div style="display:flex;align-items:center;gap:16px">
+        <el-avatar :size="80" :src="form.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
+        <div v-if="!isLocked">
+          <input type="file" ref="avatarInput" accept="image/*" style="display:none" @change="handleAvatarUpload" />
+          <el-button size="small" :loading="uploadingAvatar" @click="$refs.avatarInput.click()">上传头像</el-button>
+          <p style="font-size:12px;color:#999;margin-top:4px">支持 jpg/png，建议正方形</p>
+        </div>
+      </div>
+    </el-form-item>
     <el-form-item label="真实姓名">
       <el-input v-model="form.realName" placeholder="请输入真实姓名" :disabled="isLocked" />
     </el-form-item>
@@ -72,10 +82,11 @@ definePageMeta({ layout: 'center' })
 
 const dictStore = useDictStore()
 const { get, post } = useApi()
+const config = useRuntimeConfig()
 
 const profile = ref({})
 const form = ref({
-  realName: '', gender: 1, tutorType: null, degree: null,
+  avatar: '', realName: '', gender: 1, tutorType: null, degree: null,
   university: '', major: '', selfIntroduction: '',
   priceMin: 0, priceMax: 0
 })
@@ -83,11 +94,30 @@ const subjectList = ref([])
 const saving = ref(false)
 const submitting = ref(false)
 const pageLoading = ref(false)
+const uploadingAvatar = ref(false)
 
-// 审核中(1)或已通过(2)时锁定表单
 const isLocked = computed(() => profile.value.auditStatus === 1 || profile.value.auditStatus === 2)
-// 只有草稿(0)或驳回(3)可以提交审核
 const canSubmit = computed(() => profile.value.auditStatus === 0 || profile.value.auditStatus === 3)
+
+const handleAvatarUpload = async (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片不能超过5MB'); return }
+  uploadingAvatar.value = true
+  try {
+    const fd = new FormData()
+    fd.append('picFile', file)
+    const token = localStorage.getItem('token')
+    const res = await $fetch(`${config.public.apiBase}/system/auth/upload/pic`, {
+      method: 'POST', body: fd, headers: { token }
+    })
+    if (res.code === 200 && res.data) {
+      form.value.avatar = res.data
+      ElMessage.success('头像上传成功')
+    } else { ElMessage.error(res.msg || '上传失败') }
+  } catch (err) { ElMessage.error('上传失败，请重试') }
+  finally { uploadingAvatar.value = false; e.target.value = '' }
+}
 
 const loadProfile = async () => {
   pageLoading.value = true
@@ -95,6 +125,7 @@ const loadProfile = async () => {
     const res = await get('/user/auth/tutor-profile/view')
     if (res.code === 200 && res.data) {
       profile.value = res.data
+      form.value.avatar = res.data.avatar || ''
       form.value.realName = res.data.realName || ''
       form.value.gender = res.data.gender || 1
       form.value.tutorType = res.data.tutorType || null
