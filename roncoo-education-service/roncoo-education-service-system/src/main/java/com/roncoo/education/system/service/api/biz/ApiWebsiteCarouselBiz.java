@@ -9,8 +9,6 @@ import com.roncoo.education.system.dao.impl.mapper.entity.WebsiteCarousel;
 import com.roncoo.education.system.dao.impl.mapper.entity.WebsiteCarouselExample;
 import com.roncoo.education.system.service.api.resp.ApiWebsiteCarouselResp;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
@@ -24,13 +22,11 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = {"system"})
 public class ApiWebsiteCarouselBiz extends BaseBiz {
 
     @NotNull
     private final WebsiteCarouselDao dao;
 
-    @Cacheable
     public Result<List<ApiWebsiteCarouselResp>> list() {
         WebsiteCarouselExample example = new WebsiteCarouselExample();
         example.createCriteria().andStatusIdEqualTo(StatusIdEnum.YES.getCode());

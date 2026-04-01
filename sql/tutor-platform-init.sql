@@ -367,3 +367,19 @@ CREATE TABLE `dict_tutor_tag` (
 ALTER TABLE `users` ADD COLUMN `user_type` tinyint NOT NULL DEFAULT 0 COMMENT '用户类型 0未设置 1教员 2学员' AFTER `register_source`;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- 文章管理表
+DROP TABLE IF EXISTS `website_article`;
+CREATE TABLE `website_article` (
+  `id` bigint NOT NULL COMMENT '主键',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `status_id` tinyint NOT NULL DEFAULT 1 COMMENT '状态(1:正常,0:禁用)',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
+  `article_title` varchar(200) NOT NULL DEFAULT '' COMMENT '文章标题',
+  `article_cover` varchar(500) NOT NULL DEFAULT '' COMMENT '封面图片',
+  `article_summary` varchar(500) NOT NULL DEFAULT '' COMMENT '文章摘要',
+  `article_content` text COMMENT '文章内容',
+  `view_count` int NOT NULL DEFAULT 0 COMMENT '浏览次数',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章管理';
