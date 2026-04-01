@@ -63,4 +63,10 @@ public class TutorSearchReq implements Serializable {
 
     @ApiModelProperty(value = "排序方向(asc,desc)")
     private String sortOrder;
+
+    @ApiModelProperty(value = "学历(1:高中,2:大专,3:本科,4:硕士,5:博士)")
+    private Integer degree;
+
+    @ApiModelProperty(value = "科目名称(模糊匹配)")
+    private String subject;
 }

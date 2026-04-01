@@ -40,10 +40,34 @@ public class ApiTutorBiz extends BaseBiz {
         if (req.getCityId() != null) {
             c.andCityIdEqualTo(req.getCityId());
         }
+        if (req.getDistrictId() != null) {
+            c.andDistrictIdEqualTo(req.getDistrictId());
+        }
+        if (req.getDegree() != null) {
+            c.andDegreeEqualTo(req.getDegree());
+        }
+        if (req.getPriceMin() != null) {
+            c.andPriceMaxGreaterThan(req.getPriceMin().subtract(java.math.BigDecimal.ONE));
+        }
+        if (req.getPriceMax() != null) {
+            c.andPriceMinLessThan(req.getPriceMax().add(java.math.BigDecimal.ONE));
+        }
+        if (StringUtils.hasText(req.getSubject())) {
+            c.andSubjectsLike(PageUtil.like(req.getSubject()));
+        }
         if (StringUtils.hasText(req.getKeyword())) {
             c.andRealNameLike(PageUtil.like(req.getKeyword()));
         }
-        example.setOrderByClause("sort asc, id desc");
+        // 动态排序
+        String orderBy = "sort asc, id desc";
+        if (StringUtils.hasText(req.getSortField())) {
+            String field = req.getSortField();
+            if ("priceMin".equals(field) || "viewCount".equals(field) || "successCount".equals(field)) {
+                String dir = "desc".equalsIgnoreCase(req.getSortOrder()) ? "desc" : "asc";
+                orderBy = camelToSnake(field) + " " + dir + ", id desc";
+            }
+        }
+        example.setOrderByClause(orderBy);
         Page<TutorProfile> page = tutorProfileDao.page(req.getPageCurrent(), req.getPageSize(), example);
         return Result.success(PageUtil.transform(page, TutorSearchResp.class));
     }
@@ -64,5 +88,9 @@ public class ApiTutorBiz extends BaseBiz {
         tutorProfileDao.updateById(update);
         // 直接返回 entity，确保 userId 等字段不丢失
         return Result.success(profile);
+    }
+
+    private static String camelToSnake(String camel) {
+        return camel.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
     }
 }
