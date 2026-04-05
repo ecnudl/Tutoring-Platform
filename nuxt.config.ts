@@ -8,11 +8,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: '家教在线平台',
+      title: '51家教网',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: '家教在线平台 - 找家教、做家教、一站式服务' }
+        { name: 'description', content: '51家教网 - 找家教、做家教、一站式服务平台' }
       ]
     }
   }

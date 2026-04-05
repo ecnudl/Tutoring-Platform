@@ -1,0 +1,608 @@
+<template>
+  <div class="home-page">
+    <Head>
+      <Title>51家教网 - 找家教上门辅导一对一</Title>
+      <Meta name="description" content="51家教网,提供上门家教一对一辅导服务,大学生家教、专职教员、在职教师,覆盖小学初中高中全科辅导。" />
+    </Head>
+
+    <!-- 主搜索区域 -->
+    <div class="hero-section">
+      <div class="container">
+        <h1 class="hero-title">找家教，上51家教网</h1>
+        <p class="hero-subtitle">专业的一对一上门家教服务平台</p>
+
+        <div class="search-box">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索科目、年级或教员编号"
+            size="large"
+            clearable
+            @keyup.enter="doSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+            <template #append>
+              <el-button type="primary" @click="doSearch">搜索教员</el-button>
+            </template>
+          </el-input>
+        </div>
+
+        <div class="quick-links">
+          <NuxtLink to="/jy?tutorType=1" class="quick-link-item">大学生家教</NuxtLink>
+          <NuxtLink to="/jy?tutorType=3" class="quick-link-item">在职教师</NuxtLink>
+          <NuxtLink to="/qjj" class="quick-link-item">发布需求</NuxtLink>
+          <NuxtLink to="/zf" class="quick-link-item">价格参考</NuxtLink>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类导航 -->
+    <div class="container category-nav-section">
+      <div class="category-nav-grid">
+        <!-- 区域 -->
+        <div class="category-nav-item">
+          <h3 class="nav-title">按区域</h3>
+          <div class="nav-links">
+            <NuxtLink v-for="d in districts.slice(0, 8)" :key="d.id" :to="'/jy?district=' + d.id">{{ d.name }}</NuxtLink>
+          </div>
+        </div>
+
+        <!-- 科目 -->
+        <div class="category-nav-item">
+          <h3 class="nav-title">按科目</h3>
+          <div class="nav-links">
+            <NuxtLink v-for="s in hotSubjects.slice(0, 8)" :key="s.id" :to="'/jy?subject=' + s.id">{{ s.name }}</NuxtLink>
+          </div>
+        </div>
+
+        <!-- 高校 -->
+        <div class="category-nav-item">
+          <h3 class="nav-title">按高校</h3>
+          <div class="nav-links">
+            <NuxtLink v-for="u in universities.slice(0, 8)" :key="u.id" :to="'/jy?university=' + u.id">{{ u.name }}</NuxtLink>
+          </div>
+        </div>
+
+        <!-- 教员类型 -->
+        <div class="category-nav-item">
+          <h3 class="nav-title">按类型</h3>
+          <div class="nav-links">
+            <NuxtLink to="/jy?tutorType=1">大学生</NuxtLink>
+            <NuxtLink to="/jy?tutorType=2">专职教员</NuxtLink>
+            <NuxtLink to="/jy?tutorType=3">在职教师</NuxtLink>
+            <NuxtLink to="/jy?tutorType=4">海归外教</NuxtLink>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最新教员 -->
+    <div class="container section-container">
+      <div class="section-header">
+        <h2 class="section-title">最新教员</h2>
+        <NuxtLink to="/jy" class="more-link">查看更多 →</NuxtLink>
+      </div>
+
+      <div v-if="tutors.length" class="tutor-list">
+        <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo || t.id)" class="tutor-item">
+          <el-avatar :size="64" :src="t.avatar || '/placeholder/avatar.png'" />
+          <div class="tutor-content">
+            <div class="tutor-header">
+              <span class="tutor-name">{{ t.surname || (t.realName ? t.realName.charAt(0) + '老师' : '教员') }}</span>
+              <span class="tutor-id">编号: T{{ t.displayNo || t.id }}</span>
+            </div>
+            <div class="tutor-info-line">
+              <span>{{ t.university || '未填写' }}</span>
+              <span v-if="t.major">· {{ t.major }}</span>
+            </div>
+            <div class="tutor-tags">
+              <el-tag size="small" v-for="sub in (t.subjects || '').split(',').slice(0, 3)" :key="sub" v-if="sub">{{ sub }}</el-tag>
+            </div>
+            <div class="tutor-price" v-if="t.priceMin">{{ t.priceMin }}-{{ t.priceMax }}元/小时</div>
+          </div>
+        </NuxtLink>
+      </div>
+      <el-empty v-else description="暂无教员数据" />
+    </div>
+
+    <!-- 最新需求 -->
+    <div class="container section-container">
+      <div class="section-header">
+        <h2 class="section-title">最新学员需求</h2>
+        <NuxtLink to="/xy" class="more-link">查看更多 →</NuxtLink>
+      </div>
+
+      <div v-if="requirements.length" class="requirement-list">
+        <NuxtLink v-for="r in requirements" :key="r.id" :to="'/xy/a' + r.id" class="requirement-item">
+          <div class="req-header">
+            <span class="req-title">{{ r.title || '家教需求' }}</span>
+            <span class="req-time">{{ formatDate(r.gmtCreate) }}</span>
+          </div>
+          <div class="req-info">
+            <span v-if="r.subject">科目: {{ r.subject }}</span>
+            <span v-if="r.grade">年级: {{ r.grade }}</span>
+            <span v-if="r.district">区域: {{ r.district }}</span>
+          </div>
+          <div class="req-budget" v-if="r.budgetMin">预算: {{ r.budgetMin }}-{{ r.budgetMax }}元/小时</div>
+        </NuxtLink>
+      </div>
+      <el-empty v-else description="暂无需求数据" />
+    </div>
+
+    <!-- 平台优势 -->
+    <div class="advantage-section">
+      <div class="container">
+        <h2 class="section-title" style="text-align:center;margin-bottom:32px">为什么选择51家教网</h2>
+        <div class="advantage-grid">
+          <div class="advantage-item">
+            <div class="advantage-icon">✓</div>
+            <h3>严格筛选</h3>
+            <p>所有教员经过身份认证、学历审核</p>
+          </div>
+          <div class="advantage-item">
+            <div class="advantage-icon">⚡</div>
+            <h3>快速匹配</h3>
+            <p>24小时内推荐合适教员</p>
+          </div>
+          <div class="advantage-item">
+            <div class="advantage-icon">💰</div>
+            <h3>价格透明</h3>
+            <p>明码标价，无隐藏费用</p>
+          </div>
+          <div class="advantage-item">
+            <div class="advantage-icon">🛡️</div>
+            <h3>服务保障</h3>
+            <p>7天内不满意可免费更换</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useCityStore } from '~/stores/city'
+import { Search } from '@element-plus/icons-vue'
+
+const cityStore = useCityStore()
+const { get, post } = useApi()
+const router = useRouter()
+
+const searchKeyword = ref('')
+const tutors = ref([])
+const requirements = ref([])
+const universities = ref([])
+
+const districts = [
+        <div class="footer-bottom">
+          <p>&copy; 2024 51家教网 版权所有</p>
+          <p>沪ICP备XXXXXXXX号-1</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useCityStore } from '~/stores/city'
+import { Search } from '@element-plus/icons-vue'
+
+const cityStore = useCityStore()
+const { get, post } = useApi()
+const router = useRouter()
+
+const searchKeyword = ref('')
+const tutors = ref([])
+const requirements = ref([])
+const universities = ref([])
+
+const districts = [
+  { id: 1, name: '浦东新区' }, { id: 2, name: '徐汇区' }, { id: 3, name: '长宁区' }, { id: 4, name: '静安区' },
+  { id: 5, name: '普陀区' }, { id: 6, name: '虹口区' }, { id: 7, name: '杨浦区' }, { id: 8, name: '闵行区' },
+  { id: 9, name: '宝山区' }, { id: 10, name: '嘉定区' }, { id: 11, name: '金山区' }, { id: 12, name: '松江区' },
+  { id: 13, name: '青浦区' }, { id: 14, name: '奉贤区' }, { id: 15, name: '崇明区' }, { id: 16, name: '黄浦区' }
+]
+
+const hotSubjects = [
+  { id: 1, name: '数学' }, { id: 2, name: '英语' }, { id: 3, name: '语文' }, { id: 4, name: '物理' },
+  { id: 5, name: '化学' }, { id: 6, name: '钢琴' }, { id: 7, name: '美术' }, { id: 8, name: '编程' }
+]
+
+const doSearch = () => {
+  if (searchKeyword.value.trim()) {
+    router.push('/jy?keyword=' + encodeURIComponent(searchKeyword.value))
+  }
+}
+
+const formatDate = (date) => {
+  if (!date) return ''
+  const d = new Date(date)
+  return `${d.getMonth()+1}月${d.getDate()}日`
+}
+
+onMounted(async () => {
+  cityStore.loadFromStorage()
+  try {
+    const [tRes, rRes] = await Promise.all([
+      post('/user/api/tutor/search', { pageCurrent: 1, pageSize: 8 }),
+      post('/user/api/requirement/search', { pageCurrent: 1, pageSize: 6 })
+    ])
+    if (tRes.code === 200 && tRes.data) tutors.value = tRes.data.list || []
+    if (rRes.code === 200 && rRes.data) requirements.value = rRes.data.list || []
+  } catch (e) {
+    console.error(e)
+  }
+})
+</script>
+
+<style scoped>
+.home-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 60px 0;
+  color: #fff;
+}
+
+.hero-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  text-align: center;
+  opacity: 0.9;
+  margin-bottom: 32px;
+}
+
+.search-box {
+  max-width: 600px;
+  margin: 0 auto 24px;
+}
+
+.search-box :deep(.el-input__wrapper) {
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.quick-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.quick-link-item {
+  color: #fff;
+  font-size: 14px;
+  padding: 6px 16px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.quick-link-item:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+}
+
+/* Category Navigation */
+.category-nav-section {
+  margin-top: -30px;
+  margin-bottom: 32px;
+}
+
+.category-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.category-nav-item {
+  border-right: 1px solid #eee;
+  padding-right: 16px;
+}
+
+.category-nav-item:last-child {
+  border-right: none;
+}
+
+.nav-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-links a {
+  color: #666;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #667eea;
+}
+
+/* Section Container */
+.section-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.more-link {
+  color: #667eea;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.more-link:hover {
+  color: #764ba2;
+}
+
+/* Tutor List */
+.tutor-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tutor-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.tutor-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+  transform: translateY(-2px);
+}
+
+.tutor-content {
+  flex: 1;
+}
+
+.tutor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tutor-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.tutor-id {
+  font-size: 12px;
+  color: #999;
+}
+
+.tutor-info-line {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.tutor-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.tutor-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f56c6c;
+}
+
+/* Requirement List */
+.requirement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.requirement-item {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.requirement-item:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.req-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.req-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.req-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.req-info {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.req-budget {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f56c6c;
+}
+
+/* Advantage Section */
+.advantage-section {
+  background: #fff;
+  padding: 48px 0;
+  margin-top: 32px;
+}
+
+.advantage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.advantage-item {
+  text-align: center;
+  padding: 24px;
+}
+
+.advantage-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #667eea;
+}
+
+.advantage-item h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.advantage-item p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .category-nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tutor-list {
+    grid-template-columns: 1fr;
+  }
+
+  .advantage-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .category-nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .advantage-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>; }
+.section-title { font-size: 20px; font-weight: 600; }
+.more-link { color: #409eff; font-size: 14px; }
+.tutor-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.tutor-card { background: #fff; border-radius: 8px; padding: 16px; text-align: center; transition: box-shadow 0.3s; }
+.tutor-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.tutor-info { margin-top: 8px; }
+.tutor-name { font-weight: 600; font-size: 14px; }
+.tutor-uni { font-size: 12px; color: #999; margin-top: 2px; }
+.tutor-subjects { margin-top: 4px; }
+.tutor-price { color: #e6a23c; font-size: 13px; font-weight: 600; margin-top: 4px; }
+
+/* 最新需求 */
+.req-list { background: #fff; border-radius: 8px; }
+.req-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f5f5f5; }
+.req-item:last-child { border-bottom: none; }
+.req-item:hover { background: #f9fafc; }
+.req-title { font-size: 14px; font-weight: 500; }
+.req-meta { display: flex; gap: 16px; font-size: 13px; color: #999; }
+
+/* 页脚 */
+.home-footer { background: #2c3e50; color: #ccc; padding: 40px 0 20px; margin-top: 40px; }
+.footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+.footer-col h4 { color: #fff; font-size: 15px; margin-bottom: 12px; }
+.footer-col p { font-size: 13px; margin-bottom: 4px; }
+.footer-tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.footer-tag-list a { font-size: 13px; color: #aaa; }
+.footer-tag-list a:hover { color: #409eff; }
+.footer-bottom { text-align: center; padding-top: 16px; border-top: 1px solid #3d5166; font-size: 12px; color: #888; }
+
+@media (max-width: 768px) {
+  .quick-actions { grid-template-columns: 1fr; }
+  .tutor-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-links { grid-template-columns: repeat(2, 1fr); }
+  .banner-text h2 { font-size: 20px; }
+  .banner-text p { font-size: 14px; }
+}
+@media (max-width: 480px) {
+  .tutor-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-links { grid-template-columns: 1fr; }
+  .req-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+</style>
