@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -72,4 +73,13 @@ public class TutorSearchResp implements Serializable {
 
     @ApiModelProperty(value = "自我介绍(简短)")
     private String selfIntroduction;
+
+    @ApiModelProperty(value = "最近登录时间")
+    private LocalDateTime lastLoginTime;
+
+    @ApiModelProperty(value = "登录次数")
+    private Integer loginCount;
+
+    @ApiModelProperty(value = "展示编号")
+    private String displayNo;
 }

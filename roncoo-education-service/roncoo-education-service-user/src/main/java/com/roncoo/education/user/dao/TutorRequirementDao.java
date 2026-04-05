@@ -20,4 +20,6 @@ public interface TutorRequirementDao {
     List<TutorRequirement> listByUserId(Long userId);
 
     List<TutorRequirement> listByReqStatus(Integer reqStatus);
+
+    TutorRequirement getByDisplayNo(String displayNo);
 }

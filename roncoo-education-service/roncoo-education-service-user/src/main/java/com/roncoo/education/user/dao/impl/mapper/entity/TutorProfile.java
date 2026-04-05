@@ -76,6 +76,28 @@ public class TutorProfile implements Serializable {
 
     private Integer successCount;
 
+    private String displayNo;
+
+    private Integer teachingMethod;
+
+    private Long universityId;
+
+    private String highSchool;
+
+    private String hometownProvince;
+
+    private String certificatesDesc;
+
+    private String salaryRemark;
+
+    private Integer isStar;
+
+    private Integer isVerified;
+
+    private Integer loginCount;
+
+    private LocalDateTime lastLoginTime;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -356,6 +378,94 @@ public class TutorProfile implements Serializable {
 
     public void setSuccessCount(Integer successCount) {
         this.successCount = successCount;
+    }
+
+    public String getDisplayNo() {
+        return displayNo;
+    }
+
+    public void setDisplayNo(String displayNo) {
+        this.displayNo = displayNo == null ? null : displayNo.trim();
+    }
+
+    public Integer getTeachingMethod() {
+        return teachingMethod;
+    }
+
+    public void setTeachingMethod(Integer teachingMethod) {
+        this.teachingMethod = teachingMethod;
+    }
+
+    public Long getUniversityId() {
+        return universityId;
+    }
+
+    public void setUniversityId(Long universityId) {
+        this.universityId = universityId;
+    }
+
+    public String getHighSchool() {
+        return highSchool;
+    }
+
+    public void setHighSchool(String highSchool) {
+        this.highSchool = highSchool == null ? null : highSchool.trim();
+    }
+
+    public String getHometownProvince() {
+        return hometownProvince;
+    }
+
+    public void setHometownProvince(String hometownProvince) {
+        this.hometownProvince = hometownProvince == null ? null : hometownProvince.trim();
+    }
+
+    public String getCertificatesDesc() {
+        return certificatesDesc;
+    }
+
+    public void setCertificatesDesc(String certificatesDesc) {
+        this.certificatesDesc = certificatesDesc == null ? null : certificatesDesc.trim();
+    }
+
+    public String getSalaryRemark() {
+        return salaryRemark;
+    }
+
+    public void setSalaryRemark(String salaryRemark) {
+        this.salaryRemark = salaryRemark == null ? null : salaryRemark.trim();
+    }
+
+    public Integer getIsStar() {
+        return isStar;
+    }
+
+    public void setIsStar(Integer isStar) {
+        this.isStar = isStar;
+    }
+
+    public Integer getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Integer isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
+    }
+
+    public LocalDateTime getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(LocalDateTime lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
     }
 
     @Override

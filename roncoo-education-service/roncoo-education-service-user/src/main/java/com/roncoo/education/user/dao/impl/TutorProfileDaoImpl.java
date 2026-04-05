@@ -76,4 +76,27 @@ public class TutorProfileDaoImpl extends AbstractBaseJdbc implements TutorProfil
         criteria.andAuditStatusEqualTo(auditStatus);
         return this.tutorProfileMapper.selectByExample(example);
     }
+
+    @Override
+    public TutorProfile getByDisplayNo(String displayNo) {
+        TutorProfileExample example = new TutorProfileExample();
+        TutorProfileExample.Criteria criteria = example.createCriteria();
+        criteria.andDisplayNoEqualTo(displayNo);
+        List<TutorProfile> list = this.tutorProfileMapper.selectByExample(example);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    @Override
+    public List<TutorProfile> listByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        TutorProfileExample example = new TutorProfileExample();
+        TutorProfileExample.Criteria criteria = example.createCriteria();
+        criteria.andIdIn(ids);
+        return this.tutorProfileMapper.selectByExample(example);
+    }
 }

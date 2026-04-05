@@ -58,7 +58,13 @@ public class TutorSearchReq implements Serializable {
     @ApiModelProperty(value = "性别(1:男,2:女)")
     private Integer gender;
 
-    @ApiModelProperty(value = "排序字段(priceMin,viewCount,successCount)")
+    @ApiModelProperty(value = "高校ID")
+    private Long universityId;
+
+    @ApiModelProperty(value = "授课方式(1:教员上门,2:学员上门,3:线上授课)")
+    private Integer teachingMethod;
+
+    @ApiModelProperty(value = "排序字段(priceMin,viewCount,successCount,lastLoginTime,loginCount)")
     private String sortField;
 
     @ApiModelProperty(value = "排序方向(asc,desc)")

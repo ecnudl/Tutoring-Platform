@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roncoo.education.user.dao.impl.mapper.PriceReferenceMapper">
+    <resultMap id="BaseResultMap" type="com.roncoo.education.user.dao.impl.mapper.entity.PriceReference">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="status_id" jdbcType="TINYINT" property="statusId"/>
+        <result column="city_id" jdbcType="BIGINT" property="cityId"/>
+        <result column="tutor_type" jdbcType="TINYINT" property="tutorType"/>
+        <result column="grade_level" jdbcType="TINYINT" property="gradeLevel"/>
+        <result column="price_min" jdbcType="DECIMAL" property="priceMin"/>
+        <result column="price_max" jdbcType="DECIMAL" property="priceMax"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">and ${criterion.condition}</when>
+                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+                                <when test="criterion.listValue">and ${criterion.condition}<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach></when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">and ${criterion.condition}</when>
+                                <when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+                                <when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+                                <when test="criterion.listValue">and ${criterion.condition}<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach></when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, city_id, tutor_type, grade_level, price_min, price_max, remark, sort</sql>
+
+    <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReferenceExample" resultMap="BaseResultMap">
+        select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from price_reference
+        <if test="_parameter != null"><include refid="Example_Where_Clause"/></if>
+        <if test="orderByClause != null">order by ${orderByClause}</if>
+        <if test="limitStart >= 0">limit ${limitStart}, ${pageSize}</if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from price_reference where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from price_reference where id = #{id,jdbcType=BIGINT}</delete>
+    <delete id="deleteByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReferenceExample">delete from price_reference <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></delete>
+    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReference">insert into price_reference (id, gmt_create, gmt_modified, status_id, city_id, tutor_type, grade_level, price_min, price_max, remark, sort) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{cityId,jdbcType=BIGINT}, #{tutorType,jdbcType=TINYINT}, #{gradeLevel,jdbcType=TINYINT}, #{priceMin,jdbcType=DECIMAL}, #{priceMax,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER})</insert>
+    <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReference">
+        insert into price_reference
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="gmtCreate != null">gmt_create,</if>
+            <if test="gmtModified != null">gmt_modified,</if>
+            <if test="statusId != null">status_id,</if>
+            <if test="cityId != null">city_id,</if>
+            <if test="tutorType != null">tutor_type,</if>
+            <if test="gradeLevel != null">grade_level,</if>
+            <if test="priceMin != null">price_min,</if>
+            <if test="priceMax != null">price_max,</if>
+            <if test="remark != null">remark,</if>
+            <if test="sort != null">sort,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=BIGINT},</if>
+            <if test="gmtCreate != null">#{gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="gmtModified != null">#{gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="statusId != null">#{statusId,jdbcType=TINYINT},</if>
+            <if test="cityId != null">#{cityId,jdbcType=BIGINT},</if>
+            <if test="tutorType != null">#{tutorType,jdbcType=TINYINT},</if>
+            <if test="gradeLevel != null">#{gradeLevel,jdbcType=TINYINT},</if>
+            <if test="priceMin != null">#{priceMin,jdbcType=DECIMAL},</if>
+            <if test="priceMax != null">#{priceMax,jdbcType=DECIMAL},</if>
+            <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+            <if test="sort != null">#{sort,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReferenceExample" resultType="java.lang.Integer">select count(*) from price_reference <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update price_reference <set>
+            <if test="record.gmtCreate != null">gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="record.gmtModified != null">gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="record.statusId != null">status_id = #{record.statusId,jdbcType=TINYINT},</if>
+            <if test="record.cityId != null">city_id = #{record.cityId,jdbcType=BIGINT},</if>
+            <if test="record.tutorType != null">tutor_type = #{record.tutorType,jdbcType=TINYINT},</if>
+            <if test="record.gradeLevel != null">grade_level = #{record.gradeLevel,jdbcType=TINYINT},</if>
+            <if test="record.priceMin != null">price_min = #{record.priceMin,jdbcType=DECIMAL},</if>
+            <if test="record.priceMax != null">price_max = #{record.priceMax,jdbcType=DECIMAL},</if>
+            <if test="record.remark != null">remark = #{record.remark,jdbcType=VARCHAR},</if>
+            <if test="record.sort != null">sort = #{record.sort,jdbcType=INTEGER},</if>
+        </set>
+        <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReference">
+        update price_reference <set>
+            <if test="gmtCreate != null">gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},</if>
+            <if test="gmtModified != null">gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},</if>
+            <if test="statusId != null">status_id = #{statusId,jdbcType=TINYINT},</if>
+            <if test="cityId != null">city_id = #{cityId,jdbcType=BIGINT},</if>
+            <if test="tutorType != null">tutor_type = #{tutorType,jdbcType=TINYINT},</if>
+            <if test="gradeLevel != null">grade_level = #{gradeLevel,jdbcType=TINYINT},</if>
+            <if test="priceMin != null">price_min = #{priceMin,jdbcType=DECIMAL},</if>
+            <if test="priceMax != null">price_max = #{priceMax,jdbcType=DECIMAL},</if>
+            <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>
+            <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.PriceReference">
+        update price_reference set
+            gmt_create = #{gmtCreate,jdbcType=TIMESTAMP}
+            gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+            status_id = #{statusId,jdbcType=TINYINT}
+            city_id = #{cityId,jdbcType=BIGINT}
+            tutor_type = #{tutorType,jdbcType=TINYINT}
+            grade_level = #{gradeLevel,jdbcType=TINYINT}
+            price_min = #{priceMin,jdbcType=DECIMAL}
+            price_max = #{priceMax,jdbcType=DECIMAL}
+            remark = #{remark,jdbcType=VARCHAR}
+            sort = #{sort,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

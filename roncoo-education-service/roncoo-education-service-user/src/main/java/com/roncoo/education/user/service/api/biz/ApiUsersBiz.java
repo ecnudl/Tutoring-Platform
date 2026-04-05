@@ -232,7 +232,7 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
-     * 简化注册（开发环境，不依赖RSA和短信验证码）
+     * 简化注册（不依赖RSA，需短信验证码）
      */
     @Transactional(rollbackFor = Exception.class)
     public Result<UsersLoginResp> registerSimple(SimpleRegisterReq req) {
@@ -243,6 +243,20 @@ public class ApiUsersBiz extends BaseBiz {
         if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
             return Result.error("手机号格式不正确");
         }
+        // 短信验证码校验
+        if (!StringUtils.hasText(req.getCode())) {
+            return Result.error("请输入短信验证码");
+        }
+        String redisCode = cacheRedis.get(Constants.RedisPre.CODE + req.getMobile());
+        if (!StringUtils.hasText(redisCode)) {
+            return Result.error("验证码已过期，请重新获取");
+        }
+        if (!req.getCode().equals(redisCode)) {
+            return Result.error("验证码不正确");
+        }
+        // 删除验证码缓存
+        cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
+
         // 密码校验
         if (!StringUtils.hasText(req.getPassword())) {
             return Result.error("密码不能为空");
@@ -299,6 +313,38 @@ public class ApiUsersBiz extends BaseBiz {
         UsersLog usersLog = new UsersLog();
         usersLog.setLoginIp("127.0.0.1");
         return Result.success(login(user.getId(), user.getMobile(), LoginStatusEnum.SUCCESS, usersLog));
+    }
+
+    /**
+     * 短信验证码登录（免密）
+     */
+    public Result<UsersLoginResp> loginByMobileOnly(String mobile) {
+        Users user = usersDao.getByMobile(mobile);
+        if (user == null) {
+            return Result.error("该手机号未注册");
+        }
+        if (user.getStatusId() != null && user.getStatusId() != 1) {
+            return Result.error("账号状态异常，请联系管理员");
+        }
+        UsersLog usersLog = new UsersLog();
+        usersLog.setLoginIp("127.0.0.1");
+        return Result.success(login(user.getId(), user.getMobile(), LoginStatusEnum.SUCCESS, usersLog));
+    }
+
+    /**
+     * 通过手机号重置密码（短信验证码已在上层校验）
+     */
+    public Result<String> resetPasswordByMobile(String mobile, String newPassword) {
+        Users user = usersDao.getByMobile(mobile);
+        if (user == null) {
+            return Result.error("该手机号未注册");
+        }
+        Users record = new Users();
+        record.setId(user.getId());
+        record.setMobileSalt(IdUtil.simpleUUID());
+        record.setMobilePsw(DigestUtil.sha1Hex(record.getMobileSalt() + newPassword));
+        usersDao.updateById(record);
+        return Result.success("密码重置成功");
     }
 
     public Result<String> sendCode(SendCodeReq req) {

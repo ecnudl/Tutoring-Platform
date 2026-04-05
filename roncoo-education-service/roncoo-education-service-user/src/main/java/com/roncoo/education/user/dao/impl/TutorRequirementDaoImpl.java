@@ -72,4 +72,16 @@ public class TutorRequirementDaoImpl extends AbstractBaseJdbc implements TutorRe
         criteria.andReqStatusEqualTo(reqStatus);
         return this.tutorRequirementMapper.selectByExample(example);
     }
+
+    @Override
+    public TutorRequirement getByDisplayNo(String displayNo) {
+        TutorRequirementExample example = new TutorRequirementExample();
+        TutorRequirementExample.Criteria criteria = example.createCriteria();
+        criteria.andDisplayNoEqualTo(displayNo);
+        List<TutorRequirement> list = this.tutorRequirementMapper.selectByExample(example);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 }

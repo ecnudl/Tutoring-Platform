@@ -1556,6 +1556,36 @@ public class TutorProfileExample {
             addCriterion("success_count not in", values, "successCount");
             return (Criteria) this;
         }
+
+        public Criteria andDisplayNoIsNull() {
+            addCriterion("display_no is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayNoIsNotNull() {
+            addCriterion("display_no is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayNoEqualTo(String value) {
+            addCriterion("display_no =", value, "displayNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayNoNotEqualTo(String value) {
+            addCriterion("display_no <>", value, "displayNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayNoLike(String value) {
+            addCriterion("display_no like", value, "displayNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayNoIn(List<String> values) {
+            addCriterion("display_no in", values, "displayNo");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

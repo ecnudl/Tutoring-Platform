@@ -18,4 +18,8 @@ public interface DictSubjectDao {
     Page<DictSubject> page(int pageCurrent, int pageSize, DictSubjectExample example);
 
     List<DictSubject> listAll();
+
+    List<DictSubject> listByCategoryId(Long categoryId);
+
+    List<DictSubject> listHot();
 }

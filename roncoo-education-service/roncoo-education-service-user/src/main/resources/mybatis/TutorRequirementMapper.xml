@@ -10,7 +10,6 @@
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="subject_ids" jdbcType="VARCHAR" property="subjectIds"/>
         <result column="grade_id" jdbcType="BIGINT" property="gradeId"/>
-        <result column="province_id" jdbcType="BIGINT" property="provinceId"/>
         <result column="city_id" jdbcType="BIGINT" property="cityId"/>
         <result column="district_id" jdbcType="BIGINT" property="districtId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
@@ -23,7 +22,10 @@
         <result column="req_status" jdbcType="TINYINT" property="reqStatus"/>
         <result column="audit_remark" jdbcType="VARCHAR" property="auditRemark"/>
         <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
-        <result column="application_count" jdbcType="INTEGER" property="applicationCount"/>    </resultMap>
+        <result column="application_count" jdbcType="INTEGER" property="applicationCount"/>
+        <result column="contact_wechat" jdbcType="VARCHAR" property="contactWechat"/>
+        <result column="teaching_method" jdbcType="TINYINT" property="teachingMethod"/>
+        <result column="display_no" jdbcType="VARCHAR" property="displayNo"/>    </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
         <result column="schedule" jdbcType="LONGVARCHAR" property="schedule"/>
         <result column="requirement_detail" jdbcType="LONGVARCHAR" property="requirementDetail"/>
@@ -64,7 +66,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id, province_id, city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no</sql>
     <sql id="Blob_Column_List">schedule, requirement_detail</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_requirement
@@ -82,7 +84,7 @@
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from tutor_requirement where id = #{id,jdbcType=BIGINT}</delete>
     <delete id="deleteByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample">delete from tutor_requirement <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></delete>
-    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">insert into tutor_requirement (id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id, province_id, city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, schedule, requirement_detail) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{subjectIds,jdbcType=VARCHAR}, #{gradeId,jdbcType=BIGINT}, #{provinceId,jdbcType=BIGINT}, #{cityId,jdbcType=BIGINT}, #{districtId,jdbcType=BIGINT}, #{address,jdbcType=VARCHAR}, #{tutorGender,jdbcType=TINYINT}, #{tutorTypePref,jdbcType=VARCHAR}, #{budgetMin,jdbcType=DECIMAL}, #{budgetMax,jdbcType=DECIMAL}, #{contactName,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, #{reqStatus,jdbcType=TINYINT}, #{auditRemark,jdbcType=VARCHAR}, #{viewCount,jdbcType=INTEGER}, #{applicationCount,jdbcType=INTEGER}, #{schedule,jdbcType=LONGVARCHAR}, #{requirementDetail,jdbcType=LONGVARCHAR})</insert>
+    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">insert into tutor_requirement (id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, schedule, requirement_detail) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{subjectIds,jdbcType=VARCHAR}, #{gradeId,jdbcType=BIGINT}, #{cityId,jdbcType=BIGINT}, #{districtId,jdbcType=BIGINT}, #{address,jdbcType=VARCHAR}, #{tutorGender,jdbcType=TINYINT}, #{tutorTypePref,jdbcType=VARCHAR}, #{budgetMin,jdbcType=DECIMAL}, #{budgetMax,jdbcType=DECIMAL}, #{contactName,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, #{reqStatus,jdbcType=TINYINT}, #{auditRemark,jdbcType=VARCHAR}, #{viewCount,jdbcType=INTEGER}, #{applicationCount,jdbcType=INTEGER}, #{contactWechat,jdbcType=VARCHAR}, #{teachingMethod,jdbcType=TINYINT}, #{displayNo,jdbcType=VARCHAR}, #{schedule,jdbcType=LONGVARCHAR}, #{requirementDetail,jdbcType=LONGVARCHAR})</insert>
     <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
         insert into tutor_requirement
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -94,7 +96,6 @@
             <if test="title != null">title,</if>
             <if test="subjectIds != null">subject_ids,</if>
             <if test="gradeId != null">grade_id,</if>
-            <if test="provinceId != null">province_id,</if>
             <if test="cityId != null">city_id,</if>
             <if test="districtId != null">district_id,</if>
             <if test="address != null">address,</if>
@@ -109,7 +110,10 @@
             <if test="viewCount != null">view_count,</if>
             <if test="applicationCount != null">application_count,</if>
             <if test="schedule != null">schedule,</if>
-            <if test="requirementDetail != null">requirement_detail,</if>        </trim>
+            <if test="requirementDetail != null">requirement_detail,</if>
+            <if test="contactWechat != null">contact_wechat,</if>
+            <if test="teachingMethod != null">teaching_method,</if>
+            <if test="displayNo != null">display_no,</if>        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
             <if test="gmtCreate != null">#{gmtCreate,jdbcType=TIMESTAMP},</if>
@@ -119,7 +123,6 @@
             <if test="title != null">#{title,jdbcType=VARCHAR},</if>
             <if test="subjectIds != null">#{subjectIds,jdbcType=VARCHAR},</if>
             <if test="gradeId != null">#{gradeId,jdbcType=BIGINT},</if>
-            <if test="provinceId != null">#{provinceId,jdbcType=BIGINT},</if>
             <if test="cityId != null">#{cityId,jdbcType=BIGINT},</if>
             <if test="districtId != null">#{districtId,jdbcType=BIGINT},</if>
             <if test="address != null">#{address,jdbcType=VARCHAR},</if>
@@ -134,7 +137,10 @@
             <if test="viewCount != null">#{viewCount,jdbcType=INTEGER},</if>
             <if test="applicationCount != null">#{applicationCount,jdbcType=INTEGER},</if>
             <if test="schedule != null">#{schedule,jdbcType=LONGVARCHAR},</if>
-            <if test="requirementDetail != null">#{requirementDetail,jdbcType=LONGVARCHAR},</if>        </trim>
+            <if test="requirementDetail != null">#{requirementDetail,jdbcType=LONGVARCHAR},</if>
+            <if test="contactWechat != null">#{contactWechat,jdbcType=VARCHAR},</if>
+            <if test="teachingMethod != null">#{teachingMethod,jdbcType=TINYINT},</if>
+            <if test="displayNo != null">#{displayNo,jdbcType=VARCHAR},</if>        </trim>
     </insert>
     <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultType="java.lang.Integer">select count(*) from tutor_requirement <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
     <update id="updateByExampleSelective" parameterType="map">
@@ -146,8 +152,6 @@
             <if test="record.title != null">title = #{record.title,jdbcType=VARCHAR},</if>
             <if test="record.subjectIds != null">subject_ids = #{record.subjectIds,jdbcType=VARCHAR},</if>
             <if test="record.gradeId != null">grade_id = #{record.gradeId,jdbcType=BIGINT},</if>
-            <if test="record.provinceId != null">province_id = #{record.provinceId,jdbcType=BIGINT},</if>
-            <if test="record.cityId != null">city_id = #{record.cityId,jdbcType=BIGINT},</if>
             <if test="record.districtId != null">district_id = #{record.districtId,jdbcType=BIGINT},</if>
             <if test="record.address != null">address = #{record.address,jdbcType=VARCHAR},</if>
             <if test="record.tutorGender != null">tutor_gender = #{record.tutorGender,jdbcType=TINYINT},</if>
@@ -161,7 +165,10 @@
             <if test="record.viewCount != null">view_count = #{record.viewCount,jdbcType=INTEGER},</if>
             <if test="record.applicationCount != null">application_count = #{record.applicationCount,jdbcType=INTEGER},</if>
             <if test="record.schedule != null">schedule = #{record.schedule,jdbcType=LONGVARCHAR},</if>
-            <if test="record.requirementDetail != null">requirement_detail = #{record.requirementDetail,jdbcType=LONGVARCHAR},</if>        </set>
+            <if test="record.requirementDetail != null">requirement_detail = #{record.requirementDetail,jdbcType=LONGVARCHAR},</if>
+            <if test="record.contactWechat != null">contact_wechat = #{record.contactWechat,jdbcType=VARCHAR},</if>
+            <if test="record.teachingMethod != null">teaching_method = #{record.teachingMethod,jdbcType=TINYINT},</if>
+            <if test="record.displayNo != null">display_no = #{record.displayNo,jdbcType=VARCHAR},</if>        </set>
         <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
     </update>
     <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
@@ -173,8 +180,6 @@
             <if test="title != null">title = #{title,jdbcType=VARCHAR},</if>
             <if test="subjectIds != null">subject_ids = #{subjectIds,jdbcType=VARCHAR},</if>
             <if test="gradeId != null">grade_id = #{gradeId,jdbcType=BIGINT},</if>
-            <if test="provinceId != null">province_id = #{provinceId,jdbcType=BIGINT},</if>
-            <if test="cityId != null">city_id = #{cityId,jdbcType=BIGINT},</if>
             <if test="districtId != null">district_id = #{districtId,jdbcType=BIGINT},</if>
             <if test="address != null">address = #{address,jdbcType=VARCHAR},</if>
             <if test="tutorGender != null">tutor_gender = #{tutorGender,jdbcType=TINYINT},</if>
@@ -188,7 +193,10 @@
             <if test="viewCount != null">view_count = #{viewCount,jdbcType=INTEGER},</if>
             <if test="applicationCount != null">application_count = #{applicationCount,jdbcType=INTEGER},</if>
             <if test="schedule != null">schedule = #{schedule,jdbcType=LONGVARCHAR},</if>
-            <if test="requirementDetail != null">requirement_detail = #{requirementDetail,jdbcType=LONGVARCHAR},</if>        </set>
+            <if test="requirementDetail != null">requirement_detail = #{requirementDetail,jdbcType=LONGVARCHAR},</if>
+            <if test="contactWechat != null">contact_wechat = #{contactWechat,jdbcType=VARCHAR},</if>
+            <if test="teachingMethod != null">teaching_method = #{teachingMethod,jdbcType=TINYINT},</if>
+            <if test="displayNo != null">display_no = #{displayNo,jdbcType=VARCHAR},</if>        </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
@@ -200,7 +208,6 @@
             title = #{title,jdbcType=VARCHAR}
             subject_ids = #{subjectIds,jdbcType=VARCHAR}
             grade_id = #{gradeId,jdbcType=BIGINT}
-            province_id = #{provinceId,jdbcType=BIGINT}
             city_id = #{cityId,jdbcType=BIGINT}
             district_id = #{districtId,jdbcType=BIGINT}
             address = #{address,jdbcType=VARCHAR}

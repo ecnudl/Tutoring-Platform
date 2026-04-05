@@ -66,6 +66,11 @@ public class FavoriteDaoImpl extends AbstractBaseJdbc implements FavoriteDao {
     }
 
     @Override
+    public List<Favorite> listByExample(FavoriteExample example) {
+        return this.favoriteMapper.selectByExample(example);
+    }
+
+    @Override
     public Favorite getByUserIdAndTarget(Long userId, Integer targetType, Long targetId) {
         FavoriteExample example = new FavoriteExample();
         FavoriteExample.Criteria criteria = example.createCriteria();

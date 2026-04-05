@@ -140,6 +140,12 @@ public class TutorRequirementExample {
         public Criteria andApplicationCountGreaterThan(Integer value) { addCriterion("application_count >", value, "applicationCount"); return (Criteria) this; }
         public Criteria andApplicationCountLessThan(Integer value) { addCriterion("application_count <", value, "applicationCount"); return (Criteria) this; }
         public Criteria andApplicationCountBetween(Integer value1, Integer value2) { addCriterion("application_count between", value1, value2, "applicationCount"); return (Criteria) this; }
+        public Criteria andDisplayNoIsNull() { addCriterion("display_no is null"); return (Criteria) this; }
+        public Criteria andDisplayNoIsNotNull() { addCriterion("display_no is not null"); return (Criteria) this; }
+        public Criteria andDisplayNoEqualTo(String value) { addCriterion("display_no =", value, "displayNo"); return (Criteria) this; }
+        public Criteria andDisplayNoNotEqualTo(String value) { addCriterion("display_no <>", value, "displayNo"); return (Criteria) this; }
+        public Criteria andDisplayNoLike(String value) { addCriterion("display_no like", value, "displayNo"); return (Criteria) this; }
+        public Criteria andDisplayNoIn(List<String> values) { addCriterion("display_no in", values, "displayNo"); return (Criteria) this; }
     }
 
     public static class Criteria extends GeneratedCriteria { protected Criteria() { super(); } }

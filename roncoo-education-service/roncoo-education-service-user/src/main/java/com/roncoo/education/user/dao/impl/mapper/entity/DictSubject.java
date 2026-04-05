@@ -9,6 +9,8 @@ public class DictSubject implements Serializable {
     private LocalDateTime gmtModified;
     private Integer statusId;
     private String subjectName;
+    private Long categoryId;
+    private Integer isHot;
     private Integer sort;
     private static final long serialVersionUID = 1L;
 
@@ -22,6 +24,10 @@ public class DictSubject implements Serializable {
     public void setStatusId(Integer statusId) { this.statusId = statusId; }
     public String getSubjectName() { return subjectName; }
     public void setSubjectName(String subjectName) { this.subjectName = subjectName == null ? null : subjectName.trim(); }
+    public Long getCategoryId() { return categoryId; }
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public Integer getIsHot() { return isHot; }
+    public void setIsHot(Integer isHot) { this.isHot = isHot; }
     public Integer getSort() { return sort; }
     public void setSort(Integer sort) { this.sort = sort; }
 

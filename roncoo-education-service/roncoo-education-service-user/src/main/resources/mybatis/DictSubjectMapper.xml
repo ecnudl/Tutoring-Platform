@@ -7,6 +7,8 @@
         <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
         <result column="status_id" jdbcType="TINYINT" property="statusId"/>
         <result column="subject_name" jdbcType="VARCHAR" property="subjectName"/>
+        <result column="category_id" jdbcType="BIGINT" property="categoryId"/>
+        <result column="is_hot" jdbcType="TINYINT" property="isHot"/>
         <result column="sort" jdbcType="INTEGER" property="sort"/>    </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -45,7 +47,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, subject_name, sort</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, subject_name, category_id, is_hot, sort</sql>
 
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.DictSubjectExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from dict_subject

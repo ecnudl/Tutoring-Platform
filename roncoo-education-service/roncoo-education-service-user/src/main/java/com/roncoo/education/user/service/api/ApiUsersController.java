@@ -67,9 +67,9 @@ public class ApiUsersController {
 
 
     /**
-     * 简化注册接口（开发环境，不依赖RSA加密和短信验证码）
+     * 简化注册接口（不依赖RSA加密，需短信验证码）
      */
-    @ApiOperation(value = "简化注册", notes = "开发环境，明文密码，无需验证码，必须传userType")
+    @ApiOperation(value = "简化注册", notes = "明文密码，需短信验证码，必须传userType")
     @PostMapping(value = "/register/simple")
     public Result<UsersLoginResp> registerSimple(@RequestBody SimpleRegisterReq req) {
         return biz.registerSimple(req);

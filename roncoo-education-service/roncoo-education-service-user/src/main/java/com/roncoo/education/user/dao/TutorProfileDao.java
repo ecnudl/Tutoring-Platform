@@ -20,4 +20,8 @@ public interface TutorProfileDao {
     TutorProfile getByUserId(Long userId);
 
     List<TutorProfile> listByAuditStatus(Integer auditStatus);
+
+    TutorProfile getByDisplayNo(String displayNo);
+
+    List<TutorProfile> listByIds(List<Long> ids);
 }

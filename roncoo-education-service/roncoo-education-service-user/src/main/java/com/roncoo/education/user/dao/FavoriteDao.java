@@ -19,5 +19,7 @@ public interface FavoriteDao {
 
     List<Favorite> listByUserId(Long userId);
 
+    List<Favorite> listByExample(FavoriteExample example);
+
     Favorite getByUserIdAndTarget(Long userId, Integer targetType, Long targetId);
 }

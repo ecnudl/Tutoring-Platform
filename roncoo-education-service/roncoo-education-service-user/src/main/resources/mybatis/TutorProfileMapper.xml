@@ -18,10 +18,7 @@
         <result column="university" jdbcType="VARCHAR" property="university"/>
         <result column="major" jdbcType="VARCHAR" property="major"/>
         <result column="grade_year" jdbcType="VARCHAR" property="gradeYear"/>
-        <result column="subjects" jdbcType="VARCHAR" property="subjects"/>
-        <result column="grades" jdbcType="VARCHAR" property="grades"/>
         <result column="tags" jdbcType="VARCHAR" property="tags"/>
-        <result column="province_id" jdbcType="BIGINT" property="provinceId"/>
         <result column="city_id" jdbcType="BIGINT" property="cityId"/>
         <result column="district_id" jdbcType="BIGINT" property="districtId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
@@ -35,6 +32,17 @@
         <result column="sort" jdbcType="INTEGER" property="sort"/>
         <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
         <result column="success_count" jdbcType="INTEGER" property="successCount"/>
+        <result column="display_no" jdbcType="VARCHAR" property="displayNo"/>
+        <result column="teaching_method" jdbcType="TINYINT" property="teachingMethod"/>
+        <result column="university_id" jdbcType="BIGINT" property="universityId"/>
+        <result column="high_school" jdbcType="VARCHAR" property="highSchool"/>
+        <result column="hometown_province" jdbcType="VARCHAR" property="hometownProvince"/>
+        <result column="certificates_desc" jdbcType="VARCHAR" property="certificatesDesc"/>
+        <result column="salary_remark" jdbcType="VARCHAR" property="salaryRemark"/>
+        <result column="is_star" jdbcType="TINYINT" property="isStar"/>
+        <result column="is_verified" jdbcType="TINYINT" property="isVerified"/>
+        <result column="login_count" jdbcType="INTEGER" property="loginCount"/>
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
                type="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -102,10 +110,12 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, gmt_create, gmt_modified, status_id, user_id, real_name, gender, birth_date, avatar,
-        mobile, id_card, tutor_type, degree, university, major, grade_year, subjects, grades, tags,
-        province_id, city_id, district_id, address, latitude, longitude, price_min, price_max,
-        free_trial, audit_status, audit_remark, sort, view_count, success_count
+        id, gmt_create, gmt_modified, status_id, user_id, display_no, real_name, gender, birth_date, avatar,
+        mobile, id_card, tutor_type, degree, university, university_id, major, grade_year,
+        high_school, hometown_province, tags, city_id, district_id, address, latitude, longitude,
+        teaching_method, price_min, price_max, salary_remark, free_trial,
+        audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
+        login_count, last_login_time
     </sql>
     <sql id="Blob_Column_List">
         teaching_experience, self_introduction
@@ -171,24 +181,32 @@
                                    gender, birth_date, avatar,
                                    mobile, id_card, tutor_type,
                                    degree, university, major,
-                                   grade_year, subjects, grades,
-                                   tags, province_id, city_id,
+                                   grade_year,
+                                   tags, city_id,
                                    district_id, address, latitude,
                                    longitude, price_min, price_max,
                                    free_trial, audit_status, audit_remark,
                                    sort, view_count, success_count,
+                                   display_no, teaching_method, university_id,
+                                   high_school, hometown_province, certificates_desc,
+                                   salary_remark, is_star, is_verified,
+                                   login_count, last_login_time,
                                    teaching_experience, self_introduction)
         values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP},
                 #{statusId,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}, #{realName,jdbcType=VARCHAR},
                 #{gender,jdbcType=TINYINT}, #{birthDate,jdbcType=DATE}, #{avatar,jdbcType=VARCHAR},
                 #{mobile,jdbcType=VARCHAR}, #{idCard,jdbcType=VARCHAR}, #{tutorType,jdbcType=TINYINT},
                 #{degree,jdbcType=TINYINT}, #{university,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR},
-                #{gradeYear,jdbcType=VARCHAR}, #{subjects,jdbcType=VARCHAR}, #{grades,jdbcType=VARCHAR},
-                #{tags,jdbcType=VARCHAR}, #{provinceId,jdbcType=BIGINT}, #{cityId,jdbcType=BIGINT},
+                #{gradeYear,jdbcType=VARCHAR},
+                #{tags,jdbcType=VARCHAR}, #{cityId,jdbcType=BIGINT},
                 #{districtId,jdbcType=BIGINT}, #{address,jdbcType=VARCHAR}, #{latitude,jdbcType=DECIMAL},
                 #{longitude,jdbcType=DECIMAL}, #{priceMin,jdbcType=DECIMAL}, #{priceMax,jdbcType=DECIMAL},
                 #{freeTrial,jdbcType=TINYINT}, #{auditStatus,jdbcType=TINYINT}, #{auditRemark,jdbcType=VARCHAR},
                 #{sort,jdbcType=INTEGER}, #{viewCount,jdbcType=INTEGER}, #{successCount,jdbcType=INTEGER},
+                #{displayNo,jdbcType=VARCHAR}, #{teachingMethod,jdbcType=TINYINT}, #{universityId,jdbcType=BIGINT},
+                #{highSchool,jdbcType=VARCHAR}, #{hometownProvince,jdbcType=VARCHAR}, #{certificatesDesc,jdbcType=VARCHAR},
+                #{salaryRemark,jdbcType=VARCHAR}, #{isStar,jdbcType=TINYINT}, #{isVerified,jdbcType=TINYINT},
+                #{loginCount,jdbcType=INTEGER}, #{lastLoginTime,jdbcType=TIMESTAMP},
                 #{teachingExperience,jdbcType=LONGVARCHAR}, #{selfIntroduction,jdbcType=LONGVARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -242,17 +260,8 @@
             <if test="gradeYear != null">
                 grade_year,
             </if>
-            <if test="subjects != null">
-                subjects,
-            </if>
-            <if test="grades != null">
-                grades,
-            </if>
             <if test="tags != null">
                 tags,
-            </if>
-            <if test="provinceId != null">
-                province_id,
             </if>
             <if test="cityId != null">
                 city_id,
@@ -298,6 +307,39 @@
             </if>
             <if test="selfIntroduction != null">
                 self_introduction,
+            </if>
+            <if test="displayNo != null">
+                display_no,
+            </if>
+            <if test="teachingMethod != null">
+                teaching_method,
+            </if>
+            <if test="universityId != null">
+                university_id,
+            </if>
+            <if test="highSchool != null">
+                high_school,
+            </if>
+            <if test="hometownProvince != null">
+                hometown_province,
+            </if>
+            <if test="certificatesDesc != null">
+                certificates_desc,
+            </if>
+            <if test="salaryRemark != null">
+                salary_remark,
+            </if>
+            <if test="isStar != null">
+                is_star,
+            </if>
+            <if test="isVerified != null">
+                is_verified,
+            </if>
+            <if test="loginCount != null">
+                login_count,
+            </if>
+            <if test="lastLoginTime != null">
+                last_login_time,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -349,17 +391,8 @@
             <if test="gradeYear != null">
                 #{gradeYear,jdbcType=VARCHAR},
             </if>
-            <if test="subjects != null">
-                #{subjects,jdbcType=VARCHAR},
-            </if>
-            <if test="grades != null">
-                #{grades,jdbcType=VARCHAR},
-            </if>
             <if test="tags != null">
                 #{tags,jdbcType=VARCHAR},
-            </if>
-            <if test="provinceId != null">
-                #{provinceId,jdbcType=BIGINT},
             </if>
             <if test="cityId != null">
                 #{cityId,jdbcType=BIGINT},
@@ -405,6 +438,39 @@
             </if>
             <if test="selfIntroduction != null">
                 #{selfIntroduction,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="displayNo != null">
+                #{displayNo,jdbcType=VARCHAR},
+            </if>
+            <if test="teachingMethod != null">
+                #{teachingMethod,jdbcType=TINYINT},
+            </if>
+            <if test="universityId != null">
+                #{universityId,jdbcType=BIGINT},
+            </if>
+            <if test="highSchool != null">
+                #{highSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="hometownProvince != null">
+                #{hometownProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="certificatesDesc != null">
+                #{certificatesDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryRemark != null">
+                #{salaryRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="isStar != null">
+                #{isStar,jdbcType=TINYINT},
+            </if>
+            <if test="isVerified != null">
+                #{isVerified,jdbcType=TINYINT},
+            </if>
+            <if test="loginCount != null">
+                #{loginCount,jdbcType=INTEGER},
+            </if>
+            <if test="lastLoginTime != null">
+                #{lastLoginTime,jdbcType=TIMESTAMP},
             </if>
         </trim>
     </insert>
@@ -466,17 +532,8 @@
             <if test="record.gradeYear != null">
                 grade_year = #{record.gradeYear,jdbcType=VARCHAR},
             </if>
-            <if test="record.subjects != null">
-                subjects = #{record.subjects,jdbcType=VARCHAR},
-            </if>
-            <if test="record.grades != null">
-                grades = #{record.grades,jdbcType=VARCHAR},
-            </if>
             <if test="record.tags != null">
                 tags = #{record.tags,jdbcType=VARCHAR},
-            </if>
-            <if test="record.provinceId != null">
-                province_id = #{record.provinceId,jdbcType=BIGINT},
             </if>
             <if test="record.cityId != null">
                 city_id = #{record.cityId,jdbcType=BIGINT},
@@ -523,6 +580,39 @@
             <if test="record.selfIntroduction != null">
                 self_introduction = #{record.selfIntroduction,jdbcType=LONGVARCHAR},
             </if>
+            <if test="record.displayNo != null">
+                display_no = #{record.displayNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.teachingMethod != null">
+                teaching_method = #{record.teachingMethod,jdbcType=TINYINT},
+            </if>
+            <if test="record.universityId != null">
+                university_id = #{record.universityId,jdbcType=BIGINT},
+            </if>
+            <if test="record.highSchool != null">
+                high_school = #{record.highSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="record.hometownProvince != null">
+                hometown_province = #{record.hometownProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="record.certificatesDesc != null">
+                certificates_desc = #{record.certificatesDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="record.salaryRemark != null">
+                salary_remark = #{record.salaryRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isStar != null">
+                is_star = #{record.isStar,jdbcType=TINYINT},
+            </if>
+            <if test="record.isVerified != null">
+                is_verified = #{record.isVerified,jdbcType=TINYINT},
+            </if>
+            <if test="record.loginCount != null">
+                login_count = #{record.loginCount,jdbcType=INTEGER},
+            </if>
+            <if test="record.lastLoginTime != null">
+                last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -546,10 +636,7 @@
         university = #{record.university,jdbcType=VARCHAR},
         major = #{record.major,jdbcType=VARCHAR},
         grade_year = #{record.gradeYear,jdbcType=VARCHAR},
-        subjects = #{record.subjects,jdbcType=VARCHAR},
-        grades = #{record.grades,jdbcType=VARCHAR},
         tags = #{record.tags,jdbcType=VARCHAR},
-        province_id = #{record.provinceId,jdbcType=BIGINT},
         city_id = #{record.cityId,jdbcType=BIGINT},
         district_id = #{record.districtId,jdbcType=BIGINT},
         address = #{record.address,jdbcType=VARCHAR},
@@ -564,7 +651,18 @@
         view_count = #{record.viewCount,jdbcType=INTEGER},
         success_count = #{record.successCount,jdbcType=INTEGER},
         teaching_experience = #{record.teachingExperience,jdbcType=LONGVARCHAR},
-        self_introduction = #{record.selfIntroduction,jdbcType=LONGVARCHAR}
+        self_introduction = #{record.selfIntroduction,jdbcType=LONGVARCHAR},
+        display_no = #{record.displayNo,jdbcType=VARCHAR},
+        teaching_method = #{record.teachingMethod,jdbcType=TINYINT},
+        university_id = #{record.universityId,jdbcType=BIGINT},
+        high_school = #{record.highSchool,jdbcType=VARCHAR},
+        hometown_province = #{record.hometownProvince,jdbcType=VARCHAR},
+        certificates_desc = #{record.certificatesDesc,jdbcType=VARCHAR},
+        salary_remark = #{record.salaryRemark,jdbcType=VARCHAR},
+        is_star = #{record.isStar,jdbcType=TINYINT},
+        is_verified = #{record.isVerified,jdbcType=TINYINT},
+        login_count = #{record.loginCount,jdbcType=INTEGER},
+        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -587,10 +685,7 @@
         university = #{record.university,jdbcType=VARCHAR},
         major = #{record.major,jdbcType=VARCHAR},
         grade_year = #{record.gradeYear,jdbcType=VARCHAR},
-        subjects = #{record.subjects,jdbcType=VARCHAR},
-        grades = #{record.grades,jdbcType=VARCHAR},
         tags = #{record.tags,jdbcType=VARCHAR},
-        province_id = #{record.provinceId,jdbcType=BIGINT},
         city_id = #{record.cityId,jdbcType=BIGINT},
         district_id = #{record.districtId,jdbcType=BIGINT},
         address = #{record.address,jdbcType=VARCHAR},
@@ -603,7 +698,18 @@
         audit_remark = #{record.auditRemark,jdbcType=VARCHAR},
         sort = #{record.sort,jdbcType=INTEGER},
         view_count = #{record.viewCount,jdbcType=INTEGER},
-        success_count = #{record.successCount,jdbcType=INTEGER}
+        success_count = #{record.successCount,jdbcType=INTEGER},
+        display_no = #{record.displayNo,jdbcType=VARCHAR},
+        teaching_method = #{record.teachingMethod,jdbcType=TINYINT},
+        university_id = #{record.universityId,jdbcType=BIGINT},
+        high_school = #{record.highSchool,jdbcType=VARCHAR},
+        hometown_province = #{record.hometownProvince,jdbcType=VARCHAR},
+        certificates_desc = #{record.certificatesDesc,jdbcType=VARCHAR},
+        salary_remark = #{record.salaryRemark,jdbcType=VARCHAR},
+        is_star = #{record.isStar,jdbcType=TINYINT},
+        is_verified = #{record.isVerified,jdbcType=TINYINT},
+        login_count = #{record.loginCount,jdbcType=INTEGER},
+        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -656,17 +762,8 @@
             <if test="gradeYear != null">
                 grade_year = #{gradeYear,jdbcType=VARCHAR},
             </if>
-            <if test="subjects != null">
-                subjects = #{subjects,jdbcType=VARCHAR},
-            </if>
-            <if test="grades != null">
-                grades = #{grades,jdbcType=VARCHAR},
-            </if>
             <if test="tags != null">
                 tags = #{tags,jdbcType=VARCHAR},
-            </if>
-            <if test="provinceId != null">
-                province_id = #{provinceId,jdbcType=BIGINT},
             </if>
             <if test="cityId != null">
                 city_id = #{cityId,jdbcType=BIGINT},
@@ -713,6 +810,39 @@
             <if test="selfIntroduction != null">
                 self_introduction = #{selfIntroduction,jdbcType=LONGVARCHAR},
             </if>
+            <if test="displayNo != null">
+                display_no = #{displayNo,jdbcType=VARCHAR},
+            </if>
+            <if test="teachingMethod != null">
+                teaching_method = #{teachingMethod,jdbcType=TINYINT},
+            </if>
+            <if test="universityId != null">
+                university_id = #{universityId,jdbcType=BIGINT},
+            </if>
+            <if test="highSchool != null">
+                high_school = #{highSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="hometownProvince != null">
+                hometown_province = #{hometownProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="certificatesDesc != null">
+                certificates_desc = #{certificatesDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="salaryRemark != null">
+                salary_remark = #{salaryRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="isStar != null">
+                is_star = #{isStar,jdbcType=TINYINT},
+            </if>
+            <if test="isVerified != null">
+                is_verified = #{isVerified,jdbcType=TINYINT},
+            </if>
+            <if test="loginCount != null">
+                login_count = #{loginCount,jdbcType=INTEGER},
+            </if>
+            <if test="lastLoginTime != null">
+                last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -733,10 +863,7 @@
             university = #{university,jdbcType=VARCHAR},
             major = #{major,jdbcType=VARCHAR},
             grade_year = #{gradeYear,jdbcType=VARCHAR},
-            subjects = #{subjects,jdbcType=VARCHAR},
-            grades = #{grades,jdbcType=VARCHAR},
             tags = #{tags,jdbcType=VARCHAR},
-            province_id = #{provinceId,jdbcType=BIGINT},
             city_id = #{cityId,jdbcType=BIGINT},
             district_id = #{districtId,jdbcType=BIGINT},
             address = #{address,jdbcType=VARCHAR},
@@ -751,7 +878,18 @@
             view_count = #{viewCount,jdbcType=INTEGER},
             success_count = #{successCount,jdbcType=INTEGER},
             teaching_experience = #{teachingExperience,jdbcType=LONGVARCHAR},
-            self_introduction = #{selfIntroduction,jdbcType=LONGVARCHAR}
+            self_introduction = #{selfIntroduction,jdbcType=LONGVARCHAR},
+            display_no = #{displayNo,jdbcType=VARCHAR},
+            teaching_method = #{teachingMethod,jdbcType=TINYINT},
+            university_id = #{universityId,jdbcType=BIGINT},
+            high_school = #{highSchool,jdbcType=VARCHAR},
+            hometown_province = #{hometownProvince,jdbcType=VARCHAR},
+            certificates_desc = #{certificatesDesc,jdbcType=VARCHAR},
+            salary_remark = #{salaryRemark,jdbcType=VARCHAR},
+            is_star = #{isStar,jdbcType=TINYINT},
+            is_verified = #{isVerified,jdbcType=TINYINT},
+            login_count = #{loginCount,jdbcType=INTEGER},
+            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -771,10 +909,7 @@
             university = #{university,jdbcType=VARCHAR},
             major = #{major,jdbcType=VARCHAR},
             grade_year = #{gradeYear,jdbcType=VARCHAR},
-            subjects = #{subjects,jdbcType=VARCHAR},
-            grades = #{grades,jdbcType=VARCHAR},
             tags = #{tags,jdbcType=VARCHAR},
-            province_id = #{provinceId,jdbcType=BIGINT},
             city_id = #{cityId,jdbcType=BIGINT},
             district_id = #{districtId,jdbcType=BIGINT},
             address = #{address,jdbcType=VARCHAR},
@@ -787,7 +922,18 @@
             audit_remark = #{auditRemark,jdbcType=VARCHAR},
             sort = #{sort,jdbcType=INTEGER},
             view_count = #{viewCount,jdbcType=INTEGER},
-            success_count = #{successCount,jdbcType=INTEGER}
+            success_count = #{successCount,jdbcType=INTEGER},
+            display_no = #{displayNo,jdbcType=VARCHAR},
+            teaching_method = #{teachingMethod,jdbcType=TINYINT},
+            university_id = #{universityId,jdbcType=BIGINT},
+            high_school = #{highSchool,jdbcType=VARCHAR},
+            hometown_province = #{hometownProvince,jdbcType=VARCHAR},
+            certificates_desc = #{certificatesDesc,jdbcType=VARCHAR},
+            salary_remark = #{salaryRemark,jdbcType=VARCHAR},
+            is_star = #{isStar,jdbcType=TINYINT},
+            is_verified = #{isVerified,jdbcType=TINYINT},
+            login_count = #{loginCount,jdbcType=INTEGER},
+            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

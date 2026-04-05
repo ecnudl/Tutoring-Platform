@@ -29,6 +29,9 @@ public class TutorRequirement implements Serializable {
     private String auditRemark;
     private Integer viewCount;
     private Integer applicationCount;
+    private String contactWechat;
+    private Integer teachingMethod;
+    private String displayNo;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -79,6 +82,12 @@ public class TutorRequirement implements Serializable {
     public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
     public Integer getApplicationCount() { return applicationCount; }
     public void setApplicationCount(Integer applicationCount) { this.applicationCount = applicationCount; }
+    public String getContactWechat() { return contactWechat; }
+    public void setContactWechat(String contactWechat) { this.contactWechat = contactWechat == null ? null : contactWechat.trim(); }
+    public Integer getTeachingMethod() { return teachingMethod; }
+    public void setTeachingMethod(Integer teachingMethod) { this.teachingMethod = teachingMethod; }
+    public String getDisplayNo() { return displayNo; }
+    public void setDisplayNo(String displayNo) { this.displayNo = displayNo == null ? null : displayNo.trim(); }
 
     @Override
     public String toString() {

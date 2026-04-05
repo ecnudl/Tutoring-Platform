@@ -39,6 +39,18 @@ public class RequirementSearchReq implements Serializable {
     @ApiModelProperty(value = "城市ID")
     private Long cityId;
 
+    @ApiModelProperty(value = "区县ID")
+    private Long districtId;
+
+    @ApiModelProperty(value = "教员类型(1:大学生,2:专职教师,3:海外留学生,4:专业人士)")
+    private Integer tutorType;
+
+    @ApiModelProperty(value = "授课方式(1:教员上门,2:学员上门,3:线上授课)")
+    private Integer teachingMethod;
+
+    @ApiModelProperty(value = "是否有折扣(0:否,1:是)")
+    private Integer hasDiscount;
+
     @ApiModelProperty(value = "关键词")
     private String keyword;
 }

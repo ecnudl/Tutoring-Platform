@@ -60,6 +60,27 @@ public class DictSubjectDaoImpl extends AbstractBaseJdbc implements DictSubjectD
     @Override
     public List<DictSubject> listAll() {
         DictSubjectExample example = new DictSubjectExample();
+        example.setOrderByClause("sort asc");
+        return this.dictSubjectMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<DictSubject> listByCategoryId(Long categoryId) {
+        DictSubjectExample example = new DictSubjectExample();
+        DictSubjectExample.Criteria criteria = example.createCriteria();
+        criteria.andStatusIdEqualTo(1);
+        criteria.andCategoryIdEqualTo(categoryId);
+        example.setOrderByClause("sort asc");
+        return this.dictSubjectMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<DictSubject> listHot() {
+        DictSubjectExample example = new DictSubjectExample();
+        DictSubjectExample.Criteria criteria = example.createCriteria();
+        criteria.andStatusIdEqualTo(1);
+        criteria.andIsHotEqualTo(1);
+        example.setOrderByClause("sort asc");
         return this.dictSubjectMapper.selectByExample(example);
     }
 }

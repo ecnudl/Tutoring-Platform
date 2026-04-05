@@ -68,6 +68,12 @@ public class DictSubjectExample {
         public Criteria andSortGreaterThan(Integer value) { addCriterion("sort >", value, "sort"); return (Criteria) this; }
         public Criteria andSortLessThan(Integer value) { addCriterion("sort <", value, "sort"); return (Criteria) this; }
         public Criteria andSortBetween(Integer value1, Integer value2) { addCriterion("sort between", value1, value2, "sort"); return (Criteria) this; }
+        public Criteria andCategoryIdIsNull() { addCriterion("category_id is null"); return (Criteria) this; }
+        public Criteria andCategoryIdIsNotNull() { addCriterion("category_id is not null"); return (Criteria) this; }
+        public Criteria andCategoryIdEqualTo(Long value) { addCriterion("category_id =", value, "categoryId"); return (Criteria) this; }
+        public Criteria andCategoryIdIn(List<Long> values) { addCriterion("category_id in", values, "categoryId"); return (Criteria) this; }
+        public Criteria andIsHotEqualTo(Integer value) { addCriterion("is_hot =", value, "isHot"); return (Criteria) this; }
+        public Criteria andIsHotNotEqualTo(Integer value) { addCriterion("is_hot <>", value, "isHot"); return (Criteria) this; }
     }
 
     public static class Criteria extends GeneratedCriteria { protected Criteria() { super(); } }
