@@ -141,10 +141,11 @@ const searchKeyword = ref('')
 // 城市配置：上海主域名，其他子域名
 const cities = [
   { name: '上海', pinyin: 'shanghai', id: 1, enabled: true, url: '/' },
-  { name: '苏州', pinyin: 'suzhou', id: 2, enabled: false, url: '/suzhou' },
-  { name: '南京', pinyin: 'nanjing', id: 5, enabled: false, url: '/nanjing' },
-  { name: '合肥', pinyin: 'hefei', id: 3, enabled: false, url: '/hefei' },
-  { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: false, url: '/hangzhou' }
+  { name: '北京', pinyin: 'beijing', id: 6, enabled: true, url: '/' },
+  { name: '苏州', pinyin: 'suzhou', id: 2, enabled: true, url: '/' },
+  { name: '南京', pinyin: 'nanjing', id: 5, enabled: true, url: '/' },
+  { name: '合肥', pinyin: 'hefei', id: 3, enabled: true, url: '/' },
+  { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: false, url: '/' }
 ]
 
 const handleCityClick = (city) => {
