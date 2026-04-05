@@ -30,7 +30,7 @@
 
       <div class="city-note">
         <el-icon><InfoFilled /></el-icon>
-        <span>已开通上海、北京、苏州、南京、合肥五个城市，杭州即将上线。切换城市后将展示对应城市的教员和需求信息。</span>
+        <span>已开通上海、苏州、南京、合肥、杭州五个城市。切换城市后将展示对应城市的教员和需求信息。</span>
       </div>
     </el-card>
   </div>
@@ -46,11 +46,10 @@ const router = useRouter()
 
 const cities = [
   { id: 1, name: '上海', pinyin: 'shanghai', enabled: true, domain: '主站' },
-  { id: 6, name: '北京', pinyin: 'beijing', enabled: true, domain: 'beijing' },
   { id: 2, name: '苏州', pinyin: 'suzhou', enabled: true, domain: 'suzhou' },
   { id: 5, name: '南京', pinyin: 'nanjing', enabled: true, domain: 'nanjing' },
   { id: 3, name: '合肥', pinyin: 'hefei', enabled: true, domain: 'hefei' },
-  { id: 4, name: '杭州', pinyin: 'hangzhou', enabled: false, domain: 'hangzhou' }
+  { id: 4, name: '杭州', pinyin: 'hangzhou', enabled: true, domain: 'hangzhou' }
 ]
 
 const selectCity = (city) => {

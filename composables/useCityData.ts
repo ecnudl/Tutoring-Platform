@@ -57,23 +57,17 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 510, name: '溧水区', pinyin: 'lishui' },
     { id: 511, name: '高淳区', pinyin: 'gaochun' }
   ],
-  6: [ // 北京
-    { id: 601, name: '东城区', pinyin: 'dongcheng' },
-    { id: 602, name: '西城区', pinyin: 'xicheng' },
-    { id: 603, name: '朝阳区', pinyin: 'chaoyang' },
-    { id: 604, name: '海淀区', pinyin: 'haidian' },
-    { id: 605, name: '丰台区', pinyin: 'fengtai' },
-    { id: 606, name: '石景山区', pinyin: 'shijingshan' },
-    { id: 607, name: '通州区', pinyin: 'tongzhou' },
-    { id: 608, name: '顺义区', pinyin: 'shunyi' },
-    { id: 609, name: '房山区', pinyin: 'fangshan' },
-    { id: 610, name: '大兴区', pinyin: 'daxing' },
-    { id: 611, name: '昌平区', pinyin: 'changping' },
-    { id: 612, name: '怀柔区', pinyin: 'huairou' },
-    { id: 613, name: '平谷区', pinyin: 'pinggu' },
-    { id: 614, name: '密云区', pinyin: 'miyun' },
-    { id: 615, name: '延庆区', pinyin: 'yanqing' },
-    { id: 616, name: '门头沟区', pinyin: 'mentougou' }
+  4: [ // 杭州
+    { id: 401, name: '上城区', pinyin: 'shangcheng' },
+    { id: 402, name: '拱墅区', pinyin: 'gongshu' },
+    { id: 403, name: '西湖区', pinyin: 'xihu' },
+    { id: 404, name: '滨江区', pinyin: 'binjiang' },
+    { id: 405, name: '萧山区', pinyin: 'xiaoshan' },
+    { id: 406, name: '余杭区', pinyin: 'yuhang' },
+    { id: 407, name: '临平区', pinyin: 'linping' },
+    { id: 408, name: '钱塘区', pinyin: 'qiantang' },
+    { id: 409, name: '富阳区', pinyin: 'fuyang' },
+    { id: 410, name: '临安区', pinyin: 'linan' }
   ]
 }
 
@@ -83,7 +77,7 @@ const cityUniversities: Record<number, string[]> = {
   2: ['苏州大学', '西交利物浦大学', '苏州科技大学', '常熟理工学院', '昆山杜克大学', '苏州城市学院'],
   3: ['中国科学技术大学', '合肥工业大学', '安徽大学', '安徽医科大学', '安徽农业大学', '合肥学院', '合肥师范学院'],
   5: ['南京大学', '东南大学', '南京航空航天大学', '南京理工大学', '河海大学', '南京师范大学', '南京邮电大学', '南京农业大学'],
-  6: ['北京大学', '清华大学', '中国人民大学', '北京师范大学', '北京航空航天大学', '北京理工大学', '北京邮电大学', '中央财经大学']
+  4: ['浙江大学', '浙江工业大学', '杭州电子科技大学', '浙江工商大学', '中国美术学院', '浙江理工大学', '杭州师范大学', '浙江财经大学']
 }
 
 export function useCityData() {

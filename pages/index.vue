@@ -65,13 +65,7 @@
         <div class="category-row">
           <div class="category-label">按高校</div>
           <div class="category-links">
-            <NuxtLink to="/jy?university=1">复旦大学</NuxtLink>
-            <NuxtLink to="/jy?university=2">上海交大</NuxtLink>
-            <NuxtLink to="/jy?university=3">同济大学</NuxtLink>
-            <NuxtLink to="/jy?university=4">华东师大</NuxtLink>
-            <NuxtLink to="/jy?university=5">上海财大</NuxtLink>
-            <NuxtLink to="/jy?university=6">华东理工</NuxtLink>
-            <NuxtLink to="/jy?university=7">上海大学</NuxtLink>
+            <NuxtLink v-for="u in universities" :key="u" :to="'/jy?university=' + encodeURIComponent(u)">{{ u }}</NuxtLink>
             <NuxtLink to="/university">更多高校</NuxtLink>
           </div>
         </div>
@@ -133,7 +127,7 @@ import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 
 const cityStore = useCityStore()
-const { districts } = useCityData()
+const { districts, universities } = useCityData()
 const { post } = useApi()
 
 const tutors = ref([])
