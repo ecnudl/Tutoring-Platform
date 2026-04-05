@@ -36,20 +36,37 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useCityStore } from '~/stores/city'
+import { useCityData } from '~/composables/useCityData'
 
 const cityStore = useCityStore()
 const { get } = useApi()
+const { universities: localUniversities } = useCityData()
 const universities = ref([])
 
 onMounted(async () => {
   cityStore.loadFromStorage()
   try {
     const res = await get('/user/api/dict/university/list', { cityId: cityStore.cityId })
-    if (res.code === 200 && res.data) {
+    if (res.code === 200 && res.data && res.data.length) {
       universities.value = res.data
+    } else {
+      // API 无数据时使用本地高校列表，统一卡片格式
+      universities.value = localUniversities.value.map((name, idx) => ({
+        id: idx + 1,
+        uniName: name,
+        uniShort: '',
+        isHot: idx < 3 ? 1 : 0
+      }))
     }
   } catch (e) {
     console.error('加载高校列表失败', e)
+    // 请求失败也用本地数据兜底
+    universities.value = localUniversities.value.map((name, idx) => ({
+      id: idx + 1,
+      uniName: name,
+      uniShort: '',
+      isHot: idx < 3 ? 1 : 0
+    }))
   }
 })
 </script>
