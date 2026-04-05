@@ -101,20 +101,15 @@
 import { ref, onMounted } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
+import { useCityData } from '~/composables/useCityData'
 
 const cityStore = useCityStore()
 const route = useRoute()
 const router = useRouter()
 const { post } = useApi()
+const { districts } = useCityData()
 
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
-
-const districts = [
-  { id: 1, name: '浦东新区' }, { id: 2, name: '徐汇区' }, { id: 3, name: '长宁区' }, { id: 4, name: '静安区' },
-  { id: 5, name: '普陀区' }, { id: 6, name: '虹口区' }, { id: 7, name: '杨浦区' }, { id: 8, name: '闵行区' },
-  { id: 9, name: '宝山区' }, { id: 10, name: '嘉定区' }, { id: 11, name: '金山区' }, { id: 12, name: '松江区' },
-  { id: 13, name: '青浦区' }, { id: 14, name: '奉贤区' }, { id: 15, name: '崇明区' }, { id: 16, name: '黄浦区' }
-]
 const subjects = [
   { id: 1, name: '数学' }, { id: 2, name: '英语' }, { id: 3, name: '语文' }, { id: 4, name: '物理' },
   { id: 5, name: '化学' }, { id: 6, name: '钢琴' }, { id: 7, name: '美术' }, { id: 8, name: '编程' }

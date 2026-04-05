@@ -130,18 +130,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useCityStore } from '~/stores/city'
+import { useCityData } from '~/composables/useCityData'
 
 const cityStore = useCityStore()
+const { districts } = useCityData()
 const { post } = useApi()
 
 const tutors = ref([])
 const requirements = ref([])
-
-const districts = [
-  { id: 1, name: '浦东新区' }, { id: 2, name: '徐汇区' }, { id: 3, name: '长宁区' }, { id: 4, name: '静安区' },
-  { id: 5, name: '普陀区' }, { id: 6, name: '虹口区' }, { id: 7, name: '杨浦区' }, { id: 8, name: '闵行区' },
-  { id: 9, name: '宝山区' }, { id: 10, name: '嘉定区' }, { id: 11, name: '金山区' }, { id: 12, name: '松江区' }
-]
 
 const hotSubjects = [
   { id: 1, name: '数学' }, { id: 2, name: '英语' }, { id: 3, name: '语文' }, { id: 4, name: '物理' },

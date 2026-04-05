@@ -158,7 +158,7 @@
 
             <el-form-item label="可授课区域" prop="districts">
               <el-select v-model="form.districts" multiple collapse-tags placeholder="请选择可授课区域（可多选）" size="large" style="width:100%">
-                <el-option v-for="d in districtOptions" :key="d" :label="d" :value="d" />
+                <el-option v-for="d in districtNames" :key="d" :label="d" :value="d" />
               </el-select>
             </el-form-item>
 
@@ -219,8 +219,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
+import { useCityData } from '~/composables/useCityData'
 
 const cityStore = useCityStore()
+const { districtNames } = useCityData()
 const router = useRouter()
 const { get, post } = useApi()
 
@@ -232,7 +234,6 @@ const countdown = ref(0)
 const sendingCode = ref(false)
 
 const subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理', '钢琴', '小提琴', '古筝', '吉他', '美术', '书法', '舞蹈', '编程', '日语', '法语', '德语', '韩语', '西班牙语', '学前教育', '小学全科']
-const districtOptions = ['浦东新区', '徐汇区', '长宁区', '静安区', '普陀区', '虹口区', '杨浦区', '闵行区', '宝山区', '嘉定区', '金山区', '松江区', '青浦区', '奉贤区', '崇明区', '黄浦区']
 
 const form = reactive({
   mobile: '',
