@@ -5,6 +5,11 @@
       <Meta name="description" content="选择您所在的城市，获取本地家教服务。" />
     </Head>
 
+    <el-breadcrumb separator="/" style="margin-bottom:20px">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>选择城市</el-breadcrumb-item>
+    </el-breadcrumb>
+
     <h1 class="page-title">选择城市</h1>
 
     <el-card>

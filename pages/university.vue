@@ -5,6 +5,11 @@
       <Meta name="description" :content="`${cityStore.cityName}各大高校家教教员，覆盖${cityStore.cityName}所有重点大学，名校大学生一对一上门辅导。`" />
     </Head>
 
+    <el-breadcrumb separator="/" style="margin-bottom:20px">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>高校教员</el-breadcrumb-item>
+    </el-breadcrumb>
+
     <div class="page-header">
       <h1 class="page-title">{{ cityStore.cityName }}高校教员</h1>
       <p class="page-sub">选择高校查看该校教员，快速找到名校大学生家教</p>

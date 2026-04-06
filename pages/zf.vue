@@ -5,6 +5,11 @@
       <Meta name="description" content="上海家教收费标准参考，涵盖大学生、专职教员、在职教师各年级段课时费。" />
     </Head>
 
+    <el-breadcrumb separator="/" style="margin-bottom:20px">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>价格参考</el-breadcrumb-item>
+    </el-breadcrumb>
+
     <h1 class="page-title">{{ cityStore.cityName }}家教价格参考</h1>
     <p class="page-sub">以下价格为平台参考价，实际价格以教员标价为准（单位：元/小时）</p>
 
