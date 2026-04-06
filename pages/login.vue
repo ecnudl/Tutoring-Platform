@@ -2,7 +2,7 @@
   <div style="min-height:100vh;background:#f5f7fa;padding:20px;display:flex;align-items:center;justify-content:center">
     <div style="max-width:420px;width:100%">
       <div style="text-align:center;margin-bottom:24px">
-        <NuxtLink to="/" style="font-size:20px;font-weight:700;color:#409eff;text-decoration:none">★ 51家教网</NuxtLink>
+        <SiteLogo style="display:inline-flex" />
         <h2 style="margin-top:16px;color:#333">会员登录</h2>
       </div>
       <el-card>

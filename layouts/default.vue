@@ -5,10 +5,7 @@
       <div class="header-top">
         <div class="container top-inner">
           <div class="header-left">
-            <NuxtLink to="/" class="logo">
-              <span class="logo-icon">&#9733;</span>
-              <span class="logo-text">51家教网</span>
-            </NuxtLink>
+            <SiteLogo />
             <el-popover placement="bottom-start" :width="320" trigger="click">
               <template #reference>
                 <span class="city-trigger">
@@ -245,19 +242,7 @@ const handleLogout = () => { userStore.logout(); router.push('/') }
   gap: 12px;
   flex-shrink: 0;
 }
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #409eff;
-  white-space: nowrap;
-}
-.logo-icon {
-  font-size: 22px;
-  color: #e6a23c;
-}
+
 .city-trigger {
   display: inline-flex;
   align-items: center;

@@ -8,10 +8,7 @@
     <!-- 顶部横幅 -->
     <div class="register-banner">
       <div class="container" style="position:relative">
-        <NuxtLink to="/" class="back-home-btn">
-          <el-icon><HomeFilled /></el-icon>
-          <span>返回首页</span>
-        </NuxtLink>
+        <SiteLogo variant="light" :show-text="false" class="back-home-logo" />
         <h1>教员注册</h1>
         <p>加入我们，开启您的家教之旅</p>
       </div>
@@ -222,7 +219,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { HomeFilled } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 
@@ -375,27 +371,16 @@ const handleSubmit = async () => {
   margin: 0;
 }
 
-.back-home-btn {
+.back-home-logo {
   position: absolute;
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border-radius: 20px;
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.3s;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
-.back-home-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-50%) scale(1.05);
+.back-home-logo:hover {
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* 步骤条 */

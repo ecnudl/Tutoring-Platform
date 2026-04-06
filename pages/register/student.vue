@@ -6,7 +6,7 @@
     <div style="max-width:500px;margin:0 auto">
       <div style="text-align:center;margin-bottom:24px">
         <h2 style="color:#333">家长注册</h2>
-        <NuxtLink to="/" style="font-size:20px;font-weight:700;color:#409eff;text-decoration:none">★ 51家教网</NuxtLink>
+        <SiteLogo style="display:inline-flex;margin-top:8px" />
       </div>
       <el-card>
         <div style="margin-bottom:16px;color:#666;font-size:14px">目前所在城市：<span style="color:#409eff">{{ cityStore.cityName }}</span></div>

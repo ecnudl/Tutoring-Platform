@@ -2,7 +2,7 @@
   <div style="min-height:80vh;display:flex;align-items:center;justify-content:center;background:#f5f7fa;padding:20px">
     <div style="max-width:900px;width:100%">
       <div style="text-align:center;margin-bottom:40px">
-        <NuxtLink to="/" style="font-size:24px;font-weight:700;color:#409eff;text-decoration:none">★ 51家教网</NuxtLink>
+        <SiteLogo style="display:inline-flex" />
         <h2 style="margin-top:16px;color:#333">欢迎注册</h2>
         <p style="color:#999;margin-top:8px">如果您已经注册过，可以直接选择 <NuxtLink to="/login/find-password" style="color:#409eff">找回密码</NuxtLink></p>
       </div>
