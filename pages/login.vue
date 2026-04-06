@@ -1,9 +1,8 @@
 <template>
-  <div style="min-height:100vh;background:#f5f7fa;padding:20px;display:flex;align-items:center;justify-content:center">
-    <div style="max-width:420px;width:100%">
-      <div style="text-align:center;margin-bottom:24px">
-        <SiteLogo style="display:inline-flex" />
-        <h2 style="margin-top:16px;color:#333">会员登录</h2>
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-header">
+        <h2>会员登录</h2>
       </div>
       <el-card>
         <el-tabs v-model="activeTab" stretch>
@@ -33,14 +32,15 @@
             </el-form>
           </el-tab-pane>
         </el-tabs>
-        <div style="display:flex;justify-content:space-between;margin-top:16px;font-size:13px">
-          <NuxtLink to="/login/find-password" style="color:#409eff">找回密码</NuxtLink>
-          <NuxtLink to="/register" style="color:#409eff">我要注册</NuxtLink>
+        <div class="login-footer">
+          <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+          <NuxtLink to="/register">我要注册</NuxtLink>
         </div>
       </el-card>
     </div>
   </div>
 </template>
+
 <script setup>
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
@@ -132,3 +132,51 @@ const handleSmsLogin = async () => {
   }
 }
 </script>
+
+<style scoped>
+.login-page {
+  min-height: 100vh;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.login-container {
+  max-width: 420px;
+  width: 100%;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-header h2 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.login-footer a {
+  color: #409eff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-footer a:hover {
+  color: #66b1ff;
+}
+</style>

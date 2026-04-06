@@ -7,8 +7,7 @@
 
     <!-- 顶部横幅 -->
     <div class="register-banner">
-      <div class="container" style="position:relative">
-        <SiteLogo variant="light" :show-text="false" class="back-home-logo" />
+      <div class="container">
         <h1>教员注册</h1>
         <p>加入我们，开启您的家教之旅</p>
       </div>
@@ -369,18 +368,6 @@ const handleSubmit = async () => {
   font-size: 16px;
   opacity: 0.9;
   margin: 0;
-}
-
-.back-home-logo {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-.back-home-logo:hover {
-  transform: translateY(-50%) scale(1.1);
 }
 
 /* 步骤条 */

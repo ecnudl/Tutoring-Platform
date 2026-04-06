@@ -1,15 +1,14 @@
 <template>
-  <div style="min-height:100vh;background:#f5f7fa;padding:20px">
+  <div class="student-register-page">
     <Head>
       <Title>家长/学员注册 - 51家教网</Title>
     </Head>
-    <div style="max-width:500px;margin:0 auto">
-      <div style="text-align:center;margin-bottom:24px">
-        <h2 style="color:#333">家长注册</h2>
-        <SiteLogo style="display:inline-flex;margin-top:8px" />
+    <div class="student-register-container">
+      <div class="register-header">
+        <h2>家长注册</h2>
       </div>
       <el-card>
-        <div style="margin-bottom:16px;color:#666;font-size:14px">目前所在城市：<span style="color:#409eff">{{ cityStore.cityName }}</span></div>
+        <div class="city-info">目前所在城市：<span>{{ cityStore.cityName }}</span></div>
         <el-form :model="form" ref="formRef" label-position="top">
 
           <el-form-item label="手机号">
@@ -44,11 +43,11 @@
           </el-form-item>
           <el-button type="primary" size="large" style="width:100%" :loading="submitting" :disabled="!form.agreed" @click="handleSubmit">注册</el-button>
         </el-form>
-        <p style="text-align:center;color:#999;font-size:13px;margin-top:16px">
-          已有账号？<NuxtLink to="/login?type=student" style="color:#409eff">去登录</NuxtLink>
-          <span style="margin:0 8px">|</span>
-          想做家教？<NuxtLink to="/register/teacher" style="color:#409eff">教员注册</NuxtLink>
-        </p>
+        <div class="register-footer">
+          已有账号？<NuxtLink to="/login?type=student">去登录</NuxtLink>
+          <span>|</span>
+          想做家教？<NuxtLink to="/register/teacher">教员注册</NuxtLink>
+        </div>
       </el-card>
     </div>
   </div>
@@ -152,8 +151,75 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-a { text-decoration: none; }
-a:hover { text-decoration: underline; }
+.student-register-page {
+  min-height: 100vh;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.student-register-container {
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.register-header h2 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.city-info {
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.city-info span {
+  color: #409eff;
+  font-weight: 500;
+}
+
+.register-footer {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  margin-top: 16px;
+}
+
+.register-footer span {
+  margin: 0 8px;
+}
+
+.register-footer a {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .agreement-check {
   display: flex;
   align-items: flex-start;
@@ -164,10 +230,12 @@ a:hover { text-decoration: underline; }
   border-radius: 8px;
   transition: all 0.3s;
 }
+
 .agreement-check--error {
   background: #fef0f0;
   border-color: #f56c6c;
 }
+
 .agreement-text {
   font-size: 13px;
   color: #606266;
