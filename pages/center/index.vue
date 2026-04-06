@@ -87,8 +87,6 @@ definePageMeta({
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
 
-definePageMeta({ layout: 'center' })
-
 const userStore = useUserStore()
 const { post } = useApi()
 
