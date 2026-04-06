@@ -7,7 +7,7 @@
     <el-table-column prop="gmtCreate" label="添加时间" width="180" />
     <el-table-column label="操作" width="160">
       <template #default="{ row }">
-        <el-button size="small" @click="$router.push('/tutor/' + row.tutorId)">查看</el-button>
+        <el-button size="small" @click="$router.push('/jy/t' + row.tutorId)">查看</el-button>
         <el-popconfirm title="确定移除？" @confirm="handleRemove(row.id)">
           <template #reference>
             <el-button size="small" type="danger">移除</el-button>
@@ -22,7 +22,10 @@
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
 
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { post, del } = useApi()
 
 const list = ref([])

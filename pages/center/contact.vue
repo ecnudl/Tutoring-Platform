@@ -74,6 +74,11 @@
   </div>
 </template>
 <script setup>
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
+
 import { Phone, ChatDotRound, Message, Clock, Service } from '@element-plus/icons-vue'
 </script>
 <style scoped>

@@ -24,7 +24,10 @@
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const userStore = useUserStore()
 const router = useRouter()
 const form = ref({ password: '', confirmPassword: '' })

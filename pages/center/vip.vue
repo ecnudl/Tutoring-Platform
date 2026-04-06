@@ -16,7 +16,10 @@
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { get } = useApi()
 const vip = ref(null)
 onMounted(async () => {

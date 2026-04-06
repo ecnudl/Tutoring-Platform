@@ -7,7 +7,7 @@
           <div class="user-card">
             <el-avatar :size="64" :src="userStore.avatar" />
             <div class="user-name">{{ userStore.mobile || '用户' }}</div>
-            <div class="user-type">{{ userStore.userType === 2 ? '教员' : '学员/家长' }}</div>
+            <div class="user-type">{{ userStore.userType === 1 ? '教员' : '学员/家长' }}</div>
           </div>
 
           <div class="menu-box">
@@ -27,13 +27,13 @@
               </NuxtLink>
             </div>
 
-            <div class="menu-section" v-if="userStore.userType === 2">
+            <div class="menu-section" v-if="userStore.userType === 1">
               <div class="menu-title">教员中心</div>
-              <NuxtLink to="/center/tutor/profile" class="menu-link">
+              <NuxtLink to="/center/tutor-profile" class="menu-link">
                 <span class="icon">📝</span>
                 <span>教员资料</span>
               </NuxtLink>
-              <NuxtLink to="/center/tutor/orders" class="menu-link">
+              <NuxtLink to="/center/orders" class="menu-link">
                 <span class="icon">📋</span>
                 <span>我的订单</span>
               </NuxtLink>
@@ -53,7 +53,7 @@
 
             <div class="menu-section">
               <div class="menu-title">账户设置</div>
-              <NuxtLink to="/center/security" class="menu-link">
+              <NuxtLink to="/center/password" class="menu-link">
                 <span class="icon">🔒</span>
                 <span>安全设置</span>
               </NuxtLink>

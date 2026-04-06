@@ -192,7 +192,7 @@
           <div class="agreement-box" :class="{ error: agreementError }">
             <el-checkbox v-model="form.agreed" @change="agreementError = false">
               我已阅读并同意
-              <a href="/agreement/teacher" target="_blank">《教员服务协议》</a>
+              <a href="/agreement/user" target="_blank">《用户服务协议》</a>
               和
               <a href="/agreement/privacy" target="_blank">《隐私政策》</a>
             </el-checkbox>

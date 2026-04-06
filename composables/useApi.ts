@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const config = useRuntimeConfig()
+
 const api = axios.create({
-  baseURL: '',
+  baseURL: config.public.apiBase as string,
   timeout: 15000
 })
 

@@ -2,7 +2,7 @@
 <div class="center-home">
   <div class="welcome-box">
     <h2>欢迎回来，{{ userStore.mobile }}</h2>
-    <p>{{ userStore.userType === 2 ? '教员账户' : '学员/家长账户' }}</p>
+    <p>{{ userStore.userType === 1 ? '教员账户' : '学员/家长账户' }}</p>
   </div>
 
   <!-- 快捷功能 -->
@@ -80,6 +80,10 @@
 </template>
 
 <script setup>
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
 
@@ -105,7 +109,7 @@ onMounted(async () => {
       stats.value.favorites = favRes.data.length || 0
     }
     if (reqRes.code === 200 && reqRes.data) {
-      stats.value.requirements = reqRes.data.total || 0
+      stats.value.requirements = reqRes.data.totalCount || 0
     }
   } catch (e) {
     console.error(e)

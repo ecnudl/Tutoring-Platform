@@ -39,7 +39,10 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { post, put } = useApi()
 const router = useRouter()
 
@@ -91,7 +94,7 @@ const handleAction = async (id, action) => {
 }
 
 const viewTutor = (tutorId) => {
-  router.push('/tutor/' + tutorId)
+  router.push('/jy/t' + tutorId)
 }
 
 onMounted(() => { loadRequirements() })

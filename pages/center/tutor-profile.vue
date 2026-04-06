@@ -33,7 +33,7 @@
         <el-option label="大学生" :value="1" />
         <el-option label="专职" :value="2" />
         <el-option label="在职教师" :value="3" />
-        <el-option label="退休教师" :value="4" />
+        <el-option label="海归外教" :value="4" />
       </el-select>
     </el-form-item>
     <el-form-item label="学历">
@@ -78,7 +78,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useDictStore } from '~/stores/dict'
 import { ElMessage } from 'element-plus'
 
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 
 const dictStore = useDictStore()
 const { get, post } = useApi()

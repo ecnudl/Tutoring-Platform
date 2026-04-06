@@ -41,7 +41,10 @@ import { ElMessage } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { useDictStore } from '~/stores/dict'
 
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const dictStore = useDictStore()
 const { get, post } = useApi()
 const route = useRoute()

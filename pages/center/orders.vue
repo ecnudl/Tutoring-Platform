@@ -11,7 +11,10 @@
 </div>
 </template>
 <script setup>
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 </script>
 <style scoped>
 .orders-card { max-width: 500px; }

@@ -31,7 +31,10 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { post } = useApi()
 const form = ref({ content: '', contact: '' })
 const list = ref([])

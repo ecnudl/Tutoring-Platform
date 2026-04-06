@@ -27,7 +27,10 @@
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { get, post } = useApi()
 const userStore = useUserStore()
 const form = ref({ nickname: '', userSex: 1 })

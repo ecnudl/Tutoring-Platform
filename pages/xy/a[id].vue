@@ -85,7 +85,7 @@ const loadReq = async () => {
   finally { loading.value = false }
 }
 
-const handleApply = () => {
+const handleApply = async () => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录后再申请')
     router.push('/login')
@@ -95,7 +95,19 @@ const handleApply = () => {
     ElMessage.warning('仅教员可以申请需求')
     return
   }
-  ElMessage.success('申请已提交，请等待学员确认')
+  try {
+    const res = await post('/user/auth/application/apply', {
+      requirementId: requirement.value.id,
+      message: '您好，我对这个需求很感兴趣，希望能为您提供教学服务'
+    })
+    if (res.code === 200) {
+      ElMessage.success('申请已提交，请等待学员确认')
+    } else {
+      ElMessage.error(res.msg || '申请失败')
+    }
+  } catch (e) {
+    ElMessage.error('申请失败，请稍后重试')
+  }
 }
 
 onMounted(() => { loadReq() })

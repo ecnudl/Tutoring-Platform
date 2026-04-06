@@ -144,13 +144,25 @@ const loadTutor = async () => {
   finally { loading.value = false }
 }
 
-const handleBooking = () => {
+const handleBooking = async () => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录后再预约')
     router.push('/login')
     return
   }
-  ElMessage.success('预约请求已发送，工作人员将尽快与您联系')
+  try {
+    const res = await post('/user/auth/reservation/create', {
+      tutorId: tutor.value.id,
+      message: '我对您的教学经历很感兴趣，希望能预约试讲'
+    })
+    if (res.code === 200) {
+      ElMessage.success('预约请求已发送，工作人员将尽快与您联系')
+    } else {
+      ElMessage.error(res.msg || '预约失败')
+    }
+  } catch (e) {
+    ElMessage.error('预约失败，请稍后重试')
+  }
 }
 
 onMounted(() => { loadTutor() })

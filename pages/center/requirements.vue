@@ -25,7 +25,10 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
-definePageMeta({ layout: 'center' })
+definePageMeta({
+  layout: 'center',
+  middleware: 'auth'
+})
 const { post, del } = useApi()
 const list = ref([])
 const loading = ref(false)
