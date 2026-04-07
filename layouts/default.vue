@@ -39,6 +39,10 @@
             <NuxtLink to="/qjj">请家教</NuxtLink>
             <NuxtLink to="/zf">价格参考</NuxtLink>
             <NuxtLink to="/help">帮助</NuxtLink>
+            <a href="javascript:;" class="nav-announce" @click="announcementVisible = true">
+              公告
+              <span v-if="hasNewAnnouncement" class="nav-new-badge">new</span>
+            </a>
           </nav>
 
           <div class="header-right desktop-only">
@@ -98,6 +102,7 @@
         <NuxtLink to="/qjj">请家教</NuxtLink>
         <NuxtLink to="/zf">价格参考</NuxtLink>
         <NuxtLink to="/help">帮助</NuxtLink>
+        <a href="javascript:;" @click="announcementVisible = true; mobileMenuOpen = false">公告</a>
         <template v-if="userStore.isLoggedIn">
           <NuxtLink to="/center">个人中心</NuxtLink>
           <a @click="handleLogout" style="color:var(--color-error);cursor:pointer">退出登录</a>
@@ -111,12 +116,42 @@
 
     <main class="page-content"><slot /></main>
 
+    <!-- 公告弹窗 -->
+    <el-dialog v-model="announcementVisible" title="网站公告" width="600px" :close-on-click-modal="false">
+      <div class="announcement-list">
+        <div
+          v-for="item in announcements"
+          :key="item.id"
+          class="announcement-item"
+          @click="showAnnouncementDetail(item)"
+        >
+          <div class="ann-header">
+            <h3 class="ann-title">
+              {{ item.title }}
+              <span v-if="isNewAnnouncement(item)" class="ann-new-tag">NEW</span>
+            </h3>
+            <span class="ann-time">{{ formatDate(item.gmtCreate) }}</span>
+          </div>
+          <div class="ann-preview">{{ item.content.substring(0, 50) }}...</div>
+        </div>
+        <el-empty v-if="!announcements.length" description="暂无公告" />
+      </div>
+    </el-dialog>
+
+    <!-- 公告详情弹窗 -->
+    <el-dialog v-model="announcementDetailVisible" :title="currentAnnouncement?.title" width="600px">
+      <div class="announcement-detail">
+        <div class="detail-time">发布时间：{{ formatDate(currentAnnouncement?.gmtCreate) }}</div>
+        <div class="detail-content" v-html="currentAnnouncement?.content"></div>
+      </div>
+    </el-dialog>
+
     <SiteFooter />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Location, ArrowDown, Search, Phone, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
@@ -127,6 +162,43 @@ const cityStore = useCityStore()
 const router = useRouter()
 const mobileMenuOpen = ref(false)
 const searchKeyword = ref('')
+
+// 公告相关
+const announcementVisible = ref(false)
+const announcementDetailVisible = ref(false)
+const currentAnnouncement = ref(null)
+const announcements = ref([])
+const readIds = ref([])
+
+const mockAnnouncements = [
+  { id: 1, title: '欢迎使用51家教网', content: '51家教网致力于为学员和家长提供优质的家教服务，我们拥有大量经过认证的优秀教员，覆盖小学、初中、高中各个年级和科目。', gmtCreate: new Date().toISOString(), status: 1 },
+  { id: 2, title: '平台服务升级通知', content: '为了给您提供更好的服务体验，我们将在本周末进行系统升级维护，届时部分功能可能暂时无法使用，预计维护时间为2小时，给您带来的不便敬请谅解。', gmtCreate: new Date(Date.now() - 86400000).toISOString(), status: 1 },
+  { id: 3, title: '教员认证流程优化', content: '为了提高教员认证效率，我们优化了认证流程，现在只需要上传学生证或教师资格证即可快速完成认证，审核时间缩短至24小时内。', gmtCreate: new Date(Date.now() - 172800000).toISOString(), status: 1 }
+]
+
+const hasNewAnnouncement = computed(() => {
+  return announcements.value.some(a => !readIds.value.includes(a.id) && isNewAnnouncement(a))
+})
+
+const isNewAnnouncement = (item) => {
+  const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000
+  return new Date(item.gmtCreate).getTime() > threeDaysAgo
+}
+
+const formatDate = (date) => {
+  if (!date) return ''
+  const d = new Date(date)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+const showAnnouncementDetail = (item) => {
+  currentAnnouncement.value = item
+  announcementDetailVisible.value = true
+  if (!readIds.value.includes(item.id)) {
+    readIds.value.push(item.id)
+    localStorage.setItem('announcement_read_ids', JSON.stringify(readIds.value))
+  }
+}
 
 const cities = [
   { name: '上海', pinyin: 'shanghai', id: 1, enabled: true, url: '/' },
@@ -155,6 +227,25 @@ const doSearch = () => {
 }
 
 const handleLogout = () => { userStore.logout(); router.push('/') }
+
+onMounted(() => {
+  const stored = localStorage.getItem('announcements')
+  if (stored) {
+    try { announcements.value = JSON.parse(stored) } catch (e) { announcements.value = mockAnnouncements }
+  } else {
+    announcements.value = mockAnnouncements
+    localStorage.setItem('announcements', JSON.stringify(mockAnnouncements))
+  }
+  const readStored = localStorage.getItem('announcement_read_ids')
+  if (readStored) {
+    try { readIds.value = JSON.parse(readStored) } catch (e) { readIds.value = [] }
+  }
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'announcements' && e.newValue) {
+      try { announcements.value = JSON.parse(e.newValue) } catch (err) { /* ignore */ }
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -260,6 +351,97 @@ const handleLogout = () => { userStore.logout(); router.push('/') }
 .nav-links a:hover,
 .nav-links a.router-link-active {
   color: var(--color-primary);
+}
+
+/* Nav announce button */
+.nav-announce {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-new-badge {
+  position: absolute;
+  top: -8px;
+  right: -18px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Announcement dialog */
+.announcement-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.announcement-item {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.announcement-item:hover { background: var(--color-bg); }
+.announcement-item:last-child { border-bottom: none; }
+
+.ann-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.ann-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.ann-new-tag {
+  display: inline-block;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+}
+
+.ann-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.ann-preview {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.announcement-detail { padding: var(--space-lg) 0; }
+.detail-time {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.detail-content {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
 }
 
 /* Right area */

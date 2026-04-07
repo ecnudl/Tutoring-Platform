@@ -170,7 +170,6 @@
       </div>
     </div>
 
-    <AnnouncementFloat />
   </div>
 </template>
 
@@ -221,7 +220,7 @@ onMounted(async () => {
 /* Hero */
 .hero-section {
   display: flex;
-  gap: var(--space-3xl);
+  gap: var(--space-2xl);
   align-items: center;
   padding: var(--space-3xl) 0;
 }
@@ -269,7 +268,7 @@ onMounted(async () => {
   flex-direction: column;
   gap: var(--space-lg);
   flex-shrink: 0;
-  width: 280px;
+  width: 380px;
 }
 
 .entry-card {
