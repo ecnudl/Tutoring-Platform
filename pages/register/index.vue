@@ -1,6 +1,9 @@
 <template>
   <div class="register-page">
     <div class="register-container">
+      <div class="register-brand">
+        <SiteLogo :showText="true" />
+      </div>
       <div class="register-header">
         <h2>欢迎注册</h2>
         <p>如果您已经注册过，可以直接选择 <NuxtLink to="/login/find-password">找回密码</NuxtLink></p>
@@ -32,107 +35,105 @@
 <style scoped>
 .register-page {
   min-height: 100vh;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  overflow: hidden;
+  padding: var(--space-xl);
 }
 
 .register-container {
-  max-width: 900px;
+  max-width: 700px;
   width: 100%;
+}
+
+.register-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-2xl);
 }
 
 .register-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: var(--space-3xl);
 }
 
 .register-header h2 {
-  color: #fff;
-  font-size: 32px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .register-header p {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
 }
 
 .register-header a {
-  color: #fff;
-  text-decoration: underline;
+  color: var(--color-primary);
 }
 
 .register-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  max-width: 700px;
-  margin: 0 auto;
+  gap: var(--space-2xl);
 }
 
 .reg-card {
   display: block;
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4xl) var(--space-2xl);
   text-align: center;
-  transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  text-decoration: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .reg-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .reg-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
+  font-size: 48px;
+  margin-bottom: var(--space-lg);
 }
 
 .reg-card h3 {
-  font-size: 20px;
-  color: #333;
-  margin-bottom: 8px;
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
 }
 
 .reg-card p {
-  color: #999;
-  font-size: 14px;
-  margin-bottom: 20px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-xl);
 }
 
 .reg-links {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  gap: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .reg-links a {
-  font-size: 13px;
-  color: #409eff;
-  text-decoration: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
 }
 
 .reg-links a:hover {
-  text-decoration: underline;
+  color: var(--color-primary-light);
 }
 
 @media (max-width: 768px) {
   .register-cards {
     grid-template-columns: 1fr;
     max-width: 400px;
+    margin: 0 auto;
   }
 }
 </style>

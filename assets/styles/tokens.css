@@ -1,0 +1,81 @@
+/* ============================================
+   51家教网 Design Tokens
+   教育服务平台 — 可靠 · 务实 · 信息清晰
+   ============================================ */
+
+:root {
+  /* ---------- Color ---------- */
+  --color-primary: #1F4E8C;
+  --color-primary-light: #2A6AB5;
+  --color-primary-lighter: #E8EFF8;
+  --color-primary-dark: #163B6B;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+  --color-accent-dark: #D97706;
+
+  --color-bg: #F7F8FA;
+  --color-surface: #FFFFFF;
+
+  --color-text: #1F2937;
+  --color-text-secondary: #667085;
+  --color-text-muted: #9CA3AF;
+
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F1F3;
+
+  --color-success: #2E7D32;
+  --color-error: #C62828;
+  --color-warning: #E65100;
+
+  /* ---------- Typography ---------- */
+  --font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.4;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+  /* ---------- Spacing ---------- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+
+  /* ---------- Layout ---------- */
+  --content-width: 1200px;
+  --sidebar-width: 220px;
+
+  /* ---------- Border Radius ---------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  /* ---------- Shadow ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* ---------- Transition ---------- */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+}

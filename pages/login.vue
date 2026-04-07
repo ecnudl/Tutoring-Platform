@@ -1,10 +1,11 @@
 <template>
   <div class="login-page">
     <div class="login-container">
-      <div class="login-header">
-        <h2>会员登录</h2>
+      <div class="login-brand">
+        <SiteLogo :showText="true" />
       </div>
-      <el-card>
+      <div class="login-card">
+        <h2 class="login-title">会员登录</h2>
         <el-tabs v-model="activeTab" stretch>
           <el-tab-pane label="账号登录" name="password">
             <el-form :model="passwordForm" @keyup.enter="handlePasswordLogin">
@@ -36,7 +37,7 @@
           <NuxtLink to="/login/find-password">找回密码</NuxtLink>
           <NuxtLink to="/register">我要注册</NuxtLink>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -136,13 +137,11 @@ const handleSmsLogin = async () => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  overflow: hidden;
+  padding: var(--space-xl);
 }
 
 .login-container {
@@ -150,33 +149,40 @@ const handleSmsLogin = async () => {
   width: 100%;
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: 24px;
+.login-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-3xl);
 }
 
-.login-header h2 {
-  color: #fff;
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.login-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl);
+}
+
+.login-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
 }
 
 .login-footer {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
-  font-size: 13px;
+  margin-top: var(--space-lg);
+  font-size: var(--font-size-sm);
 }
 
 .login-footer a {
-  color: #409eff;
-  text-decoration: none;
-  transition: color 0.2s;
+  color: var(--color-primary);
+  transition: color var(--transition-fast);
 }
 
 .login-footer a:hover {
-  color: #66b1ff;
+  color: var(--color-primary-light);
 }
 </style>

@@ -4,13 +4,13 @@
       <Title>家长/学员注册 - 51家教网</Title>
     </Head>
     <div class="student-register-container">
-      <div class="register-header">
-        <h2>家长注册</h2>
+      <div class="register-brand">
+        <SiteLogo :showText="true" />
       </div>
-      <el-card>
+      <div class="register-card">
+        <h2 class="register-title">家长注册</h2>
         <div class="city-info">目前所在城市：<span>{{ cityStore.cityName }}</span></div>
         <el-form :model="form" ref="formRef" label-position="top">
-
           <el-form-item label="手机号">
             <el-input v-model="form.mobile" placeholder="请输入手机号" size="large" />
           </el-form-item>
@@ -48,7 +48,7 @@
           <span>|</span>
           想做家教？<NuxtLink to="/register/teacher">教员注册</NuxtLink>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -153,105 +153,95 @@ const handleSubmit = async () => {
 <style scoped>
 .student-register-page {
   min-height: 100vh;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
+  padding: var(--space-xl);
 }
 
 .student-register-container {
-  max-width: 500px;
+  max-width: 480px;
   width: 100%;
-  margin: auto;
 }
 
-.register-header {
+.register-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.register-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl);
+}
+
+.register-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
   text-align: center;
-  margin-bottom: 24px;
-}
-
-.register-header h2 {
-  color: #fff;
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--space-xl);
 }
 
 .city-info {
-  margin-bottom: 16px;
-  color: #666;
-  font-size: 14px;
+  margin-bottom: var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
 }
 
 .city-info span {
-  color: #409eff;
-  font-weight: 500;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .register-footer {
   text-align: center;
-  color: #999;
-  font-size: 13px;
-  margin-top: 16px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-lg);
 }
 
 .register-footer span {
-  margin: 0 8px;
+  margin: 0 var(--space-sm);
 }
 
 .register-footer a {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.register-footer a:hover {
-  text-decoration: underline;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+  color: var(--color-primary);
 }
 
 .agreement-check {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f8f9fc;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
-  transition: all 0.3s;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
 }
 
 .agreement-check--error {
-  background: #fef0f0;
-  border-color: #f56c6c;
+  background: #fef2f2;
+  border-color: var(--color-error);
 }
 
 .agreement-text {
-  font-size: 13px;
-  color: #606266;
-  line-height: 1.6;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
 }
+
 .agreement-text a {
-  color: #409eff;
-  text-decoration: none;
-  font-weight: 500;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
-.agreement-text a:hover {
-  text-decoration: underline;
-}
+
 .agreement-error-msg {
-  color: #f56c6c;
-  font-size: 12px;
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
   margin-top: 6px;
   padding-left: 4px;
 }

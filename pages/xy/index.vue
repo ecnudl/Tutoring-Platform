@@ -51,7 +51,7 @@
 
     <div v-if="loading" style="text-align:center;padding:60px">
       <el-icon class="is-loading" :size="32"><Loading /></el-icon>
-      <p style="color:#999;margin-top:8px">加载中...</p>
+      <p style="color:var(--color-text-muted);margin-top:8px">加载中...</p>
     </div>
 
     <template v-else>
@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      <div v-if="!requirements.length" style="text-align:center;padding:60px;color:#999">暂无符合条件的需求</div>
+      <div v-if="!requirements.length" style="text-align:center;padding:60px;color:var(--color-text-muted)">暂无符合条件的需求</div>
 
       <div style="display:flex;justify-content:center;margin:24px 0" v-if="total > 0">
         <el-pagination
@@ -159,38 +159,80 @@ onMounted(() => { search() })
 </script>
 
 <style scoped>
-.xy-page { padding: 20px; }
-.el-breadcrumb { margin-bottom: 16px; }
+.xy-page { padding: var(--space-xl); }
+.el-breadcrumb { margin-bottom: var(--space-lg); }
 
-.filter-section { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-.filter-row { display: flex; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.filter-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.filter-row {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
 .filter-row:last-child { border-bottom: none; }
-.filter-label { width: 80px; flex-shrink: 0; font-size: 14px; color: #333; font-weight: 500; line-height: 28px; }
+
+.filter-label {
+  width: 80px;
+  flex-shrink: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  line-height: 28px;
+}
+
 .filter-tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-.ftag { display: inline-block; padding: 4px 12px; font-size: 13px; color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s; line-height: 20px; }
-.ftag:hover { color: #409eff; }
-.ftag.active { background: #409eff; color: #fff; }
 
-.result-header { margin-bottom: 12px; font-size: 14px; color: #666; }
-.result-header strong { color: #409eff; }
+.ftag {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  line-height: 20px;
+}
+.ftag:hover { color: var(--color-primary); }
+.ftag.active { background: var(--color-primary); color: #fff; }
 
-.req-list { display: flex; flex-direction: column; gap: 12px; }
-.req-card { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 8px; padding: 16px; transition: box-shadow 0.3s; }
-.req-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+.result-header { margin-bottom: var(--space-md); font-size: var(--font-size-base); color: var(--color-text-secondary); }
+.result-header strong { color: var(--color-primary); }
+
+.req-list { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.req-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: border-color var(--transition-fast);
+}
+.req-card:hover { border-color: var(--color-primary); }
+
 .req-body { flex: 1; }
-.req-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.req-title { font-size: 16px; font-weight: 600; }
-.req-no { font-size: 12px; color: #bbb; margin-bottom: 6px; }
-.req-info { font-size: 13px; color: #999; margin-bottom: 6px; display: flex; gap: 12px; }
-.req-desc { color: #666; }
+.req-title-row { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: 4px; }
+.req-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-text); }
+.req-no { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 6px; }
+.req-info { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 6px; display: flex; gap: var(--space-md); }
+.req-desc { color: var(--color-text-secondary); }
 .req-tags { display: flex; gap: 4px; flex-wrap: wrap; }
-.req-action { flex-shrink: 0; margin-left: 16px; }
+.req-action { flex-shrink: 0; margin-left: var(--space-lg); }
 
 @media (max-width: 768px) {
-  .xy-page { padding: 12px; }
+  .xy-page { padding: var(--space-md); }
   .filter-row { flex-direction: column; }
   .filter-label { width: auto; margin-bottom: 4px; }
-  .req-card { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .req-card { flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
   .req-action { margin-left: 0; width: 100%; }
   .req-action .el-button { width: 100%; }
 }

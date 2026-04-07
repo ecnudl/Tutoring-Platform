@@ -2,10 +2,9 @@
   <div class="layout-center">
     <div class="container">
       <div class="center-wrapper">
-        <!-- 左侧菜单 -->
         <aside class="sidebar">
           <div class="user-card">
-            <el-avatar :size="64" :src="userStore.avatar" />
+            <el-avatar :size="56" :src="userStore.avatar" />
             <div class="user-name">{{ userStore.mobile || '用户' }}</div>
             <div class="user-type">{{ userStore.userType === 1 ? '教员' : '学员/家长' }}</div>
           </div>
@@ -65,7 +64,6 @@
           </div>
         </aside>
 
-        <!-- 右侧内容 -->
         <main class="main-content">
           <slot />
         </main>
@@ -90,152 +88,101 @@ const handleLogout = () => {
 
 <style scoped>
 .layout-center {
-  background: #f5f7fa;
-  min-height: calc(100vh - 86px);
-  padding: 20px 0;
+  background: var(--color-bg);
+  min-height: calc(100vh - 56px);
+  padding: var(--space-xl) 0;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: var(--content-width);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--space-xl);
 }
 
 .center-wrapper {
   display: flex;
-  gap: 20px;
+  gap: var(--space-xl);
 }
 
-/* 左侧边栏 */
 .sidebar {
-  width: 220px;
+  width: var(--sidebar-width);
   flex-shrink: 0;
 }
 
 .user-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
   text-align: center;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  margin-bottom: var(--space-lg);
 }
 
 .user-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-top: 12px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-top: var(--space-md);
 }
 
 .user-type {
-  font-size: 13px;
-  color: #999;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
   margin-top: 4px;
 }
 
 .menu-box {
-  background: #fff;
-  border-radius: 8px;
-  padding: 8px 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) 0;
 }
 
 .menu-section {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
 }
-
-.menu-section:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
+.menu-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 
 .menu-title {
-  font-size: 12px;
-  color: #999;
-  padding: 8px 16px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding: var(--space-sm) var(--space-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .menu-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  color: #666;
-  font-size: 14px;
-  transition: all 0.2s;
+  gap: var(--space-sm);
+  padding: 10px var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-fast);
   cursor: pointer;
 }
+.menu-link:hover { background: var(--color-bg); color: var(--color-primary); }
+.menu-link.router-link-active { background: var(--color-primary-lighter); color: var(--color-primary); font-weight: var(--font-weight-medium); }
 
-.menu-link:hover {
-  background: #f5f7fa;
-  color: #409eff;
-}
+.icon { font-size: var(--font-size-lg); width: 20px; text-align: center; }
 
-.menu-link.router-link-active {
-  background: #ecf5ff;
-  color: #409eff;
-  font-weight: 500;
-}
-
-.icon {
-  font-size: 16px;
-  width: 20px;
-  text-align: center;
-}
-
-/* 右侧内容 */
 .main-content {
   flex: 1;
-  background: #fff;
-  border-radius: 8px;
-  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
   min-height: 500px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 @media (max-width: 768px) {
-  .center-wrapper {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-  }
-
-  .menu-box {
-    display: flex;
-    overflow-x: auto;
-    padding: 8px;
-    gap: 8px;
-  }
-
-  .menu-section {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-    flex-shrink: 0;
-  }
-
-  .menu-title {
-    display: none;
-  }
-
-  .menu-link {
-    white-space: nowrap;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
-
-  .main-content {
-    padding: 16px;
-  }
+  .center-wrapper { flex-direction: column; }
+  .sidebar { width: 100%; }
+  .menu-box { display: flex; overflow-x: auto; padding: var(--space-sm); gap: var(--space-sm); }
+  .menu-section { display: flex; gap: 4px; margin-bottom: 0; padding-bottom: 0; border-bottom: none; flex-shrink: 0; }
+  .menu-title { display: none; }
+  .menu-link { white-space: nowrap; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--font-size-sm); }
+  .main-content { padding: var(--space-lg); }
 }
 </style>

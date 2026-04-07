@@ -38,10 +38,7 @@
 
           <!-- 账号信息 -->
           <div class="form-section">
-            <div class="section-title">
-              <span class="title-icon">📱</span>
-              <span>账号信息</span>
-            </div>
+            <div class="section-title">账号信息</div>
             <el-row :gutter="20">
               <el-col :span="12" :xs="24">
                 <el-form-item label="手机号" prop="mobile">
@@ -70,10 +67,7 @@
 
           <!-- 个人信息 -->
           <div class="form-section">
-            <div class="section-title">
-              <span class="title-icon">👤</span>
-              <span>个人信息</span>
-            </div>
+            <div class="section-title">个人信息</div>
             <el-row :gutter="20">
               <el-col :span="12" :xs="24">
                 <el-form-item label="真实姓名" prop="realName">
@@ -146,10 +140,7 @@
 
           <!-- 家教信息 -->
           <div class="form-section">
-            <div class="section-title">
-              <span class="title-icon">📚</span>
-              <span>家教信息</span>
-            </div>
+            <div class="section-title">家教信息</div>
             <el-form-item label="可教授科目" prop="subjects">
               <el-select v-model="form.subjects" multiple collapse-tags placeholder="请选择可教授科目（可多选）" size="large" style="width:100%">
                 <el-option v-for="s in subjectOptions" :key="s" :label="s" :value="s" />
@@ -347,35 +338,35 @@ const handleSubmit = async () => {
 <style scoped>
 .register-wrapper {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--color-bg);
 }
 
-/* 顶部横幅 */
+/* Banner */
 .register-banner {
-  background: linear-gradient(135deg, #409eff 0%, #667eea 100%);
+  background: var(--color-primary);
   color: white;
-  padding: 48px 20px;
+  padding: 40px var(--space-xl);
   text-align: center;
 }
 
 .register-banner h1 {
-  font-size: 32px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .register-banner p {
-  font-size: 16px;
-  opacity: 0.9;
+  font-size: var(--font-size-md);
+  opacity: 0.85;
   margin: 0;
 }
 
-/* 步骤条 */
+/* Steps */
 .steps-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 0;
+  padding: var(--space-3xl) 0;
   gap: 0;
 }
 
@@ -383,47 +374,45 @@ const handleSubmit = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .step-number {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #dcdfe6;
+  background: var(--color-border);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
 }
 
 .step-item.active .step-number {
-  background: linear-gradient(135deg, #409eff 0%, #667eea 100%);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
+  background: var(--color-primary);
 }
 
 .step-text {
-  font-size: 14px;
-  color: #999;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
 }
 
 .step-item.active .step-text {
-  color: #409eff;
-  font-weight: 500;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .step-line {
   width: 80px;
   height: 2px;
-  background: #dcdfe6;
-  margin: 0 16px;
+  background: var(--color-border);
+  margin: 0 var(--space-lg);
   margin-bottom: 22px;
 }
 
-/* 表单容器 */
+/* Form */
 .form-container {
   max-width: 900px;
   margin: 0 auto;
@@ -431,77 +420,58 @@ const handleSubmit = async () => {
 }
 
 .form-section {
-  background: white;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl) var(--space-3xl);
+  margin-bottom: var(--space-xl);
 }
 
 .section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 24px;
-  padding-bottom: 14px;
-  border-bottom: 2px solid #f0f2f5;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.title-icon {
-  font-size: 22px;
-}
-
-/* 验证码输入组 */
+/* Code input */
 .code-input-group {
   display: flex;
   gap: 10px;
   width: 100%;
 }
+.code-input-group .el-input { flex: 1; }
+.code-input-group .el-button { white-space: nowrap; min-width: 120px; }
 
-.code-input-group .el-input {
-  flex: 1;
-}
-
-.code-input-group .el-button {
-  white-space: nowrap;
-  min-width: 120px;
-}
-
-/* 协议区域 */
+/* Agreement */
 .agreement-box {
-  background: white;
-  border-radius: 12px;
-  padding: 20px 32px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: all 0.3s;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-3xl);
+  margin-bottom: var(--space-xl);
+  transition: all var(--transition-normal);
 }
 
 .agreement-box.error {
-  border: 1px solid #f56c6c;
-  background: #fef0f0;
+  border-color: var(--color-error);
+  background: #fef2f2;
 }
 
 .agreement-box a {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.agreement-box a:hover {
-  text-decoration: underline;
+  color: var(--color-primary);
 }
 
 .agreement-box .error-msg {
-  color: #f56c6c;
-  font-size: 12px;
-  margin-top: 8px;
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-sm);
   padding-left: 24px;
 }
 
-/* 提交区域 */
+/* Submit */
 .submit-box {
   text-align: center;
   padding: 10px 0 40px;
@@ -510,64 +480,45 @@ const handleSubmit = async () => {
 .submit-btn {
   width: 320px;
   height: 48px;
-  font-size: 16px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #409eff 0%, #667eea 100%);
-  border: none;
-}
-
-.submit-btn:hover {
-  opacity: 0.9;
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-lg);
 }
 
 .login-tip {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #999;
+  margin-top: var(--space-lg);
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
 }
 
 .login-tip a {
-  color: #409eff;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-tip a:hover {
-  text-decoration: underline;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 @media (max-width: 768px) {
   .register-banner {
-    padding: 32px 16px;
+    padding: var(--space-3xl) var(--space-lg);
   }
-
   .register-banner h1 {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
   }
-
   .form-container {
-    padding: 0 12px 40px;
+    padding: 0 var(--space-md) 40px;
   }
-
   .form-section {
-    padding: 20px 16px;
-    border-radius: 8px;
+    padding: var(--space-xl) var(--space-lg);
   }
-
   .agreement-box {
-    padding: 16px;
+    padding: var(--space-lg);
   }
-
   .submit-btn {
     width: 100%;
   }
-
   .step-line {
     width: 40px;
   }
-
   .steps-wrapper {
-    padding: 20px 0;
+    padding: var(--space-xl) 0;
   }
 }
 </style>

@@ -55,7 +55,6 @@ const cityStore = useCityStore()
 const { get } = useApi()
 const loading = ref(false)
 
-// 默认数据
 const defaultPriceData = [
   { tutorType: '大学生', primary: '80-120', juniorMiddle: '100-150', juniorThird: '120-180', seniorFirst: '150-200', seniorThird: '180-250', college: '150-250' },
   { tutorType: '研究生', primary: '100-150', juniorMiddle: '120-180', juniorThird: '150-220', seniorFirst: '180-250', seniorThird: '200-300', college: '200-300' },
@@ -82,20 +81,33 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.zf-page { padding: 20px; }
-.page-sub { color: #999; margin-bottom: 24px; margin-top: -12px; }
+.zf-page { padding: var(--space-xl); }
+.page-sub { color: var(--color-text-muted); margin-bottom: var(--space-2xl); margin-top: calc(-1 * var(--space-md)); }
 
-.notes-section { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 24px; }
-.notes-section h2 { font-size: 18px; margin-bottom: 12px; }
-.notes-list { padding-left: 20px; }
-.notes-list li { font-size: 14px; color: #666; line-height: 2; }
+.notes-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+}
+.notes-section h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-md); color: var(--color-text); }
+.notes-list { padding-left: var(--space-xl); }
+.notes-list li { font-size: var(--font-size-base); color: var(--color-text-secondary); line-height: 2; }
+.notes-list strong { color: var(--color-primary); }
 
-.cta-section { background: #fff; border-radius: 8px; padding: 32px; text-align: center; }
-.cta-section h2 { font-size: 20px; margin-bottom: 16px; }
-.cta-buttons { display: flex; gap: 12px; justify-content: center; }
+.cta-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl);
+  text-align: center;
+}
+.cta-section h2 { font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); color: var(--color-text); }
+.cta-buttons { display: flex; gap: var(--space-md); justify-content: center; }
 
 @media (max-width: 768px) {
-  .zf-page { padding: 12px; }
-  .el-table { font-size: 12px; }
+  .zf-page { padding: var(--space-md); }
+  .el-table { font-size: var(--font-size-xs); }
 }
 </style>

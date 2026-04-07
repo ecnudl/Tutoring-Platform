@@ -14,8 +14,7 @@
     <p class="page-sub">我们提供多种方式帮您找到满意的家教老师</p>
 
     <div class="methods-grid">
-      <!-- 方式一：电话热线 -->
-      <el-card shadow="hover" class="method-card">
+      <el-card shadow="never" class="method-card">
         <div class="method-num">方式一</div>
         <h2>拨打服务热线</h2>
         <p class="method-desc">直接拨打我们的服务热线，专业顾问为您推荐教员</p>
@@ -23,8 +22,7 @@
         <p class="phone-time">工作时间：9:00 - 21:00（周一至周日）</p>
       </el-card>
 
-      <!-- 方式二：在线提交 -->
-      <el-card shadow="hover" class="method-card method-form-card">
+      <el-card shadow="never" class="method-card method-form-card">
         <div class="method-num">方式二</div>
         <h2>在线提交需求</h2>
         <p class="method-desc">填写简单信息，我们将在24小时内联系您</p>
@@ -47,8 +45,7 @@
         </el-form>
       </el-card>
 
-      <!-- 方式三：浏览教员 -->
-      <el-card shadow="hover" class="method-card">
+      <el-card shadow="never" class="method-card">
         <div class="method-num">方式三</div>
         <h2>自助浏览教员</h2>
         <p class="method-desc">直接浏览教员库，按条件筛选合适的教员</p>
@@ -61,24 +58,22 @@
         </div>
       </el-card>
 
-      <!-- 方式四：微信 -->
-      <el-card shadow="hover" class="method-card">
+      <el-card shadow="never" class="method-card">
         <div class="method-num">方式四</div>
         <h2>微信咨询</h2>
         <p class="method-desc">扫描二维码添加客服微信，一对一咨询</p>
         <div class="wechat-qr">
-          <img src="/placeholder/wechat-qr.svg" alt="微信二维码" style="width:160px;height:160px;border:1px solid #eee;border-radius:8px" />
-          <p style="margin-top:8px;font-size:13px;color:#999">扫码添加客服微信</p>
+          <div class="qr-placeholder">微信二维码</div>
+          <p style="margin-top:8px;font-size:13px;color:var(--color-text-muted)">扫码添加客服微信</p>
         </div>
       </el-card>
     </div>
 
-    <!-- 成功弹窗 -->
     <el-dialog v-model="successVisible" title="提交成功" width="400px" :close-on-click-modal="false">
       <div style="text-align:center;padding:20px">
-        <el-icon :size="48" color="#67c23a"><CircleCheck /></el-icon>
+        <el-icon :size="48" color="#2E7D32"><CircleCheck /></el-icon>
         <h3 style="margin-top:12px">需求提交成功！</h3>
-        <p style="color:#666;margin-top:8px">我们将在24小时内联系您，请保持电话畅通。</p>
+        <p style="color:var(--color-text-secondary);margin-top:8px">我们将在24小时内联系您，请保持电话畅通。</p>
       </div>
       <template #footer>
         <el-button type="primary" @click="successVisible = false; $router.push('/')">返回首页</el-button>
@@ -149,25 +144,49 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.qjj-page { padding: 20px; }
-.page-sub { color: #999; margin-bottom: 24px; margin-top: -12px; }
+.qjj-page { padding: var(--space-xl); }
+.page-sub { color: var(--color-text-muted); margin-bottom: var(--space-2xl); margin-top: calc(-1 * var(--space-md)); }
 
-.methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xl); }
+
 .method-card { text-align: center; }
+.method-card :deep(.el-card__body) { border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
 .method-form-card { text-align: left; }
-.method-num { display: inline-block; background: #409eff; color: #fff; padding: 2px 12px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; }
-.method-card h2 { font-size: 18px; margin-bottom: 8px; }
-.method-desc { color: #999; font-size: 14px; margin-bottom: 16px; }
 
-.phone-number { font-size: 28px; font-weight: 700; color: #e6a23c; margin: 16px 0 8px; }
-.phone-time { font-size: 13px; color: #999; }
+.method-num {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-md);
+}
 
-.wechat-qr { display: flex; flex-direction: column; align-items: center; margin-top: 16px; }
+.method-card h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-sm); color: var(--color-text); }
+.method-desc { color: var(--color-text-muted); font-size: var(--font-size-base); margin-bottom: var(--space-lg); }
 
-.browse-links { margin-top: 16px; }
+.phone-number { font-size: 28px; font-weight: var(--font-weight-bold); color: var(--color-accent-dark); margin: var(--space-lg) 0 var(--space-sm); }
+.phone-time { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+
+.wechat-qr { display: flex; flex-direction: column; align-items: center; margin-top: var(--space-lg); }
+.qr-placeholder {
+  width: 160px;
+  height: 160px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg);
+}
+
+.browse-links { margin-top: var(--space-lg); }
 
 @media (max-width: 768px) {
-  .qjj-page { padding: 12px; }
+  .qjj-page { padding: var(--space-md); }
   .methods-grid { grid-template-columns: 1fr; }
 }
 </style>
