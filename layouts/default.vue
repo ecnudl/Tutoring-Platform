@@ -5,6 +5,7 @@
         <div class="container header-inner">
           <div class="header-left">
             <SiteLogo />
+            <span class="site-slogan desktop-only">长三角精品家教一站式服务</span>
             <el-popover placement="bottom-start" :width="300" trigger="click">
               <template #reference>
                 <span class="city-trigger">
@@ -298,6 +299,15 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   transition: all var(--transition-fast);
   white-space: nowrap;
+}
+
+.site-slogan {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  padding-left: var(--space-md);
+  border-left: 1px solid var(--color-border);
+  line-height: 1.2;
 }
 .city-trigger:hover {
   border-color: var(--color-primary);

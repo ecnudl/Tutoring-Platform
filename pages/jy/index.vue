@@ -31,6 +31,7 @@
         <div class="filter-tags">
           <span class="ftag" :class="{ active: !filters.university }" @click="setFilter('university', null)">不限</span>
           <span v-for="u in universities" :key="u" class="ftag" :class="{ active: filters.university === u }" @click="setFilter('university', u)">{{ u }}</span>
+          <NuxtLink to="/university" class="ftag more-link">更多高校 &rarr;</NuxtLink>
         </div>
       </div>
       <div class="filter-row">
@@ -304,6 +305,14 @@ onMounted(() => {
 .ftag.active {
   background: var(--color-primary);
   color: #fff;
+}
+
+.ftag.more-link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+.ftag.more-link:hover {
+  background: var(--color-primary-lighter);
 }
 
 .result-header {
