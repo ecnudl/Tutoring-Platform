@@ -16,12 +16,16 @@
             <SiteLogo />
           </div>
 
-          <!-- 中：城市 + 电话 + 搜索 -->
+          <!-- 中：城市 + 电话 + 搜索（居中偏右） -->
           <div class="nav-center">
             <div class="nav-center-top">
               <el-popover placement="bottom-start" :width="300" trigger="click">
                 <template #reference>
-                  <span class="city-name">{{ cityStore.cityName }}，</span>
+                  <span class="city-btn">
+                    <el-icon size="14"><Location /></el-icon>
+                    {{ cityStore.cityName }}
+                    <el-icon size="10"><ArrowDown /></el-icon>
+                  </span>
                 </template>
                 <div class="city-popover">
                   <div class="city-popover-title">选择城市</div>
@@ -58,23 +62,26 @@
             </div>
           </div>
 
-          <!-- 右：导航 + 登录注册 -->
+          <!-- 右：导航 + 功能链接（靠最右） -->
           <div class="nav-right">
-            <div class="nav-right-top">
-              <NuxtLink to="/">{{ cityStore.cityName }}家教</NuxtLink>
-              <NuxtLink to="/jy">教员库</NuxtLink>
-              <NuxtLink to="/xy">学员需求</NuxtLink>
-              <NuxtLink to="/qjj">请家教</NuxtLink>
-              <NuxtLink to="/center">学员中心</NuxtLink>
+            <div class="nav-right-row">
+              <NuxtLink to="/" class="nav-cell">{{ cityStore.cityName }}家教</NuxtLink>
+              <NuxtLink to="/jy" class="nav-cell">教员库</NuxtLink>
+              <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
+              <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
+              <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
             </div>
-            <div class="nav-right-bottom">
+            <div class="nav-right-row">
+              <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
+              <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
+              <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
               <template v-if="userStore.isLoggedIn">
-                <NuxtLink to="/center" class="nav-user">{{ userStore.mobile || '个人中心' }}</NuxtLink>
-                <a href="javascript:;" @click="handleLogout" class="nav-btn-text">退出</a>
+                <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile || '个人中心' }}</NuxtLink>
+                <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
               </template>
               <template v-else>
-                <NuxtLink to="/login" class="nav-btn login-btn">登录</NuxtLink>
-                <NuxtLink to="/register" class="nav-btn register-btn">注册</NuxtLink>
+                <NuxtLink to="/login" class="nav-cell">登录</NuxtLink>
+                <NuxtLink to="/register" class="nav-cell nav-highlight">注册</NuxtLink>
               </template>
             </div>
           </div>
@@ -213,7 +220,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Phone, Search } from '@element-plus/icons-vue'
+import { Phone, Search, Location, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
@@ -337,16 +344,16 @@ onMounted(async () => {
   display: flex;
   align-items: stretch;
   border-bottom: 1px solid var(--color-border-light);
-  min-height: 90px;
+  min-height: 100px;
 }
 
 /* 左：Logo */
 .nav-logo {
   display: flex;
   align-items: center;
-  padding: var(--space-lg) var(--space-xl);
-  border-right: 1px solid var(--color-border-light);
+  padding: 0 var(--space-2xl);
   flex-shrink: 0;
+  border-right: 1px solid var(--color-border-light);
 }
 
 /* 中：城市+电话 / 搜索 */
@@ -354,114 +361,89 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--space-md) var(--space-xl);
-  gap: var(--space-sm);
-  min-width: 260px;
-  border-right: 1px solid var(--color-border-light);
+  padding: var(--space-md) var(--space-3xl);
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .nav-center-top {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-xl);
 }
 
-.city-name {
+/* 城市按钮样式 */
+.city-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   cursor: pointer;
-  transition: color var(--transition-fast);
+  padding: 4px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
 }
-.city-name:hover {
+.city-btn:hover {
   color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: var(--color-primary-lighter);
 }
 
 .nav-phone {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  gap: 4px;
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
 }
 
+.nav-search {
+  width: 220px;
+}
 .nav-search :deep(.el-input__wrapper) {
   border-radius: var(--radius-sm);
 }
 
-/* 右：导航链接 + 登录注册 */
+/* 右：5列等宽网格，上下两排完全对齐 */
 .nav-right {
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--space-md) var(--space-xl);
-  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-2xl);
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
-.nav-right-top {
+.nav-right-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+}
+
+.nav-cell {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
-}
-
-.nav-right-top a {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
+  justify-content: center;
+  padding: 4px 12px;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
   white-space: nowrap;
   transition: color var(--transition-fast);
+  text-align: center;
 }
-.nav-right-top a:hover {
+.nav-cell:hover {
   color: var(--color-primary);
 }
 
-.nav-right-bottom {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.nav-user {
-  font-size: var(--font-size-sm);
+.nav-highlight {
   color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-.nav-btn-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-.nav-btn-text:hover {
-  color: var(--color-primary);
-}
-
-.nav-btn {
-  display: inline-block;
-  padding: 4px 18px;
-  font-size: var(--font-size-sm);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.login-btn {
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-}
-.login-btn:hover {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.register-btn {
-  background: var(--color-primary);
-  color: #fff;
-  border: 1px solid var(--color-primary);
-}
-.register-btn:hover {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary-light);
 }
 
 /* ============================================

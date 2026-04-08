@@ -30,8 +30,8 @@ defineProps({
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: var(--color-primary, #1F4E8C);
   border-radius: var(--radius-md, 6px);
   display: flex;
@@ -40,14 +40,14 @@ defineProps({
 }
 
 .logo-number {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.5px;
 }
 
 .logo-text {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-text, #1F2937);
 }
