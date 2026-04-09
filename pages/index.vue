@@ -89,7 +89,7 @@
 
         <!-- ▸ 板块二：轮播图 -->
         <div class="card-banner">
-          <el-carousel height="380px" :interval="5000" arrow="hover" indicator-position="outside">
+          <el-carousel height="380px" :interval="5000" arrow="hover">
             <el-carousel-item v-for="slide in slides" :key="slide.id">
               <div class="slide-item">
                 <img v-if="slide.imageUrl" :src="slide.imageUrl" :alt="slide.title" class="slide-img" />
@@ -104,35 +104,55 @@
           </el-carousel>
         </div>
 
-        <!-- ▸ 板块三：三个入口方块 -->
+        <!-- ▸ 板块三：三栏功能区 -->
         <div class="card-actions">
-          <NuxtLink to="/qjj" class="action-box">
-            <div class="action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <!-- 框1：热线 + 两个入口按钮 -->
+          <div class="action-panel">
+            <div class="panel-hotline">
+              <span class="hotline-label">家教热线</span>
+              <span class="hotline-number">400-000-0000</span>
             </div>
-            <div class="action-text">
-              <div class="action-title">我是家长</div>
-              <div class="action-sub">找最家教</div>
-            </div>
-          </NuxtLink>
+            <NuxtLink to="/qjj" class="action-entry">
+              <div class="entry-icon find-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <span>我要找家教</span>
+            </NuxtLink>
+            <NuxtLink to="/register/teacher" class="action-entry">
+              <div class="entry-icon teach-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span>我要做家教</span>
+            </NuxtLink>
+          </div>
 
-          <NuxtLink to="/register/teacher" class="action-box">
-            <div class="action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <!-- 框2：二维码 -->
+          <div class="action-panel contact-panel">
+            <div class="qr-header">为便于沟通，欢迎添加微信号</div>
+            <div class="contact-qr">
+              <div class="qr-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="80" height="80"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
+              </div>
+              <span class="qr-tip">扫码添加微信</span>
             </div>
-            <div class="action-text">
-              <div class="action-title">我是教员</div>
-              <div class="action-sub">找最教员</div>
-            </div>
-          </NuxtLink>
+          </div>
 
-          <div class="action-box action-hotline">
-            <div class="action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <!-- 框3：公告栏（三个 tab） -->
+          <div class="action-panel notice-panel">
+            <div class="notice-tabs">
+              <span
+                v-for="(tab, idx) in noticeTabs"
+                :key="idx"
+                class="notice-tab"
+                :class="{ active: activeNoticeTab === idx }"
+                @click="activeNoticeTab = idx"
+              >{{ tab.label }}</span>
             </div>
-            <div class="action-text">
-              <div class="action-title">家教热线</div>
-              <div class="action-phone">400-000-0000</div>
+            <div class="notice-body">
+              <div v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" class="notice-item">
+                <span class="notice-dot"></span>
+                <span class="notice-text">{{ item }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -144,8 +164,14 @@
         <div class="category-body">
           <div class="category-row">
             <div class="category-label">家教科目</div>
-            <div class="category-links">
-              <NuxtLink v-for="s in hotSubjects" :key="s.id" :to="'/jy?subject=' + s.id">{{ s.name }}</NuxtLink>
+            <div class="category-links-wrap">
+              <div class="category-links" :class="{ expanded: subjectExpanded }">
+                <NuxtLink v-for="s in allSubjects" :key="s.name" :to="'/jy?subject=' + encodeURIComponent(s.name)">{{ s.name }}</NuxtLink>
+              </div>
+              <span class="expand-btn" @click.prevent="subjectExpanded = !subjectExpanded">
+                {{ subjectExpanded ? '收起' : '展开' }}
+                <el-icon size="12"><component :is="subjectExpanded ? ArrowUp : ArrowDown" /></el-icon>
+              </span>
             </div>
           </div>
           <div class="category-row">
@@ -156,9 +182,14 @@
           </div>
           <div class="category-row">
             <div class="category-label">热门高校</div>
-            <div class="category-links">
-              <NuxtLink v-for="u in universities" :key="u" :to="'/jy?university=' + encodeURIComponent(u)">{{ u }}</NuxtLink>
-              <NuxtLink to="/university" class="more-link">更多 &rarr;</NuxtLink>
+            <div class="category-links-wrap">
+              <div class="category-links" :class="{ expanded: universityExpanded }">
+                <NuxtLink v-for="u in universities" :key="u" :to="'/jy?university=' + encodeURIComponent(u)">{{ u }}</NuxtLink>
+              </div>
+              <span class="expand-btn" @click.prevent="universityExpanded = !universityExpanded">
+                {{ universityExpanded ? '收起' : '展开' }}
+                <el-icon size="12"><component :is="universityExpanded ? ArrowUp : ArrowDown" /></el-icon>
+              </span>
             </div>
           </div>
           <div class="category-row">
@@ -170,14 +201,6 @@
               <NuxtLink to="/jy?tutorType=4">海归外教</NuxtLink>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- ========== 热门科目 ========== -->
-      <div class="hot-subjects">
-        <div class="hot-title">热门科目</div>
-        <div class="hot-grid">
-          <NuxtLink v-for="item in hotCombos" :key="item.label" :to="item.link" class="hot-tag">{{ item.label }}</NuxtLink>
         </div>
       </div>
 
@@ -220,7 +243,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Phone, Search, Location, ArrowDown } from '@element-plus/icons-vue'
+import { Phone, Search, Location, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
@@ -235,6 +258,53 @@ const router = useRouter()
 const searchKeyword = ref('')
 const tutors = ref([])
 const requirements = ref([])
+const activeNoticeTab = ref(0)
+const subjectExpanded = ref(false)
+const universityExpanded = ref(false)
+
+const allSubjects = [
+  { name: '幼儿学前' }, { name: '小学全科' }, { name: '初中理科' }, { name: '初中文科' },
+  { name: '高中理科' }, { name: '高中文科' }, { name: '语文' }, { name: '英语' },
+  { name: '数学' }, { name: '奥数' }, { name: '物理' }, { name: '化学' },
+  { name: '生物' }, { name: '历史' }, { name: '地理' }, { name: '政治' },
+  { name: '钢琴' }, { name: '小提琴' }, { name: '古筝' }, { name: '跳绳' },
+  { name: '篮球' }, { name: '游泳' }, { name: '围棋' }, { name: '书法' },
+  { name: '美术' }, { name: '英语口语' }, { name: '四级' }, { name: '托福' },
+  { name: '雅思' }, { name: 'SAT' }, { name: 'AP' }, { name: 'A-level' },
+  { name: 'IB' }, { name: 'IGCSE' }, { name: '日语' }, { name: '德语' },
+  { name: '高数' }, { name: '计算机' }, { name: '初中' }, { name: '高中' },
+  { name: '大学考研' }
+]
+
+const noticeTabs = [
+  {
+    label: '网站公告',
+    items: [
+      '平台服务升级维护通知',
+      '五一假期客服时间调整',
+      '教员认证流程优化公告',
+      '新增苏州、南京站点上线',
+    ]
+  },
+  {
+    label: '教育资讯',
+    items: [
+      '2025年上海中考政策解读',
+      '小学数学思维训练方法分享',
+      '初中英语听力提分技巧',
+      '高考志愿填报注意事项',
+    ]
+  },
+  {
+    label: '教/学员须知',
+    items: [
+      '首次试讲免费，满意后再上课',
+      '课时费由家长与教员直接结算',
+      '教员需通过实名认证方可接单',
+      '如遇问题请拨打客服热线反馈',
+    ]
+  }
+]
 
 // 轮播图数据
 const slides = ref([
@@ -249,31 +319,6 @@ const cities = [
   { name: '南京', pinyin: 'nanjing', id: 5, enabled: true },
   { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
   { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: true }
-]
-
-const hotSubjects = [
-  { id: 1, name: '数学' }, { id: 2, name: '英语' }, { id: 3, name: '语文' }, { id: 4, name: '物理' },
-  { id: 5, name: '化学' }, { id: 6, name: '钢琴' }, { id: 7, name: '美术' }, { id: 8, name: '编程' },
-  { id: 9, name: '日语' }, { id: 10, name: '法语' }, { id: 11, name: '小提琴' }, { id: 12, name: '书法' }
-]
-
-const hotCombos = [
-  { label: '小学数学', link: '/jy?subject=1&grade=1' },
-  { label: '小学英语', link: '/jy?subject=2&grade=1' },
-  { label: '小学语文', link: '/jy?subject=3&grade=1' },
-  { label: '初中数学', link: '/jy?subject=1&grade=2' },
-  { label: '初中英语', link: '/jy?subject=2&grade=2' },
-  { label: '初中物理', link: '/jy?subject=4&grade=2' },
-  { label: '初中化学', link: '/jy?subject=5&grade=2' },
-  { label: '高中数学', link: '/jy?subject=1&grade=3' },
-  { label: '高中英语', link: '/jy?subject=2&grade=3' },
-  { label: '高中物理', link: '/jy?subject=4&grade=3' },
-  { label: '高中化学', link: '/jy?subject=5&grade=3' },
-  { label: '钢琴陪练', link: '/jy?subject=6' },
-  { label: '美术绘画', link: '/jy?subject=7' },
-  { label: '书法练字', link: '/jy?subject=12' },
-  { label: '日语辅导', link: '/jy?subject=9' },
-  { label: '编程入门', link: '/jy?subject=8' },
 ]
 
 const handleCityClick = (city) => {
@@ -484,49 +529,91 @@ onMounted(async () => {
   font-size: var(--font-size-lg);
 }
 
-.card-banner :deep(.el-carousel__indicators--outside) {
-  margin-top: -30px;
-  position: relative;
-  z-index: 2;
+.card-banner :deep(.el-carousel__indicators) {
+  bottom: 12px;
 }
 
 .card-banner :deep(.el-carousel__indicator .el-carousel__button) {
-  background: var(--color-primary);
-  opacity: 0.3;
+  background: #fff;
+  opacity: 0.5;
+  width: 30px;
+  height: 3px;
+  border-radius: 2px;
 }
 .card-banner :deep(.el-carousel__indicator.is-active .el-carousel__button) {
   opacity: 1;
+  background: var(--color-primary);
 }
 
 /* ============================================
-   板块三：三个入口方块
+   板块三：三栏功能区
    ============================================ */
 .card-actions {
   display: flex;
-  border-top: 1px solid var(--color-border-light);
+  gap: var(--space-lg);
+  padding: var(--space-xl) var(--space-xl) var(--space-xl);
+  margin-top: var(--space-lg);
+  border-top: none;
+  min-height: 180px;
 }
 
-.action-box {
+.action-panel {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-2xl);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  transition: box-shadow var(--transition-fast);
+}
+.action-panel:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* --- 框1：热线 + 两个入口按钮 --- */
+.panel-hotline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 20px var(--space-md);
+  margin-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.hotline-label {
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.hotline-number {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.action-entry {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  padding: var(--space-xl) var(--space-2xl);
-  border-right: 1px solid var(--color-border-light);
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
   transition: background var(--transition-fast);
   cursor: pointer;
 }
-.action-box:last-child {
-  border-right: none;
-}
-.action-box:hover {
+.action-entry:hover {
   background: var(--color-primary-lighter);
 }
+.action-entry + .action-entry {
+  margin-top: var(--space-md);
+}
 
-.action-icon {
-  width: 52px;
-  height: 52px;
-  background: var(--color-primary);
+.entry-icon {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -534,28 +621,122 @@ onMounted(async () => {
   color: #fff;
   flex-shrink: 0;
 }
+.find-icon {
+  background: var(--color-primary);
+}
+.teach-icon {
+  background: var(--color-accent);
+}
 
-.action-title {
+.action-entry span {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
-  line-height: 1.4;
 }
 
-.action-sub {
-  font-size: var(--font-size-sm);
+/* --- 框2：二维码 --- */
+.contact-panel {
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-header {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.contact-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.qr-placeholder {
+  width: 140px;
+  height: 140px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-text-muted);
 }
 
-.action-phone {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-  letter-spacing: 0.5px;
+.qr-tip {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
-.action-hotline {
-  cursor: default;
+/* --- 框3：公告栏 --- */
+.notice-panel {
+  padding: var(--space-lg) var(--space-xl);
+  gap: 0;
+}
+
+.notice-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-border-light);
+  margin-bottom: var(--space-md);
+}
+
+.notice-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0 10px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+}
+.notice-tab:hover {
+  color: var(--color-text);
+}
+.notice-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.notice-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notice-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: 1.6;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.notice-item:hover {
+  color: var(--color-primary);
+}
+
+.notice-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notice-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -642,42 +823,43 @@ onMounted(async () => {
 .category-links a:hover { color: var(--color-primary); }
 
 /* ============================================
-   热门科目
+   可展开科目/高校行
    ============================================ */
-.hot-subjects {
-  background: var(--color-surface);
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  margin-bottom: var(--space-2xl);
-  overflow: hidden;
-}
-
-.hot-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  padding: var(--space-md) var(--space-xl);
-  background: var(--color-bg);
-  border-bottom: 2px solid var(--color-primary);
-}
-
-.hot-grid {
+.category-links-wrap {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--space-md);
-  padding: var(--space-lg) var(--space-xl);
 }
 
-.hot-tag {
-  padding: 6px 16px;
-  background: var(--color-primary-lighter);
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+.category-links-wrap .category-links {
+  flex: 1;
+  min-width: 0;
+  max-height: 28px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
-.hot-tag:hover {
-  background: var(--color-primary);
-  color: #fff;
+
+.category-links-wrap .category-links.expanded {
+  max-height: 500px;
+}
+
+.expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+  line-height: 28px;
+  flex-shrink: 0;
+}
+.expand-btn:hover {
+  color: var(--color-primary-light);
 }
 
 /* ============================================
@@ -777,12 +959,11 @@ onMounted(async () => {
 
   .card-actions {
     flex-direction: column;
+    padding: var(--space-md);
   }
-  .action-box {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-light);
+  .action-panel {
+    border-radius: 10px;
   }
-  .action-box:last-child { border-bottom: none; }
 
   .category-row { flex-direction: column; }
   .category-label { margin-bottom: var(--space-xs); }
