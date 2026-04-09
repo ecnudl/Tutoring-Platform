@@ -131,9 +131,8 @@
             <div class="qr-header">为便于沟通，欢迎添加微信号</div>
             <div class="contact-qr">
               <div class="qr-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="80" height="80"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="96" height="96"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
               </div>
-              <span class="qr-tip">扫码添加微信</span>
             </div>
           </div>
 
@@ -656,19 +655,14 @@ onMounted(async () => {
 }
 
 .qr-placeholder {
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   border: 2px dashed var(--color-border);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-muted);
-}
-
-.qr-tip {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
 }
 
 /* --- 框3：公告栏 --- */
@@ -930,8 +924,9 @@ onMounted(async () => {
    ============================================ */
 @media (max-width: 768px) {
   .home-page { padding: var(--space-md) 0 var(--space-2xl); }
-  .home-card { border-radius: 8px; }
+  .home-card { border-radius: 8px; margin: 0 var(--space-sm); }
 
+  /* 导航栏：竖排 */
   .card-nav {
     flex-direction: column;
   }
@@ -945,18 +940,28 @@ onMounted(async () => {
     border-right: none;
     border-bottom: 1px solid var(--color-border-light);
     min-width: auto;
+    padding: var(--space-md) var(--space-lg);
+    align-items: center;
   }
   .nav-right {
     padding: var(--space-md) var(--space-lg);
+    align-items: center;
   }
-  .nav-right-top {
-    flex-wrap: wrap;
-    gap: var(--space-md);
+  .nav-right-row {
+    grid-template-columns: repeat(5, auto);
+    justify-content: center;
+    gap: 0 var(--space-md);
+  }
+  .nav-cell {
+    font-size: var(--font-size-sm);
+    padding: 4px 6px;
   }
 
+  /* 轮播图 */
   .slide-item { height: 200px; }
   .card-banner :deep(.el-carousel) { height: 200px !important; }
 
+  /* 三栏功能区 */
   .card-actions {
     flex-direction: column;
     padding: var(--space-md);
@@ -964,10 +969,19 @@ onMounted(async () => {
   .action-panel {
     border-radius: 10px;
   }
+  .qr-placeholder {
+    width: 120px;
+    height: 120px;
+  }
 
+  /* 分类速查 */
+  .category-section { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
   .category-row { flex-direction: column; }
   .category-label { margin-bottom: var(--space-xs); }
+  .category-links-wrap { flex-direction: column; align-items: flex-start; }
 
+  /* 下方模块 */
+  .section-box { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
   .tutor-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
