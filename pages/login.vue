@@ -4,8 +4,34 @@
       <div class="login-brand">
         <SiteLogo :showText="true" />
       </div>
-      <div class="login-card">
-        <h2 class="login-title">会员登录</h2>
+
+      <!-- 角色选择 -->
+      <div v-if="!selectedRole" class="role-select">
+        <h2 class="role-title">欢迎登录</h2>
+        <p class="role-subtitle">请选择您的身份</p>
+        <div class="role-cards">
+          <div class="role-card" @click="selectedRole = 'student'">
+            <div class="role-icon">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;</div>
+            <h3>家长/学员</h3>
+            <p>我要找家教老师</p>
+          </div>
+          <div class="role-card" @click="selectedRole = 'teacher'">
+            <div class="role-icon">&#x1F393;</div>
+            <h3>教员/老师</h3>
+            <p>我要做家教</p>
+          </div>
+        </div>
+        <div class="role-footer">
+          还没有账号？<NuxtLink to="/register">立即注册</NuxtLink>
+        </div>
+      </div>
+
+      <!-- 登录表单 -->
+      <div v-else class="login-card">
+        <div class="login-back" @click="selectedRole = null">
+          <span>&larr;</span> 返回选择
+        </div>
+        <h2 class="login-title">{{ selectedRole === 'student' ? '家长/学员登录' : '教员登录' }}</h2>
         <el-tabs v-model="activeTab" stretch>
           <el-tab-pane label="账号登录" name="password">
             <el-form :model="passwordForm" @keyup.enter="handlePasswordLogin">
@@ -26,7 +52,7 @@
               <el-form-item>
                 <div style="display:flex;gap:8px">
                   <el-input v-model="smsForm.code" placeholder="请输入短信验证码" size="large" style="flex:1" />
-                  <el-button size="large" :disabled="countdown > 0" @click="sendSmsCode">{{ countdown > 0 ? `${countdown}秒` : '发送验证码' }}</el-button>
+                  <el-button size="large" :disabled="countdown > 0" @click="sendSmsCode">{{ countdownText }}</el-button>
                 </div>
               </el-form-item>
               <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handleSmsLogin">登录</el-button>
@@ -35,7 +61,7 @@
         </el-tabs>
         <div class="login-footer">
           <NuxtLink to="/login/find-password">找回密码</NuxtLink>
-          <NuxtLink to="/register">我要注册</NuxtLink>
+          <NuxtLink :to="selectedRole === 'student' ? '/register/student' : '/register/teacher'">我要注册</NuxtLink>
         </div>
       </div>
     </div>
@@ -44,9 +70,10 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '~/stores/user'
 
+const selectedRole = ref(null)
 const activeTab = ref('password')
 const passwordForm = ref({ mobile: '', password: '' })
 const smsForm = ref({ mobile: '', code: '' })
@@ -56,6 +83,12 @@ const userStore = useUserStore()
 const router = useRouter()
 const { post } = useApi()
 const route = useRoute()
+
+const countdownText = computed(() => countdown.value > 0 ? countdown.value + '秒' : '发送验证码')
+
+if (route.query.type === 'student' || route.query.type === 'teacher') {
+  selectedRole.value = route.query.type
+}
 
 const sendSmsCode = async () => {
   if (!smsForm.value.mobile || !/^1[3-9]\d{9}$/.test(smsForm.value.mobile)) {
@@ -80,7 +113,6 @@ const handlePasswordLogin = async () => {
   if (!passwordForm.value.mobile) { ElMessage.warning('请输入用户名或手机号'); return }
   if (!passwordForm.value.password) { ElMessage.warning('请输入密码'); return }
 
-  // 临时管理员账号（开发测试用）
   if (passwordForm.value.mobile === 'admin' && passwordForm.value.password === 'admin123') {
     userStore.saveLogin({
       token: 'admin-token-' + Date.now(),
@@ -95,7 +127,8 @@ const handlePasswordLogin = async () => {
 
   loading.value = true
   try {
-    const res = await post('/user/api/login', passwordForm.value)
+    const loginData = { ...passwordForm.value, userType: selectedRole.value === 'student' ? 1 : 2 }
+    const res = await post('/user/api/login', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
       ElMessage.success('登录成功')
@@ -118,7 +151,8 @@ const handleSmsLogin = async () => {
   if (!smsForm.value.code) { ElMessage.warning('请输入验证码'); return }
   loading.value = true
   try {
-    const res = await post('/user/api/login/sms', smsForm.value)
+    const loginData = { ...smsForm.value, userType: selectedRole.value === 'student' ? 1 : 2 }
+    const res = await post('/user/api/login/sms', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
       ElMessage.success('登录成功')
@@ -136,7 +170,8 @@ const handleSmsLogin = async () => {
 
 <style scoped>
 .login-page {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-bg);
   display: flex;
   align-items: center;
@@ -145,7 +180,7 @@ const handleSmsLogin = async () => {
 }
 
 .login-container {
-  max-width: 420px;
+  max-width: 520px;
   width: 100%;
 }
 
@@ -155,11 +190,93 @@ const handleSmsLogin = async () => {
   margin-bottom: var(--space-3xl);
 }
 
+.role-select {
+  text-align: center;
+}
+
+.role-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.role-subtitle {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3xl);
+}
+
+.role-cards {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.role-card {
+  flex: 1;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl) var(--space-xl);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: center;
+}
+
+.role-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.role-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-lg);
+}
+
+.role-card h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.role-card p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.role-footer {
+  margin-top: var(--space-2xl);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.role-footer a {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
 .login-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-3xl);
+}
+
+.login-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  margin-bottom: var(--space-lg);
+  transition: color var(--transition-fast);
+}
+
+.login-back:hover {
+  color: var(--color-primary);
 }
 
 .login-title {
@@ -184,5 +301,20 @@ const handleSmsLogin = async () => {
 
 .login-footer a:hover {
   color: var(--color-primary-light);
+}
+
+@media (max-width: 768px) {
+  .role-cards {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .role-card {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+
+  .role-icon {
+    font-size: 36px;
+  }
 }
 </style>

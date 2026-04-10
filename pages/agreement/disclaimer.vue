@@ -2,14 +2,14 @@
   <div class="agreement-page">
     <div class="agreement-wrapper">
       <div class="agreement-header">
-        <NuxtLink to="/" class="logo">51家教网</NuxtLink>
+        <NuxtLink to="/" class="logo">591家教网</NuxtLink>
         <h1>免责声明</h1>
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
       <div class="agreement-content">
         <div class="agreement-intro">
-          <p><strong>重要提示：</strong>本免责声明是<NuxtLink to="/agreement/user" class="link">《用户服务协议》</NuxtLink>的组成部分。请您在使用51家教网（以下简称"本平台"）服务前仔细阅读本声明。使用本平台即表示您已了解并接受以下全部条款。</p>
+          <p><strong>重要提示：</strong>本免责声明是<NuxtLink to="/agreement/user" class="link">《用户服务协议》</NuxtLink>的组成部分。请您在使用591家教网（以下简称"本平台"）服务前仔细阅读本声明。使用本平台即表示您已了解并接受以下全部条款。</p>
         </div>
 
         <h2>第一条 平台性质与定位</h2>
@@ -92,7 +92,7 @@
         <h2>第十一条 联系与投诉</h2>
         <p>如您在使用平台过程中遇到安全问题或需要投诉举报，请及时联系我们：</p>
         <div class="contact-info">
-          <p>投诉邮箱：service@51jiajiao.com</p>
+          <p>投诉邮箱：service@591jiajiao.com</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>紧急情况请直接拨打110报警</p>
         </div>

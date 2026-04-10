@@ -10,7 +10,7 @@
           <div class="footer-col">
             <h4>找家教</h4>
             <NuxtLink to="/jy">教员库</NuxtLink>
-            <NuxtLink to="/xy">学员需求</NuxtLink>
+            <NuxtLink to="/xy">学员库</NuxtLink>
             <NuxtLink to="/qjj">请家教</NuxtLink>
             <NuxtLink to="/zf">价格参考</NuxtLink>
           </div>
@@ -25,21 +25,26 @@
             <NuxtLink to="/help">帮助中心</NuxtLink>
             <NuxtLink to="/agreement/user">用户协议</NuxtLink>
             <NuxtLink to="/agreement/privacy">隐私政策</NuxtLink>
+            <NuxtLink to="/agreement/disclaimer" class="disclaimer-link">免责声明</NuxtLink>
           </div>
           <div class="footer-col">
-            <h4>联系我们</h4>
-            <span>客服热线：400-000-0000</span>
-            <span>服务时间：9:00-21:00</span>
-            <span>邮箱：service@51jiajiao.com</span>
+            <h4>关于我们</h4>
+            <NuxtLink to="/about/contact">联系我们</NuxtLink>
+            <NuxtLink to="/about/wechat">服务号</NuxtLink>
+            <NuxtLink to="/about/intro">公司简介</NuxtLink>
+            <NuxtLink to="/agreement/privacy">隐私保护</NuxtLink>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; {{ new Date().getFullYear() }} 51家教网 版权所有</span>
+        <span>&copy; {{ new Date().getFullYear() }} 591家教网 版权所有</span>
       </div>
     </div>
   </footer>
 </template>
+
+<script setup>
+</script>
 
 <style scoped>
 .site-footer {
@@ -108,6 +113,16 @@
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
   text-align: center;
+}
+
+.footer-col a.disclaimer-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.footer-col a.disclaimer-link:hover {
+  color: #fff;
 }
 
 @media (max-width: 768px) {

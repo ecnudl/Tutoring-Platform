@@ -1,4 +1,5 @@
 <template>
+  <div class="detail-page-wrapper">
   <div class="container req-detail-page">
     <el-card style="max-width:900px;margin:0 auto" v-loading="loading">
       <div v-if="req">
@@ -46,6 +47,7 @@
         <el-button type="primary" :loading="applying" @click="submitApply">提交申请</el-button>
       </template>
     </el-dialog>
+  </div>
   </div>
 </template>
 <script setup>
@@ -103,7 +105,16 @@ const submitApply = async () => {
 onMounted(() => { loadReq(); isMobile.value = window.innerWidth <= 768 })
 </script>
 <style scoped>
-.req-detail-page { padding: 20px; }
+.detail-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.req-detail-page {
+  padding: 20px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 @media (max-width: 768px) {
   .req-detail-page { padding: 12px; }
   .req-detail-page :deep(.el-descriptions) { font-size: 13px; }

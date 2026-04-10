@@ -1,7 +1,7 @@
 <template>
   <div class="student-register-page">
     <Head>
-      <Title>家长/学员注册 - 51家教网</Title>
+      <Title>家长/学员注册 - 591家教网</Title>
     </Head>
     <div class="student-register-container">
       <div class="register-brand">
@@ -152,7 +152,8 @@ const handleSubmit = async () => {
 
 <style scoped>
 .student-register-page {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: auto;
   background: var(--color-bg);
   display: flex;
   align-items: center;

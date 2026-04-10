@@ -1,7 +1,8 @@
 <template>
+  <div class="city-page-wrapper">
   <div class="container city-page">
     <Head>
-      <Title>选择城市 - 51家教网</Title>
+      <Title>选择城市 - 591家教网</Title>
       <Meta name="description" content="选择您所在的城市，获取本地家教服务。" />
     </Head>
 
@@ -39,6 +40,7 @@
       </div>
     </el-card>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -69,7 +71,16 @@ const selectCity = (city) => {
 </script>
 
 <style scoped>
-.city-page { padding: 20px; }
+.city-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.city-page {
+  padding: 20px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .current-city { display: flex; align-items: center; gap: 8px; font-size: 16px; }
 .city-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .city-item {

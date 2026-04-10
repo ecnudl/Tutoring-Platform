@@ -1,5 +1,6 @@
 <template>
-  <div class="container tutor-page">
+  <div class="tutor-page-wrapper">
+    <div class="container tutor-page">
     <h1 class="page-title">教员库</h1>
 
     <!-- 移动端筛选折叠 -->
@@ -102,6 +103,7 @@
       </main>
     </div>
   </div>
+  </div>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -170,5 +172,15 @@ onMounted(async () => { await dictStore.fetchAll(); await search() })
     background: #fff; border-radius: 8px; color: #409eff; font-size: 14px; cursor: pointer;
   }
   .desktop-only { display: none; }
+}
+.tutor-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.tutor-page {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-xl);
 }
 </style>

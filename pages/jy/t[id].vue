@@ -1,7 +1,8 @@
 <template>
+  <div class="detail-page-wrapper">
   <div class="container tutor-detail-page">
     <Head>
-      <Title>T{{ displayNo }}教员详情 - 51家教网</Title>
+      <Title>T{{ displayNo }}教员详情 - 591家教网</Title>
       <Meta name="description" :content="`查看T${displayNo}教员的详细信息，包括学历、院校、教学经验、授课科目等。`" />
     </Head>
 
@@ -107,6 +108,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -169,7 +171,16 @@ onMounted(() => { loadTutor() })
 </script>
 
 <style scoped>
-.tutor-detail-page { padding: 20px; }
+.detail-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.tutor-detail-page {
+  padding: 20px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .el-breadcrumb { margin-bottom: 20px; }
 
 .detail-layout { display: flex; gap: 24px; }

@@ -1,5 +1,6 @@
 <template>
-  <div class="container req-page">
+  <div class="req-page-wrapper">
+    <div class="container req-page">
     <h1 class="page-title">找老师需求</h1>
     <div class="req-search-bar">
       <el-input v-model="keyword" placeholder="搜索需求标题" clearable @keyup.enter="search" />
@@ -35,6 +36,7 @@
         />
       </div>
     </template>
+    </div>
   </div>
 </template>
 <script setup>
@@ -84,5 +86,15 @@ onMounted(() => { search() })
   .req-page { padding: 12px; }
   .req-search-bar { flex-direction: column; align-items: stretch; }
   .req-search-bar .el-input { width: 100%; }
+}
+.req-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.req-page {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-xl);
 }
 </style>

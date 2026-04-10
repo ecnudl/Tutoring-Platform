@@ -1,7 +1,7 @@
 <template>
   <div class="register-wrapper">
     <Head>
-      <Title>教员注册 - 51家教网</Title>
+      <Title>教员注册 - 591家教网</Title>
       <Meta name="description" content="注册成为家教教员，接单赚取课时费。大学生、专职教员、在职教师均可注册。" />
     </Head>
 
@@ -337,7 +337,8 @@ const handleSubmit = async () => {
 
 <style scoped>
 .register-wrapper {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: auto;
   background: var(--color-bg);
 }
 

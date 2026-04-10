@@ -1,8 +1,8 @@
 <template>
-  <div style="min-height:100vh;background:#f5f7fa;padding:20px;display:flex;align-items:center;justify-content:center">
-    <div style="max-width:420px;width:100%">
+  <div class="find-pwd-page">
+    <div class="find-pwd-container">
       <div style="text-align:center;margin-bottom:24px">
-        <NuxtLink to="/" style="font-size:20px;font-weight:700;color:#409eff;text-decoration:none">★ 51家教网</NuxtLink>
+        <NuxtLink to="/" class="find-pwd-brand">★ 591家教网</NuxtLink>
         <h2 style="margin-top:16px;color:#333">找回密码</h2>
       </div>
       <el-card>

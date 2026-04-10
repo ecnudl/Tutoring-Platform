@@ -1,7 +1,8 @@
 <template>
+  <div class="uni-page-wrapper">
   <div class="container university-page">
     <Head>
-      <Title>{{ cityStore.cityName }}高校教员 - 51家教网</Title>
+      <Title>{{ cityStore.cityName }}高校教员 - 591家教网</Title>
       <Meta name="description" :content="`${cityStore.cityName}各大高校家教教员，覆盖${cityStore.cityName}所有重点大学，名校大学生一对一上门辅导。`" />
     </Head>
 
@@ -35,6 +36,7 @@
     <div v-else style="text-align:center;padding:60px;color:#999">
       <p>暂无高校数据</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -77,7 +79,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.university-page { padding: 24px 0; }
+.uni-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.university-page {
+  padding: 24px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .page-header { margin-bottom: 24px; }
 .page-title { font-size: 24px; font-weight: 700; }
 .page-sub { color: #999; margin-top: 4px; }

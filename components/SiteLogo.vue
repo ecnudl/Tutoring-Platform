@@ -1,7 +1,7 @@
 <template>
   <NuxtLink to="/" class="site-logo" :class="variant">
     <div class="logo-icon">
-      <span class="logo-number">51</span>
+      <span class="logo-number">591</span>
     </div>
     <span v-if="showText" class="logo-text">家教网</span>
   </NuxtLink>
@@ -30,8 +30,8 @@ defineProps({
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   background: var(--color-primary, #1F4E8C);
   border-radius: var(--radius-md, 6px);
   display: flex;
@@ -40,14 +40,14 @@ defineProps({
 }
 
 .logo-number {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.5px;
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--color-text, #1F2937);
 }
@@ -72,16 +72,16 @@ defineProps({
 
 @media (max-width: 768px) {
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
   }
 
   .logo-number {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .logo-text {
-    font-size: 14px;
+    font-size: 17px;
   }
 }
 </style>

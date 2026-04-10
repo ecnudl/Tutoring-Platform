@@ -61,8 +61,8 @@ const readIds = ref([])
 const mockAnnouncements = [
   {
     id: 1,
-    title: '欢迎使用51家教网',
-    content: '51家教网致力于为学员和家长提供优质的家教服务，我们拥有大量经过认证的优秀教员，覆盖小学、初中、高中各个年级和科目。',
+    title: '欢迎使用591家教网',
+    content: '591家教网致力于为学员和家长提供优质的家教服务，我们拥有大量经过认证的优秀教员，覆盖小学、初中、高中各个年级和科目。',
     gmtCreate: new Date().toISOString(),
     status: 1
   },

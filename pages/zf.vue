@@ -1,7 +1,8 @@
 <template>
-  <div class="container zf-page">
+  <div class="zf-page-wrapper">
+    <div class="container zf-page">
     <Head>
-      <Title>家教价格参考 - 51家教网</Title>
+      <Title>家教价格参考 - 591家教网</Title>
       <Meta name="description" content="上海家教收费标准参考，涵盖大学生、专职教员、在职教师各年级段课时费。" />
     </Head>
 
@@ -45,6 +46,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -81,7 +83,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.zf-page { padding: var(--space-xl); }
+.zf-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.zf-page {
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .page-sub { color: var(--color-text-muted); margin-bottom: var(--space-2xl); margin-top: calc(-1 * var(--space-md)); }
 
 .notes-section {

@@ -1,5 +1,6 @@
 <template>
-  <div class="container" style="padding:20px">
+  <div class="tutor-detail-wrapper">
+    <div class="container tutor-detail-page">
     <el-card style="max-width:900px;margin:0 auto" v-loading="loading">
       <div v-if="tutor">
         <div class="tutor-header">
@@ -61,6 +62,7 @@
         <el-button type="primary" :loading="reserving" @click="submitReservation">确认预约</el-button>
       </template>
     </el-dialog>
+  </div>
   </div>
 </template>
 <script setup>
@@ -142,5 +144,15 @@ onMounted(() => { loadTutor() })
 @media (max-width: 768px) {
   .tutor-header { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
   .el-descriptions { font-size: 13px; }
+}
+.tutor-detail-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.tutor-detail-page {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-xl);
 }
 </style>

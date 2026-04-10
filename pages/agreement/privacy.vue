@@ -2,14 +2,14 @@
   <div class="agreement-page">
     <div class="agreement-wrapper">
       <div class="agreement-header">
-        <NuxtLink to="/" class="logo">51家教网</NuxtLink>
+        <NuxtLink to="/" class="logo">591家教网</NuxtLink>
         <h1>隐私保护政策</h1>
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
       <div class="agreement-content">
         <div class="agreement-intro">
-          <p>51家教网（以下简称"我们"）深知个人信息对您的重要性，我们将按照法律法规的规定，采取相应的安全保护措施，保护您的个人信息安全可控。本政策适用于您通过51家教网网站、移动应用、小程序等渠道使用我们的服务。</p>
+          <p>591家教网（以下简称"我们"）深知个人信息对您的重要性，我们将按照法律法规的规定，采取相应的安全保护措施，保护您的个人信息安全可控。本政策适用于您通过591家教网网站、移动应用、小程序等渠道使用我们的服务。</p>
           <p><strong>请您在使用我们的服务前，仔细阅读并了解本隐私保护政策。</strong></p>
         </div>
 
@@ -134,16 +134,16 @@
         <h2>第十条 联系我们</h2>
         <p>如您对本隐私保护政策有任何疑问、意见或建议，或需要行使您的个人信息权利，请通过以下方式联系我们：</p>
         <div class="contact-info">
-          <p>平台名称：51家教网</p>
-          <p>隐私保护邮箱：privacy@51jiajiao.com</p>
-          <p>客服邮箱：service@51jiajiao.com</p>
+          <p>平台名称：591家教网</p>
+          <p>隐私保护邮箱：privacy@591jiajiao.com</p>
+          <p>客服邮箱：service@591jiajiao.com</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>通讯地址：上海市</p>
         </div>
         <p>我们将在收到您的请求后15个工作日内予以回复。</p>
 
         <div class="agreement-footer">
-          <p>本政策与<NuxtLink to="/agreement/user" class="link">《用户服务协议》</NuxtLink>共同构成您使用51家教网服务的完整协议。感谢您对51家教网的信任，我们将持续努力保护您的个人信息安全。</p>
+          <p>本政策与<NuxtLink to="/agreement/user" class="link">《用户服务协议》</NuxtLink>共同构成您使用591家教网服务的完整协议。感谢您对591家教网的信任，我们将持续努力保护您的个人信息安全。</p>
         </div>
       </div>
 

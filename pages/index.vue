@@ -1,8 +1,8 @@
 <template>
   <div class="home-page">
     <Head>
-      <Title>51家教网 - 找家教上门辅导一对一</Title>
-      <Meta name="description" content="51家教网,提供上门家教一对一辅导服务,大学生家教、专职教员、在职教师,覆盖小学初中高中全科辅导。" />
+      <Title>591家教网 - 找家教上门辅导一对一</Title>
+      <Meta name="description" content="591家教网,提供上门家教一对一辅导服务,大学生家教、专职教员、在职教师,覆盖小学初中高中全科辅导。" />
     </Head>
 
     <div class="container">
@@ -43,7 +43,7 @@
               </el-popover>
               <span class="nav-phone">
                 <el-icon size="13"><Phone /></el-icon>
-                400-000-0000
+                13795420591
               </span>
             </div>
             <div class="nav-center-bottom">
@@ -110,7 +110,7 @@
           <div class="action-panel">
             <div class="panel-hotline">
               <span class="hotline-label">家教热线</span>
-              <span class="hotline-number">400-000-0000</span>
+              <span class="hotline-number">13795420591</span>
             </div>
             <NuxtLink to="/qjj" class="action-entry">
               <div class="entry-icon find-icon">
@@ -130,9 +130,18 @@
           <div class="action-panel contact-panel">
             <div class="qr-header">为便于沟通，欢迎添加微信号</div>
             <div class="contact-qr">
-              <div class="qr-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="96" height="96"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
+              <div class="qr-frame">
+                <div class="qr-frame-inner">
+                  <div class="qr-corner qr-corner-tl"></div>
+                  <div class="qr-corner qr-corner-tr"></div>
+                  <div class="qr-corner qr-corner-bl"></div>
+                  <div class="qr-corner qr-corner-br"></div>
+                  <div class="qr-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="120" height="120"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
+                  </div>
+                </div>
               </div>
+              <span class="qr-tip">微信扫一扫添加</span>
             </div>
           </div>
 
@@ -144,7 +153,7 @@
                 :key="idx"
                 class="notice-tab"
                 :class="{ active: activeNoticeTab === idx }"
-                @click="activeNoticeTab = idx"
+                @mouseenter="activeNoticeTab = idx"
               >{{ tab.label }}</span>
             </div>
             <div class="notice-body">
@@ -222,19 +231,43 @@
         <el-empty v-else description="暂无教员数据" />
       </div>
 
-      <!-- ========== 最新需求 ========== -->
+      <!-- ========== 家教最新订单 ========== -->
       <div class="section-box">
         <div class="section-header">
-          <h2>最新学员需求</h2>
+          <h2>{{ cityStore.cityName }}家教最新订单</h2>
           <NuxtLink to="/xy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
-        <div v-if="requirements.length" class="req-list">
-          <NuxtLink v-for="r in requirements" :key="r.id" :to="'/xy/a' + r.id" class="req-item">
-            <div class="req-title">{{ r.title || '家教需求' }}</div>
-            <div class="req-budget" v-if="r.budgetMin">预算: {{ r.budgetMin }}-{{ r.budgetMax }}元/小时</div>
-          </NuxtLink>
+        <div class="order-list">
+          <div v-for="(order, idx) in latestOrders" :key="idx" class="order-item">
+            <div class="order-left">
+              <span class="order-tag" :class="order.tagClass">{{ order.tag }}</span>
+              <span class="order-title">{{ order.title }}</span>
+            </div>
+            <div class="order-right">
+              <span class="order-area">{{ order.area }}</span>
+              <span class="order-time">{{ order.time }}</span>
+            </div>
+          </div>
         </div>
-        <el-empty v-else description="暂无需求数据" />
+      </div>
+
+      <!-- ========== 家教感言 ========== -->
+      <div class="section-box">
+        <div class="section-header">
+          <h2>{{ cityStore.cityName }}家教感言</h2>
+        </div>
+        <div class="testimonial-grid">
+          <div v-for="(t, idx) in testimonials" :key="idx" class="testimonial-card">
+            <div class="testimonial-top">
+              <el-avatar :size="40">{{ t.name.charAt(0) }}</el-avatar>
+              <div class="testimonial-meta">
+                <div class="testimonial-name">{{ t.name }}</div>
+                <div class="testimonial-role">{{ t.role }}</div>
+              </div>
+            </div>
+            <div class="testimonial-content">"{{ t.content }}"</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -256,8 +289,23 @@ const router = useRouter()
 
 const searchKeyword = ref('')
 const tutors = ref([])
-const requirements = ref([])
 const activeNoticeTab = ref(0)
+
+const latestOrders = [
+  { tag: '急', tagClass: 'tag-urgent', title: '高二数学，每周两次上门辅导', area: '浦东新区', time: '1小时前' },
+  { tag: '新', tagClass: 'tag-new', title: '小学三年级英语，启蒙阶段', area: '徐汇区', time: '2小时前' },
+  { tag: '新', tagClass: 'tag-new', title: '初三物理化学，冲刺中考', area: '闵行区', time: '3小时前' },
+  { tag: '急', tagClass: 'tag-urgent', title: '钢琴陪练，5岁女孩入门', area: '长宁区', time: '4小时前' },
+  { tag: '新', tagClass: 'tag-new', title: '高一语文作文专项提升', area: '杨浦区', time: '5小时前' },
+  { tag: '新', tagClass: 'tag-new', title: '雅思口语7分冲刺辅导', area: '静安区', time: '6小时前' },
+]
+
+const testimonials = [
+  { name: '张女士', role: '学生家长', content: '老师非常耐心，孩子数学从70分提到了95分，非常感谢平台推荐的教员！' },
+  { name: '李同学', role: '大学生教员', content: '平台派单很快，家长也很好沟通，一个月接了5个学生，课时费准时结算。' },
+  { name: '王先生', role: '学生家长', content: '给孩子找了一位复旦的英语家教，口语提升很明显，试讲免费这个政策很好。' },
+  { name: '陈老师', role: '专职教员', content: '在平台上教了两年了，学生资源稳定，平台不收中介费，比之前的机构好很多。' },
+]
 const subjectExpanded = ref(false)
 const universityExpanded = ref(false)
 
@@ -352,12 +400,8 @@ onMounted(async () => {
   }
 
   try {
-    const [tRes, rRes] = await Promise.all([
-      post('/user/api/tutor/search', { pageCurrent: 1, pageSize: 8 }),
-      post('/user/api/requirement/search', { pageCurrent: 1, pageSize: 6 })
-    ])
+    const tRes = await post('/user/api/tutor/search', { pageCurrent: 1, pageSize: 8 })
     if (tRes.code === 200 && tRes.data) tutors.value = tRes.data.list || []
-    if (rRes.code === 200 && rRes.data) requirements.value = rRes.data.list || []
   } catch (e) {
     console.error(e)
   }
@@ -640,29 +684,62 @@ onMounted(async () => {
 }
 
 .qr-header {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   color: var(--color-text);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   text-align: center;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .contact-qr {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
+.qr-frame {
+  padding: 3px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light), var(--color-accent));
+  box-shadow: 0 4px 16px rgba(31, 78, 140, 0.15);
+}
+
+.qr-frame-inner {
+  position: relative;
+  padding: 16px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.qr-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--color-primary);
+  border-style: solid;
+  border-width: 0;
+}
+.qr-corner-tl { top: 8px; left: 8px; border-top-width: 2.5px; border-left-width: 2.5px; border-radius: 4px 0 0 0; }
+.qr-corner-tr { top: 8px; right: 8px; border-top-width: 2.5px; border-right-width: 2.5px; border-radius: 0 4px 0 0; }
+.qr-corner-bl { bottom: 8px; left: 8px; border-bottom-width: 2.5px; border-left-width: 2.5px; border-radius: 0 0 0 4px; }
+.qr-corner-br { bottom: 8px; right: 8px; border-bottom-width: 2.5px; border-right-width: 2.5px; border-radius: 0 0 4px 0; }
+
 .qr-placeholder {
-  width: 150px;
-  height: 150px;
-  border: 2px dashed var(--color-border);
+  width: 190px;
+  height: 190px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-primary-light);
+  background: var(--color-primary-lighter);
+}
+
+.qr-tip {
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  letter-spacing: 0.5px;
 }
 
 /* --- 框3：公告栏 --- */
@@ -908,16 +985,117 @@ onMounted(async () => {
 .tutor-school { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 4px; }
 .tutor-price { font-weight: var(--font-weight-semibold); color: var(--color-accent-dark); }
 
-.req-list { display: flex; flex-direction: column; gap: var(--space-md); }
-.req-item {
-  padding: var(--space-lg);
+/* ============================================
+   最新订单
+   ============================================ */
+.order-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.order-item:last-child { border-bottom: none; }
+
+.order-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.order-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.tag-urgent {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+.tag-new {
+  background: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+.order-title {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex-shrink: 0;
+  margin-left: var(--space-lg);
+}
+
+.order-area {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.order-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ============================================
+   家教感言
+   ============================================ */
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.testimonial-card {
+  padding: var(--space-xl);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   transition: border-color var(--transition-fast);
 }
-.req-item:hover { border-color: var(--color-primary); }
-.req-title { font-weight: var(--font-weight-medium); margin-bottom: var(--space-sm); }
-.req-budget { font-weight: var(--font-weight-semibold); color: var(--color-accent-dark); }
+.testimonial-card:hover {
+  border-color: var(--color-primary);
+}
+
+.testimonial-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.testimonial-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.testimonial-role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.testimonial-content {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
 
 /* ============================================
    Responsive
@@ -945,12 +1123,12 @@ onMounted(async () => {
   }
   .nav-right {
     padding: var(--space-md) var(--space-lg);
-    align-items: center;
+    width: 100%;
   }
   .nav-right-row {
-    grid-template-columns: repeat(5, auto);
-    justify-content: center;
-    gap: 0 var(--space-md);
+    grid-template-columns: repeat(5, 1fr);
+    justify-items: center;
+    gap: 0;
   }
   .nav-cell {
     font-size: var(--font-size-sm);
@@ -970,8 +1148,11 @@ onMounted(async () => {
     border-radius: 10px;
   }
   .qr-placeholder {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
+  }
+  .qr-frame-inner {
+    padding: 12px;
   }
 
   /* 分类速查 */
@@ -983,5 +1164,7 @@ onMounted(async () => {
   /* 下方模块 */
   .section-box { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
   .tutor-grid { grid-template-columns: repeat(2, 1fr); }
+  .testimonial-grid { grid-template-columns: 1fr; }
+  .order-right { gap: var(--space-sm); }
 }
 </style>

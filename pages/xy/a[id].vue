@@ -1,7 +1,8 @@
 <template>
+  <div class="detail-page-wrapper">
   <div class="container req-detail-page">
     <Head>
-      <Title>A{{ displayNo }}需求详情 - 51家教网</Title>
+      <Title>A{{ displayNo }}需求详情 - 591家教网</Title>
       <Meta name="description" :content="`查看A${displayNo}学员需求的详细信息，科目、年级、预算、上课要求等。`" />
     </Head>
 
@@ -49,6 +50,7 @@
         <NuxtLink to="/xy"><el-button type="primary" style="margin-top:16px">返回需求列表</el-button></NuxtLink>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -114,7 +116,16 @@ onMounted(() => { loadReq() })
 </script>
 
 <style scoped>
-.req-detail-page { padding: 20px; }
+.detail-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.req-detail-page {
+  padding: 20px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .el-breadcrumb { margin-bottom: 20px; }
 .req-title { font-size: 22px; margin-bottom: 4px; }
 .req-no { font-size: 13px; color: #bbb; }

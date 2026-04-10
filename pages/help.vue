@@ -56,12 +56,12 @@
         <div v-if="activeCategory === categories.length - 1" class="contact-cards">
           <div class="contact-card">
             <div class="c-title">客服热线</div>
-            <div class="c-value">400-000-0000</div>
+            <div class="c-value">13795420591</div>
             <div class="c-desc">周一至周日 9:00-21:00</div>
           </div>
           <div class="contact-card">
             <div class="c-title">客服邮箱</div>
-            <div class="c-value">service@51jiajiao.com</div>
+            <div class="c-value">service@591jiajiao.com</div>
             <div class="c-desc">24小时内回复</div>
           </div>
           <div class="contact-card">
@@ -117,7 +117,7 @@ const categories = reactive([
     items: [
       { q: '忘记密码怎么办？', a: '<ul><li>点击登录页面的"找回密码"</li><li>输入注册时使用的手机号</li><li>获取短信验证码并验证</li><li>设置新密码即可</li></ul>', open: false },
       { q: '如何修改个人信息？', a: '<ul><li>登录后进入"个人中心"</li><li>点击"个人资料"菜单</li><li>修改需要变更的信息</li><li>点击保存即可</li></ul>', open: false },
-      { q: '如何注销账号？', a: '<p>如需注销账号，请联系客服热线 400-000-0000，客服人员会在确认身份后为您处理。注销后账号数据将无法恢复。</p>', open: false }
+      { q: '如何注销账号？', a: '<p>如需注销账号，请联系客服热线 13795420591，客服人员会在确认身份后为您处理。注销后账号数据将无法恢复。</p>', open: false }
     ]
   },
   {
@@ -125,7 +125,7 @@ const categories = reactive([
     icon: '📞',
     items: [
       { q: '平台客服工作时间？', a: '<p>客服热线工作时间为 <strong>周一至周日 9:00-21:00</strong>，节假日照常服务。</p>', open: false },
-      { q: '如何投诉或建议？', a: '<ul><li>拨打客服热线：400-000-0000</li><li>发送邮件至：service@51jiajiao.com</li><li>通过微信客服进行反馈</li><li>我们会在24小时内处理您的反馈</li></ul>', open: false }
+      { q: '如何投诉或建议？', a: '<ul><li>拨打客服热线：13795420591</li><li>发送邮件至：service@591jiajiao.com</li><li>通过微信客服进行反馈</li><li>我们会在24小时内处理您的反馈</li></ul>', open: false }
     ]
   }
 ])
@@ -149,6 +149,10 @@ const categories = reactive([
 }
 
 .help-body {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-xl);
   max-width: var(--content-width);
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-xl);
@@ -270,7 +274,11 @@ const categories = reactive([
 .c-desc { font-size: var(--font-size-xs); color: var(--color-text-muted); }
 
 @media (max-width: 768px) {
-  .help-body { flex-direction: column; padding: var(--space-lg) var(--space-md); }
+  .help-body {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-xl); flex-direction: column; padding: var(--space-lg) var(--space-md); }
   .help-sidebar { width: 100%; position: static; }
   .sidebar-menu { display: flex; overflow-x: auto; padding: var(--space-sm) var(--space-md); gap: 4px; }
   .menu-item { white-space: nowrap; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-lg); border-left: none; font-size: var(--font-size-sm); }

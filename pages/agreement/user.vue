@@ -2,19 +2,19 @@
   <div class="agreement-page">
     <div class="agreement-wrapper">
       <div class="agreement-header">
-        <NuxtLink to="/" class="logo">51家教网</NuxtLink>
+        <NuxtLink to="/" class="logo">591家教网</NuxtLink>
         <h1>用户服务协议</h1>
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
       <div class="agreement-content">
         <div class="agreement-intro">
-          <p>欢迎您使用51家教网（以下简称"本平台"）。本平台由上海五一教育信息科技有限公司运营，为家长/学员与教员之间提供家教信息撮合服务。请您在注册或使用本平台服务前，仔细阅读并充分理解以下协议条款。</p>
+          <p>欢迎您使用591家教网（以下简称"本平台"）。本平台由上海五一教育信息科技有限公司运营，为家长/学员与教员之间提供家教信息撮合服务。请您在注册或使用本平台服务前，仔细阅读并充分理解以下协议条款。</p>
           <p><strong>当您点击"注册"或"同意"按钮，或以其他方式实际使用本平台服务时，即视为您已充分阅读、理解并同意接受本协议的全部内容，本协议即在您与平台之间产生法律效力。</strong></p>
         </div>
 
         <h2>第一条 定义与解释</h2>
-        <p>1.1 <strong>"平台"</strong>：指51家教网网站（www.51jiajiao.com）及其关联的移动应用程序、小程序等。</p>
+        <p>1.1 <strong>"平台"</strong>：指591家教网网站（www.591jiajiao.com）及其关联的移动应用程序、小程序等。</p>
         <p>1.2 <strong>"用户"</strong>：指注册并使用本平台服务的自然人，包括但不限于教员用户和家长/学员用户。</p>
         <p>1.3 <strong>"教员"</strong>：指在本平台注册并发布个人信息、提供家教服务的用户，包括大学生家教、专职教员、在职教师、海归外教等。</p>
         <p>1.4 <strong>"家长/学员"</strong>：指在本平台注册并发布家教需求、寻找教员的用户。</p>
@@ -99,8 +99,8 @@
         <h2>第十三条 联系方式</h2>
         <p>如对本协议有任何疑问、建议或投诉，请通过以下方式联系我们：</p>
         <div class="contact-info">
-          <p>平台名称：51家教网</p>
-          <p>客服邮箱：service@51jiajiao.com</p>
+          <p>平台名称：591家教网</p>
+          <p>客服邮箱：service@591jiajiao.com</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>通讯地址：上海市</p>
         </div>

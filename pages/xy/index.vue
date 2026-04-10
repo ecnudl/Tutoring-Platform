@@ -1,7 +1,8 @@
 <template>
-  <div class="container xy-page">
+  <div class="xy-page-wrapper">
+    <div class="container xy-page">
     <Head>
-      <Title>学员需求 - 51家教网</Title>
+      <Title>学员需求 - 591家教网</Title>
       <Meta name="description" content="浏览最新学员家教需求，按区域、科目筛选，找到合适的家教单子。" />
     </Head>
 
@@ -95,6 +96,7 @@
       </div>
     </template>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -159,7 +161,16 @@ onMounted(() => { search() })
 </script>
 
 <style scoped>
-.xy-page { padding: var(--space-xl); }
+.xy-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.xy-page {
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .el-breadcrumb { margin-bottom: var(--space-lg); }
 
 .filter-section {

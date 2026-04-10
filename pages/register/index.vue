@@ -34,7 +34,8 @@
 
 <style scoped>
 .register-page {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-bg);
   display: flex;
   align-items: center;

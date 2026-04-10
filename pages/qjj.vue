@@ -1,7 +1,8 @@
 <template>
-  <div class="container qjj-page">
+  <div class="qjj-page-wrapper">
+    <div class="container qjj-page">
     <Head>
-      <Title>请家教 - 51家教网</Title>
+      <Title>请家教 - 591家教网</Title>
       <Meta name="description" content="快速提交您的家教需求，我们将在24小时内为您推荐合适的教员。" />
     </Head>
 
@@ -18,7 +19,7 @@
         <div class="method-num">方式一</div>
         <h2>拨打服务热线</h2>
         <p class="method-desc">直接拨打我们的服务热线，专业顾问为您推荐教员</p>
-        <div class="phone-number">400-000-0000</div>
+        <div class="phone-number">13795420591</div>
         <p class="phone-time">工作时间：9:00 - 21:00（周一至周日）</p>
       </el-card>
 
@@ -80,6 +81,7 @@
         <el-button @click="successVisible = false">继续浏览</el-button>
       </template>
     </el-dialog>
+  </div>
   </div>
 </template>
 
@@ -144,7 +146,16 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.qjj-page { padding: var(--space-xl); }
+.qjj-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.qjj-page {
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .page-sub { color: var(--color-text-muted); margin-bottom: var(--space-2xl); margin-top: calc(-1 * var(--space-md)); }
 
 .methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xl); }

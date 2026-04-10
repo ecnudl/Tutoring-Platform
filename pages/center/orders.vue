@@ -5,7 +5,7 @@
   <el-card class="orders-card">
     <h4>联系客服</h4>
     <p style="color:#666;margin-top:8px">如需开通VIP或其他付费服务，请通过以下方式联系：</p>
-    <p style="margin-top:8px">客服电话：400-000-0000</p>
+    <p style="margin-top:8px">客服电话：13795420591</p>
     <p>工作时间：周一至周五 9:00-18:00</p>
   </el-card>
 </div>

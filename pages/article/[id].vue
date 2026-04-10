@@ -1,4 +1,5 @@
 <template>
+  <div class="article-page-wrapper">
   <div class="container article-detail-page">
     <div v-if="loading" style="text-align:center;padding:60px">
       <el-icon class="is-loading" :size="24"><Loading /></el-icon>
@@ -16,6 +17,7 @@
     <div style="margin-top:20px">
       <NuxtLink to="/article" class="back-link">← 返回资讯列表</NuxtLink>
     </div>
+  </div>
   </div>
 </template>
 <script setup>
@@ -39,7 +41,19 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.article-detail-page { padding: 20px 0; min-height: 60vh; max-width: 800px; margin: 0 auto; }
+.article-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.article-detail-page {
+  padding: 20px;
+  min-height: 60vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .article-card { padding: 12px; }
 .article-title { font-size: 24px; font-weight: 700; margin: 0 0 12px; line-height: 1.4; }
 .article-meta { font-size: 13px; color: #999; display: flex; gap: 20px; }

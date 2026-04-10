@@ -1,7 +1,8 @@
 <template>
-  <div class="container jy-page">
+  <div class="jy-page-wrapper">
+    <div class="container jy-page">
     <Head>
-      <Title>教员库 - 51家教网</Title>
+      <Title>教员库 - 591家教网</Title>
       <Meta name="description" content="浏览优质家教教员，按区域、科目、教员类型筛选，找到最适合的家教老师。" />
     </Head>
 
@@ -132,6 +133,7 @@
       </div>
     </template>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -254,7 +256,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.jy-page { padding: var(--space-xl) var(--space-xl); }
+.jy-page-wrapper {
+  background: var(--color-bg);
+  padding: var(--space-2xl) 0 var(--space-4xl);
+}
+.jy-page {
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .el-breadcrumb { margin-bottom: var(--space-lg); }
 
 .filter-section {
