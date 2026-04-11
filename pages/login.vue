@@ -1,12 +1,6 @@
 <template>
   <div class="login-page-wrapper">
     <div class="container login-page">
-      <!-- 登录/注册 切换 -->
-      <div class="auth-tabs">
-        <NuxtLink to="/login" class="auth-tab active">登录</NuxtLink>
-        <NuxtLink to="/register" class="auth-tab">注册</NuxtLink>
-      </div>
-
       <!-- 角色选择 -->
       <div v-if="!selectedRole" class="role-select">
         <h2 class="role-title">欢迎登录</h2>

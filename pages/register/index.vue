@@ -1,12 +1,6 @@
 <template>
   <div class="register-page-wrapper">
     <div class="container register-page">
-      <!-- 登录/注册 切换 -->
-      <div class="auth-tabs">
-        <NuxtLink to="/login" class="auth-tab">登录</NuxtLink>
-        <NuxtLink to="/register" class="auth-tab active">注册</NuxtLink>
-      </div>
-
       <div class="register-body">
         <h2 class="register-title">欢迎注册</h2>
         <p class="register-subtitle">如果您已经注册过，可以直接 <NuxtLink to="/login/find-password">找回密码</NuxtLink></p>
