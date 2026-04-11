@@ -22,9 +22,29 @@
       </div>
       <div class="filter-row">
         <span class="filter-label">科目：</span>
-        <div class="filter-tags">
-          <span class="ftag" :class="{ active: !filters.subject }" @click="setFilter('subject', null)">不限</span>
-          <span v-for="s in subjects" :key="s.id" class="ftag" :class="{ active: filters.subject === s.id }" @click="setFilter('subject', s.id)">{{ s.name }}</span>
+        <div class="filter-tags-wrap">
+          <div class="filter-tags" :class="{ expanded: subjectExpanded }">
+            <span class="ftag" :class="{ active: !filters.subject }" @click="setFilter('subject', null)">不限</span>
+            <span v-for="s in allSubjects" :key="s.name" class="ftag" :class="{ active: filters.subject === s.name }" @click="setFilter('subject', s.name)">{{ s.name }}</span>
+          </div>
+          <span class="expand-btn" @click.prevent="subjectExpanded = !subjectExpanded">
+            {{ subjectExpanded ? '收起' : '展开' }}
+            <el-icon size="12"><component :is="subjectExpanded ? ArrowUp : ArrowDown" /></el-icon>
+          </span>
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">院校：</span>
+        <div class="filter-tags-wrap">
+          <div class="filter-tags" :class="{ expanded: universityExpanded }">
+            <span class="ftag" :class="{ active: !filters.university }" @click="setFilter('university', null)">不限</span>
+            <span v-for="u in universities" :key="u" class="ftag" :class="{ active: filters.university === u }" @click="setFilter('university', u)">{{ u }}</span>
+            <NuxtLink to="/university" class="ftag more-link">更多高校 &rarr;</NuxtLink>
+          </div>
+          <span class="expand-btn" @click.prevent="universityExpanded = !universityExpanded">
+            {{ universityExpanded ? '收起' : '展开' }}
+            <el-icon size="12"><component :is="universityExpanded ? ArrowUp : ArrowDown" /></el-icon>
+          </span>
         </div>
       </div>
       <div class="filter-row">
@@ -101,7 +121,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 
@@ -109,15 +129,28 @@ const cityStore = useCityStore()
 const route = useRoute()
 const router = useRouter()
 const { post } = useApi()
-const { districts } = useCityData()
+const { districts, universities } = useCityData()
 
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
-const subjects = [
-  { id: 1, name: '数学' }, { id: 2, name: '英语' }, { id: 3, name: '语文' }, { id: 4, name: '物理' },
-  { id: 5, name: '化学' }, { id: 6, name: '钢琴' }, { id: 7, name: '美术' }, { id: 8, name: '编程' }
+
+const subjectExpanded = ref(false)
+const universityExpanded = ref(false)
+
+const allSubjects = [
+  { name: '幼儿学前' }, { name: '小学全科' }, { name: '初中理科' }, { name: '初中文科' },
+  { name: '高中理科' }, { name: '高中文科' }, { name: '语文' }, { name: '英语' },
+  { name: '数学' }, { name: '奥数' }, { name: '物理' }, { name: '化学' },
+  { name: '生物' }, { name: '历史' }, { name: '地理' }, { name: '政治' },
+  { name: '钢琴' }, { name: '小提琴' }, { name: '古筝' }, { name: '跳绳' },
+  { name: '篮球' }, { name: '游泳' }, { name: '围棋' }, { name: '书法' },
+  { name: '美术' }, { name: '英语口语' }, { name: '四级' }, { name: '托福' },
+  { name: '雅思' }, { name: 'SAT' }, { name: 'AP' }, { name: 'A-level' },
+  { name: 'IB' }, { name: 'IGCSE' }, { name: '日语' }, { name: '德语' },
+  { name: '高数' }, { name: '计算机' }, { name: '初中' }, { name: '高中' },
+  { name: '大学考研' }, { name: '高考志愿填报' }, { name: '生涯规划' }, { name: '心理辅导' }
 ]
 
-const filters = ref({ district: null, subject: null, tutorType: null, teachingMethod: null })
+const filters = ref({ district: null, subject: null, university: null, tutorType: null, teachingMethod: null })
 const requirements = ref([])
 const total = ref(0)
 const pageCurrent = ref(1)
@@ -139,7 +172,8 @@ const search = async () => {
       pageSize: pageSize.value,
       cityId: cityStore.cityId,
       districtId: f.district || undefined,
-      subjectId: f.subject || undefined,
+      subject: f.subject || undefined,
+      university: f.university || undefined,
       tutorType: f.tutorType || undefined,
       teachingMethod: f.teachingMethod || undefined
     })
@@ -198,7 +232,46 @@ onMounted(() => { search() })
   line-height: 28px;
 }
 
-.filter-tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.filter-tags-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  max-height: 30px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.filter-tags.expanded {
+  max-height: none;
+}
+
+.filter-row > .filter-tags {
+  max-height: none;
+}
+
+.expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 8px;
+  line-height: 20px;
+}
+.expand-btn:hover {
+  opacity: 0.8;
+}
 
 .ftag {
   display: inline-block;
@@ -212,6 +285,14 @@ onMounted(() => { search() })
 }
 .ftag:hover { color: var(--color-primary); }
 .ftag.active { background: var(--color-primary); color: #fff; }
+
+.ftag.more-link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+.ftag.more-link:hover {
+  background: var(--color-primary-lighter);
+}
 
 .result-header { margin-bottom: var(--space-md); font-size: var(--font-size-base); color: var(--color-text-secondary); }
 .result-header strong { color: var(--color-primary); }
