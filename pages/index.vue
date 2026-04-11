@@ -62,6 +62,15 @@
             </div>
           </div>
 
+          <!-- 中右：品牌名 + 域名 -->
+          <div class="nav-brand">
+            <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">长三角优质家教平台</span></div>
+            <div class="nav-brand-domains">
+              <span>www.591jiajiao.com</span>
+              <span>www.591jiajiao.cn</span>
+            </div>
+          </div>
+
           <!-- 右：导航 + 功能链接（靠最右） -->
           <div class="nav-right">
             <div class="nav-right-row">
@@ -269,6 +278,18 @@
           </div>
         </div>
       </div>
+
+      <!-- ========== 友情链接 & 热门城市 ========== -->
+      <div class="section-box links-section">
+        <div class="links-row">
+          <span class="links-label">友情链接：</span>
+          <a href="https://www.ttgood.com" target="_blank" rel="noopener noreferrer" class="links-item">天天家教网</a>
+        </div>
+        <div class="links-row">
+          <span class="links-label">热门城市：</span>
+          <NuxtLink v-for="c in cities" :key="c.pinyin" :to="'/city?name=' + c.name" class="links-item">{{ c.name }}</NuxtLink>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -439,7 +460,7 @@ onMounted(async () => {
 .nav-logo {
   display: flex;
   align-items: center;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-xl);
   flex-shrink: 0;
   border-right: 1px solid var(--color-border-light);
 }
@@ -449,8 +470,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--space-md) var(--space-3xl);
-  gap: 8px;
+  padding: var(--space-sm) var(--space-xl);
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -497,12 +518,61 @@ onMounted(async () => {
   border-radius: var(--radius-sm);
 }
 
+/* 中右：品牌名 + 域名 */
+.nav-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  border-right: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+
+.nav-brand-name {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.brand-main {
+  font-family: "SimHei", "STHeiti", "Heiti SC", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 2px;
+}
+
+.brand-sub {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  letter-spacing: 1px;
+}
+
+.nav-brand-domains {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.nav-brand-domains span {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
 /* 右：5列等宽网格，上下两排完全对齐 */
 .nav-right {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--space-md) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   gap: 8px;
   margin-left: auto;
   flex-shrink: 0;
@@ -518,7 +588,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 12px;
+  padding: 4px 8px;
   font-size: 15px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
@@ -1098,6 +1168,37 @@ onMounted(async () => {
 }
 
 /* ============================================
+   友情链接 & 热门城市
+   ============================================ */
+.links-section {
+  padding: var(--space-lg) var(--space-xl) !important;
+}
+
+.links-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 4px 0;
+}
+
+.links-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.links-item {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.links-item:hover {
+  color: var(--color-primary);
+}
+
+/* ============================================
    Responsive
    ============================================ */
 @media (max-width: 768px) {
@@ -1120,6 +1221,11 @@ onMounted(async () => {
     min-width: auto;
     padding: var(--space-md) var(--space-lg);
     align-items: center;
+  }
+  .nav-brand {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+    padding: var(--space-md);
   }
   .nav-right {
     padding: var(--space-md) var(--space-lg);
