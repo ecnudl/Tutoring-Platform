@@ -1,8 +1,10 @@
 <template>
-  <div class="login-page">
-    <div class="login-container">
-      <div class="login-brand">
-        <SiteLogo :showText="true" />
+  <div class="login-page-wrapper">
+    <div class="container login-page">
+      <!-- 登录/注册 切换 -->
+      <div class="auth-tabs">
+        <NuxtLink to="/login" class="auth-tab active">登录</NuxtLink>
+        <NuxtLink to="/register" class="auth-tab">注册</NuxtLink>
       </div>
 
       <!-- 角色选择 -->
@@ -169,29 +171,55 @@ const handleSmsLogin = async () => {
 </script>
 
 <style scoped>
-.login-page {
-  height: 100vh;
-  overflow: hidden;
+.login-page-wrapper {
   background: var(--color-bg);
+  padding: 0 0 var(--space-4xl);
+  min-height: calc(100vh - 200px);
+}
+
+.login-page {
+  background: var(--color-surface);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: var(--space-2xl) var(--space-xl) var(--space-4xl);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
 }
 
-.login-container {
-  max-width: 520px;
-  width: 100%;
-}
-
-.login-brand {
+/* 登录/注册 切换标签 */
+.auth-tabs {
   display: flex;
-  justify-content: center;
+  gap: var(--space-xl);
   margin-bottom: var(--space-3xl);
+  border-bottom: 2px solid var(--color-border-light);
+  padding-bottom: 0;
+}
+
+.auth-tab {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  padding: var(--space-md) var(--space-xl);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+}
+
+.auth-tab:hover {
+  color: var(--color-primary);
+}
+
+.auth-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .role-select {
   text-align: center;
+  max-width: 520px;
+  width: 100%;
 }
 
 .role-title {
@@ -258,6 +286,8 @@ const handleSmsLogin = async () => {
 }
 
 .login-card {
+  max-width: 460px;
+  width: 100%;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -304,17 +334,10 @@ const handleSmsLogin = async () => {
 }
 
 @media (max-width: 768px) {
-  .role-cards {
-    flex-direction: column;
-    gap: var(--space-lg);
-  }
-
-  .role-card {
-    padding: var(--space-2xl) var(--space-xl);
-  }
-
-  .role-icon {
-    font-size: 36px;
-  }
+  .login-page { padding: var(--space-lg); }
+  .role-cards { flex-direction: column; gap: var(--space-lg); }
+  .role-card { padding: var(--space-2xl) var(--space-xl); }
+  .role-icon { font-size: 36px; }
+  .login-card { padding: var(--space-xl); }
 }
 </style>
