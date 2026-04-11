@@ -6,10 +6,6 @@
       <Meta name="description" content="快速提交您的家教需求，我们将在24小时内为您推荐合适的教员。" />
     </Head>
 
-    <el-breadcrumb separator="/" style="margin-bottom:20px">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>请家教</el-breadcrumb-item>
-    </el-breadcrumb>
 
     <h1 class="page-title">请家教 - 快速提交您的需求</h1>
     <p class="page-sub">我们提供多种方式帮您找到满意的家教老师</p>
