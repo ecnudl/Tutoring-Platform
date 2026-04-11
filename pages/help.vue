@@ -150,7 +150,7 @@ const categories = reactive([
 
 .help-body {
   background: var(--color-surface);
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   padding: var(--space-xl);
   max-width: var(--content-width);

@@ -85,12 +85,12 @@ onMounted(async () => {
 <style scoped>
 .zf-page-wrapper {
   background: var(--color-bg);
-  padding: var(--space-2xl) 0 var(--space-4xl);
+  padding: 0 0 var(--space-4xl);
 }
 .zf-page {
   padding: var(--space-xl);
   background: var(--color-surface);
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 .page-sub { color: var(--color-text-muted); margin-bottom: var(--space-2xl); margin-top: calc(-1 * var(--space-md)); }

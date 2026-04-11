@@ -43,7 +43,7 @@ onMounted(async () => {
 <style scoped>
 .article-page-wrapper {
   background: var(--color-bg);
-  padding: var(--space-2xl) 0 var(--space-4xl);
+  padding: 0 0 var(--space-4xl);
 }
 .article-detail-page {
   padding: 20px;
@@ -51,7 +51,7 @@ onMounted(async () => {
   max-width: 800px;
   margin: 0 auto;
   background: var(--color-surface);
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 .article-card { padding: 12px; }
