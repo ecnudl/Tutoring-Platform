@@ -64,7 +64,7 @@
 
           <!-- 中右：品牌名 + 域名 -->
           <div class="nav-brand">
-            <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">长三角优质家教平台</span></div>
+            <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
             <div class="nav-brand-domains">
               <span>www.591jiajiao.com</span>
               <span>www.591jiajiao.cn</span>
@@ -383,13 +383,13 @@ const slides = ref([
 
 const cities = [
   { name: '上海', pinyin: 'shanghai', id: 1, enabled: true },
-  { name: '苏州', pinyin: 'suzhou', id: 2, enabled: true },
   { name: '南京', pinyin: 'nanjing', id: 5, enabled: true },
-  { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
+  { name: '苏州', pinyin: 'suzhou', id: 2, enabled: true },
   { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: true },
+  { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
   { name: '福州', pinyin: 'fuzhou', id: 6, enabled: true },
-  { name: '济南', pinyin: 'jinan', id: 7, enabled: true },
-  { name: '南昌', pinyin: 'nanchang', id: 8, enabled: true }
+  { name: '南昌', pinyin: 'nanchang', id: 8, enabled: true },
+  { name: '济南', pinyin: 'jinan', id: 7, enabled: true }
 ]
 
 const handleCityClick = (city) => {
