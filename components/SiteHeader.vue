@@ -1,89 +1,87 @@
 <template>
   <div class="site-header-outer">
-    <div class="container">
-      <div class="site-header-card">
-        <!-- 左：Logo -->
-        <div class="nav-logo">
-          <SiteLogo />
-        </div>
+    <div class="site-header-card container">
+      <!-- 左：Logo -->
+      <div class="nav-logo">
+        <SiteLogo />
+      </div>
 
-        <!-- 中：城市 + 电话 + 搜索 -->
-        <div class="nav-center">
-          <div class="nav-center-top">
-            <el-popover placement="bottom-start" :width="300" trigger="click">
-              <template #reference>
-                <span class="city-btn">
-                  <el-icon size="14"><Location /></el-icon>
-                  {{ cityStore.cityName }}
-                  <el-icon size="10"><ArrowDown /></el-icon>
-                </span>
-              </template>
-              <div class="city-popover">
-                <div class="city-popover-title">选择城市</div>
-                <div class="city-popover-grid">
-                  <a
-                    v-for="c in cities"
-                    :key="c.pinyin"
-                    href="javascript:;"
-                    class="city-opt"
-                    :class="{ active: cityStore.cityName === c.name, disabled: !c.enabled }"
-                    @click.prevent="handleCityClick(c)"
-                  >{{ c.name }}</a>
-                </div>
+      <!-- 中：城市 + 电话 + 搜索 -->
+      <div class="nav-center">
+        <div class="nav-center-top">
+          <el-popover placement="bottom-start" :width="300" trigger="click">
+            <template #reference>
+              <span class="city-btn">
+                <el-icon size="14"><Location /></el-icon>
+                {{ cityStore.cityName }}
+                <el-icon size="10"><ArrowDown /></el-icon>
+              </span>
+            </template>
+            <div class="city-popover">
+              <div class="city-popover-title">选择城市</div>
+              <div class="city-popover-grid">
+                <a
+                  v-for="c in cities"
+                  :key="c.pinyin"
+                  href="javascript:;"
+                  class="city-opt"
+                  :class="{ active: cityStore.cityName === c.name, disabled: !c.enabled }"
+                  @click.prevent="handleCityClick(c)"
+                >{{ c.name }}</a>
               </div>
-            </el-popover>
-            <span class="nav-phone">
-              <el-icon size="13"><Phone /></el-icon>
-              13795420591
-            </span>
-          </div>
-          <div class="nav-center-bottom">
-            <el-input
-              v-model="searchKeyword"
-              placeholder="搜索科目"
-              size="small"
-              clearable
-              class="nav-search"
-              @keyup.enter="doSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </div>
+            </div>
+          </el-popover>
+          <span class="nav-phone">
+            <el-icon size="13"><Phone /></el-icon>
+            13795420591
+          </span>
         </div>
-
-        <!-- 中右：品牌名 + 域名 -->
-        <div class="nav-brand">
-          <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
-          <div class="nav-brand-domains">
-            <span>www.591jiajiao.com</span>
-            <span>www.591jiajiao.cn</span>
-          </div>
+        <div class="nav-center-bottom">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索科目"
+            size="small"
+            clearable
+            class="nav-search"
+            @keyup.enter="doSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
         </div>
+      </div>
 
-        <!-- 右：导航 + 功能链接 -->
-        <div class="nav-right">
-          <div class="nav-right-row">
-            <NuxtLink to="/" class="nav-cell">{{ cityStore.cityName }}家教</NuxtLink>
-            <NuxtLink to="/jy" class="nav-cell">教员库</NuxtLink>
-            <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
-            <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
-            <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
-          </div>
-          <div class="nav-right-row">
-            <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
-            <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
-            <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
-            <template v-if="userStore.isLoggedIn">
-              <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile || '个人中心' }}</NuxtLink>
-              <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
-            </template>
-            <template v-else>
-              <NuxtLink to="/login" class="nav-cell">登录</NuxtLink>
-              <NuxtLink to="/register" class="nav-cell nav-highlight">注册</NuxtLink>
-            </template>
-          </div>
+      <!-- 中右：品牌名 + 域名 -->
+      <div class="nav-brand">
+        <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
+        <div class="nav-brand-domains">
+          <span>www.591jiajiao.com</span>
+          <span>www.591jiajiao.cn</span>
+        </div>
+      </div>
+
+      <!-- 右：导航 + 功能链接 -->
+      <div class="nav-right">
+        <div class="nav-right-row">
+          <NuxtLink to="/" class="nav-cell">{{ cityStore.cityName }}家教</NuxtLink>
+          <NuxtLink to="/jy" class="nav-cell">教员库</NuxtLink>
+          <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
+          <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
+          <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
+        </div>
+        <div class="nav-right-row">
+          <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
+          <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
+          <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
+          <template v-if="userStore.isLoggedIn">
+            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile || '个人中心' }}</NuxtLink>
+            <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
+          </template>
+          <template v-else>
+            <NuxtLink to="/login" class="nav-cell">登录</NuxtLink>
+            <NuxtLink to="/register" class="nav-cell nav-highlight">注册</NuxtLink>
+          </template>
         </div>
       </div>
     </div>
@@ -341,7 +339,6 @@ const handleLogout = () => {
   .site-header-card {
     flex-direction: column;
     border-radius: 8px 8px 0 0;
-    margin: 0 var(--space-sm);
   }
   .nav-logo {
     border-right: none;
