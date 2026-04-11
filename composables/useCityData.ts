@@ -68,6 +68,39 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 408, name: '钱塘区', pinyin: 'qiantang' },
     { id: 409, name: '富阳区', pinyin: 'fuyang' },
     { id: 410, name: '临安区', pinyin: 'linan' }
+  ],
+  6: [ // 福州
+    { id: 601, name: '鼓楼区', pinyin: 'gulou' },
+    { id: 602, name: '台江区', pinyin: 'taijiang' },
+    { id: 603, name: '仓山区', pinyin: 'cangshan' },
+    { id: 604, name: '马尾区', pinyin: 'mawei' },
+    { id: 605, name: '晋安区', pinyin: 'jinan' },
+    { id: 606, name: '长乐区', pinyin: 'changle' },
+    { id: 607, name: '闽侯县', pinyin: 'minhou' },
+    { id: 608, name: '福清市', pinyin: 'fuqing' }
+  ],
+  7: [ // 济南
+    { id: 701, name: '历下区', pinyin: 'lixia' },
+    { id: 702, name: '市中区', pinyin: 'shizhong' },
+    { id: 703, name: '槐荫区', pinyin: 'huaiyin' },
+    { id: 704, name: '天桥区', pinyin: 'tianqiao' },
+    { id: 705, name: '历城区', pinyin: 'licheng' },
+    { id: 706, name: '长清区', pinyin: 'changqing' },
+    { id: 707, name: '章丘区', pinyin: 'zhangqiu' },
+    { id: 708, name: '济阳区', pinyin: 'jiyang' },
+    { id: 709, name: '莱芜区', pinyin: 'laiwu' },
+    { id: 710, name: '高新区', pinyin: 'gaoxin' }
+  ],
+  8: [ // 南昌
+    { id: 801, name: '东湖区', pinyin: 'donghu' },
+    { id: 802, name: '西湖区', pinyin: 'xihu' },
+    { id: 803, name: '青云谱区', pinyin: 'qingyunpu' },
+    { id: 804, name: '青山湖区', pinyin: 'qingshanhu' },
+    { id: 805, name: '新建区', pinyin: 'xinjian' },
+    { id: 806, name: '红谷滩区', pinyin: 'honggutan' },
+    { id: 807, name: '南昌县', pinyin: 'nanchangxian' },
+    { id: 808, name: '安义县', pinyin: 'anyi' },
+    { id: 809, name: '进贤县', pinyin: 'jinxian' }
   ]
 }
 
@@ -108,6 +141,23 @@ const cityUniversities: Record<number, string[]> = {
     '浙江中医药大学', '中国计量大学', '浙江科技大学', '浙江传媒学院',
     '浙江外国语学院', '杭州医学院', '浙大城市学院', '浙江音乐学院',
     '浙江树人学院', '杭州电子科技大学信息工程学院'
+  ],
+  6: [
+    '福州大学', '福建师范大学', '福建农林大学', '福建医科大学',
+    '福建中医药大学', '闽江学院', '福建工程学院', '福建江夏学院',
+    '福建商学院', '福建警察学院', '阳光学院', '福州外语外贸学院'
+  ],
+  7: [
+    '山东大学', '济南大学', '山东师范大学', '山东财经大学',
+    '齐鲁工业大学', '山东建筑大学', '山东中医药大学', '山东政法学院',
+    '山东艺术学院', '山东体育学院', '山东女子学院', '山东交通学院',
+    '齐鲁师范学院', '山东英才学院'
+  ],
+  8: [
+    '南昌大学', '江西师范大学', '江西财经大学', '华东交通大学',
+    '东华理工大学', '江西农业大学', '江西中医药大学', '南昌航空大学',
+    '江西科技师范大学', '南昌工程学院', '江西警察学院', '豫章师范学院',
+    '南昌理工学院', '江西应用科技学院'
   ]
 }
 

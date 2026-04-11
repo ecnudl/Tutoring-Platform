@@ -341,7 +341,7 @@ const allSubjects = [
   { name: '雅思' }, { name: 'SAT' }, { name: 'AP' }, { name: 'A-level' },
   { name: 'IB' }, { name: 'IGCSE' }, { name: '日语' }, { name: '德语' },
   { name: '高数' }, { name: '计算机' }, { name: '初中' }, { name: '高中' },
-  { name: '大学考研' }
+  { name: '大学考研' }, { name: '高考志愿填报' }, { name: '生涯规划' }, { name: '心理辅导' }
 ]
 
 const noticeTabs = [
@@ -386,7 +386,10 @@ const cities = [
   { name: '苏州', pinyin: 'suzhou', id: 2, enabled: true },
   { name: '南京', pinyin: 'nanjing', id: 5, enabled: true },
   { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
-  { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: true }
+  { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: true },
+  { name: '福州', pinyin: 'fuzhou', id: 6, enabled: true },
+  { name: '济南', pinyin: 'jinan', id: 7, enabled: true },
+  { name: '南昌', pinyin: 'nanchang', id: 8, enabled: true }
 ]
 
 const handleCityClick = (city) => {
