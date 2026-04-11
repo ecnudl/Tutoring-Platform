@@ -15,8 +15,14 @@
         <el-menu-item index="/student/list"><el-icon><UserFilled /></el-icon><span>学员管理</span></el-menu-item>
         <el-menu-item index="/feedback/list"><el-icon><ChatDotRound /></el-icon><span>反馈管理</span></el-menu-item>
         <el-menu-item index="/vip/list"><el-icon><StarFilled /></el-icon><span>VIP管理</span></el-menu-item>
-        <el-sub-menu index="dict"><template #title><el-icon><Collection /></el-icon><span>字典管理</span></template>
-          <el-menu-item index="/dict/subject">科目</el-menu-item><el-menu-item index="/dict/grade">年级</el-menu-item><el-menu-item index="/dict/tag">标签</el-menu-item></el-sub-menu>
+        <el-sub-menu index="geo"><template #title><el-icon><Location /></el-icon><span>地理配置</span></template>
+          <el-menu-item index="/city/list">城市管理</el-menu-item><el-menu-item index="/district/list">区域管理</el-menu-item><el-menu-item index="/university/list">高校管理</el-menu-item></el-sub-menu>
+        <el-sub-menu index="dict"><template #title><el-icon><Collection /></el-icon><span>科目配置</span></template>
+          <el-menu-item index="/subject-category/list">科目分类</el-menu-item><el-menu-item index="/dict/subject">科目管理</el-menu-item><el-menu-item index="/dict/grade">年级管理</el-menu-item><el-menu-item index="/dict/tag">标签管理</el-menu-item></el-sub-menu>
+        <el-sub-menu index="content"><template #title><el-icon><Notebook /></el-icon><span>内容管理</span></template>
+          <el-menu-item index="/content/banner">轮播图</el-menu-item><el-menu-item index="/content/article">文章</el-menu-item><el-menu-item index="/homepage/config">首页配置</el-menu-item><el-menu-item index="/price-reference/list">价格参考</el-menu-item></el-sub-menu>
+        <el-sub-menu index="system"><template #title><el-icon><Setting /></el-icon><span>系统管理</span></template>
+          <el-menu-item index="/system/user">用户</el-menu-item><el-menu-item index="/system/role">角色</el-menu-item><el-menu-item index="/system/menu">菜单</el-menu-item><el-menu-item index="/audit-log/list">审核日志</el-menu-item></el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>
@@ -33,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { House, User, UserFilled, Document, Clock, List, ChatDotRound, StarFilled, Collection, Fold, ArrowDown } from '@element-plus/icons-vue'
+import { House, User, UserFilled, Document, Clock, List, ChatDotRound, StarFilled, Collection, Fold, ArrowDown, Location, Notebook, Setting } from '@element-plus/icons-vue'
 const isCollapse = ref(false)
 const router = useRouter()
 const logout = () => { localStorage.removeItem('admin_token'); router.push('/login') }
