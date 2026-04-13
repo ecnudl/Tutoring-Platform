@@ -123,8 +123,8 @@ const handlePasswordLogin = async () => {
 
   loading.value = true
   try {
-    const loginData = { ...passwordForm.value, userType: selectedRole.value === 'student' ? 1 : 2 }
-    const res = await post('/user/api/login', loginData)
+    const loginData = { mobile: passwordForm.value.mobile, password: passwordForm.value.password }
+    const res = await post('/user/api/users/login/simple', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
       ElMessage.success('登录成功')

@@ -17,12 +17,6 @@
           <el-form-item label="您的尊称">
             <el-input v-model="form.realName" placeholder="请输入您的尊称：例如 张女士" size="large" />
           </el-form-item>
-          <el-form-item label="短信验证码">
-            <div style="display:flex;gap:8px">
-              <el-input v-model="form.smsCode" placeholder="请输入短信验证码" size="large" style="flex:1" />
-              <el-button size="large" :disabled="countdown > 0" :loading="sendingCode" @click="sendSms">{{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}</el-button>
-            </div>
-          </el-form-item>
           <el-form-item label="密码">
             <el-input v-model="form.password" type="password" placeholder="请输入密码" size="large" show-password />
           </el-form-item>
@@ -64,41 +58,14 @@ const { post } = useApi()
 const formRef = ref(null)
 const submitting = ref(false)
 const showAgreementError = ref(false)
-const countdown = ref(0)
-const sendingCode = ref(false)
 
 const form = ref({
   mobile: '',
   realName: '',
-  smsCode: '',
   password: '',
   confirmPassword: '',
   agreed: false
 })
-
-const sendSms = async () => {
-  if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  sendingCode.value = true
-  try {
-    const res = await post('/user/api/users/send/code', { mobile: form.value.mobile })
-    if (res.code === 200) {
-      ElMessage.success('验证码已发送，请注意查收')
-      countdown.value = 60
-      const timer = setInterval(() => {
-        if (--countdown.value <= 0) clearInterval(timer)
-      }, 1000)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e) {
-    ElMessage.error('发送失败')
-  } finally {
-    sendingCode.value = false
-  }
-}
 
 const handleSubmit = async () => {
   if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
@@ -107,10 +74,6 @@ const handleSubmit = async () => {
   }
   if (!form.value.realName) {
     ElMessage.warning('请输入您的尊称')
-    return
-  }
-  if (!form.value.smsCode) {
-    ElMessage.warning('请输入短信验证码')
     return
   }
   if (!form.value.password || form.value.password.length < 6) {
@@ -129,12 +92,11 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
-    const res = await post('/user/api/register/student', {
+    const res = await post('/user/api/users/register/simple', {
       mobile: form.value.mobile,
-      realName: form.value.realName,
-      smsCode: form.value.smsCode,
       password: form.value.password,
-      cityId: cityStore.cityId
+      code: '',
+      userType: 2
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')
