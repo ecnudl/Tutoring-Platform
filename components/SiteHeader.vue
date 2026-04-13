@@ -75,7 +75,7 @@
           <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
-            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile || '个人中心' }}</NuxtLink>
+            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile ? userStore.mobile.slice(0,3) + '***' + userStore.mobile.slice(-2) : '个人中心' }}</NuxtLink>
             <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
           </template>
           <template v-else>
@@ -303,6 +303,8 @@ const handleLogout = () => {
   gap: 8px;
   margin-left: auto;
   flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .nav-right-row {
@@ -320,9 +322,12 @@ const handleLogout = () => {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color var(--transition-fast);
   text-align: center;
   text-decoration: none;
+  min-width: 0;
 }
 
 .nav-cell:hover,
