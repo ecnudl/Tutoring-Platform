@@ -257,7 +257,6 @@ const onUniversityChange = (id) => {
 }
 
 onMounted(async () => {
-  cityStore.loadFromStorage()
   try {
     const res = await get('/user/api/dict/university/list', { cityId: cityStore.cityId })
     if (res.code === 200 && res.data) {
@@ -280,7 +279,8 @@ const handleSubmit = async () => {
       mobile: form.mobile,
       password: form.password,
       code: '',
-      userType: 1
+      userType: 1,
+      realName: form.realName
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！审核通过后即可接单。')

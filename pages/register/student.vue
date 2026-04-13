@@ -96,7 +96,8 @@ const handleSubmit = async () => {
       mobile: form.value.mobile,
       password: form.value.password,
       code: '',
-      userType: 2
+      userType: 2,
+      realName: form.value.realName
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')

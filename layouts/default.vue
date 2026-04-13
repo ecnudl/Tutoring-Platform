@@ -9,17 +9,12 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
 
 const userStore = useUserStore()
 const cityStore = useCityStore()
 const route = useRoute()
-
-onMounted(() => {
-  cityStore.loadFromStorage()
-})
 </script>
 
 <style scoped>

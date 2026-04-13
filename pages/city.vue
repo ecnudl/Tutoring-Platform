@@ -29,14 +29,14 @@
           @click="selectCity(c)"
         >
           <span class="city-name">{{ c.name }}</span>
-          <span class="city-domain" v-if="c.enabled">{{ c.domain }}</span>
+          <span class="city-domain" v-if="c.enabled">{{ c.pinyin === 'shanghai' ? '主站' : c.pinyin }}</span>
           <el-tag v-if="!c.enabled" size="small" type="info" class="city-badge">即将开通</el-tag>
         </div>
       </div>
 
       <div class="city-note">
         <el-icon><InfoFilled /></el-icon>
-        <span>已开通上海、苏州、南京、合肥、杭州五个城市。切换城市后将展示对应城市的教员和需求信息。</span>
+        <span>切换城市后将跳转到对应城市子域名，展示该城市的教员和需求信息。</span>
       </div>
     </el-card>
   </div>
@@ -44,29 +44,21 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus'
 import { InfoFilled } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
+import { CITY_LIST, buildCityUrl, navigateToCity } from '~/composables/useCityMap'
 
 const cityStore = useCityStore()
-const router = useRouter()
 
-const cities = [
-  { id: 1, name: '上海', pinyin: 'shanghai', enabled: true, domain: '主站' },
-  { id: 2, name: '苏州', pinyin: 'suzhou', enabled: true, domain: 'suzhou' },
-  { id: 5, name: '南京', pinyin: 'nanjing', enabled: true, domain: 'nanjing' },
-  { id: 3, name: '合肥', pinyin: 'hefei', enabled: true, domain: 'hefei' },
-  { id: 4, name: '杭州', pinyin: 'hangzhou', enabled: true, domain: 'hangzhou' }
-]
+const cities = CITY_LIST
 
 const selectCity = (city) => {
   if (!city.enabled) {
     ElMessage.info(`${city.name}站即将开通，敬请期待`)
     return
   }
-  cityStore.setCity(city.id, city.name)
-  ElMessage.success(`已切换到${city.name}`)
-  router.push('/')
+  navigateToCity(city, '/')
 }
 </script>
 

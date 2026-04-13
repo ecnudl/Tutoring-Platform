@@ -2,8 +2,8 @@
   <div class="jy-page-wrapper">
     <div class="container jy-page">
     <Head>
-      <Title>教员库 - 591家教网</Title>
-      <Meta name="description" content="浏览优质家教教员，按区域、科目、教员类型筛选，找到最适合的家教老师。" />
+      <Title>{{ cityStore.cityName }}教员库 - 591家教网</Title>
+      <Meta name="description" :content="`浏览${cityStore.cityName}优质家教教员，按区域、科目、教员类型筛选，找到最适合的家教老师。`" />
     </Head>
 
     <el-breadcrumb separator="/">

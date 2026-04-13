@@ -2,8 +2,8 @@
   <div class="qjj-page-wrapper">
     <div class="container qjj-page">
     <Head>
-      <Title>请家教 - 591家教网</Title>
-      <Meta name="description" content="快速提交您的家教需求，我们将在24小时内为您推荐合适的教员。" />
+      <Title>{{ cityStore.cityName }}请家教 - 591家教网</Title>
+      <Meta name="description" :content="`在${cityStore.cityName}快速提交您的家教需求，我们将在24小时内为您推荐合适的教员。`" />
     </Head>
 
 

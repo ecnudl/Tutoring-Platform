@@ -2,8 +2,8 @@
   <div class="xy-page-wrapper">
     <div class="container xy-page">
     <Head>
-      <Title>学员需求 - 591家教网</Title>
-      <Meta name="description" content="浏览最新学员家教需求，按区域、科目筛选，找到合适的家教单子。" />
+      <Title>{{ cityStore.cityName }}学员需求 - 591家教网</Title>
+      <Meta name="description" :content="`浏览${cityStore.cityName}最新学员家教需求，按区域、科目筛选，找到合适的家教单子。`" />
     </Head>
 
     <el-breadcrumb separator="/">

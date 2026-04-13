@@ -1,8 +1,8 @@
 <template>
   <div class="home-page">
     <Head>
-      <Title>591家教网 - 找家教上门辅导一对一</Title>
-      <Meta name="description" content="591家教网,提供上门家教一对一辅导服务,大学生家教、专职教员、在职教师,覆盖小学初中高中全科辅导。" />
+      <Title>{{ cityStore.cityName }}家教 - 591家教网 - 找家教上门辅导一对一</Title>
+      <Meta name="description" :content="`${cityStore.cityName}家教网,提供上门家教一对一辅导服务,大学生家教、专职教员、在职教师,覆盖小学初中高中全科辅导。`" />
     </Head>
 
     <div class="container">
@@ -287,7 +287,7 @@
         </div>
         <div class="links-row">
           <span class="links-label">热门城市：</span>
-          <NuxtLink v-for="c in cities" :key="c.pinyin" :to="'/city?name=' + c.name" class="links-item">{{ c.name }}</NuxtLink>
+          <a v-for="c in cities" :key="c.pinyin" :href="buildCityUrl(c, '/')" class="links-item">{{ c.name }}</a>
         </div>
       </div>
     </div>
@@ -301,6 +301,7 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
+import { CITY_LIST, buildCityUrl, navigateToCity } from '~/composables/useCityMap'
 
 const userStore = useUserStore()
 const cityStore = useCityStore()
@@ -381,28 +382,14 @@ const slides = ref([
   { id: 3, title: '新学期辅导计划', imageUrl: '', link: '/qjj' }
 ])
 
-const cities = [
-  { name: '上海', pinyin: 'shanghai', id: 1, enabled: true },
-  { name: '南京', pinyin: 'nanjing', id: 5, enabled: true },
-  { name: '苏州', pinyin: 'suzhou', id: 2, enabled: true },
-  { name: '杭州', pinyin: 'hangzhou', id: 4, enabled: true },
-  { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
-  { name: '福州', pinyin: 'fuzhou', id: 6, enabled: true },
-  { name: '南昌', pinyin: 'nanchang', id: 8, enabled: true },
-  { name: '济南', pinyin: 'jinan', id: 7, enabled: true },
-  { name: '北京', pinyin: 'beijing', id: 9, enabled: true },
-  { name: '天津', pinyin: 'tianjin', id: 10, enabled: true },
-  { name: '广州', pinyin: 'guangzhou', id: 11, enabled: true },
-  { name: '武汉', pinyin: 'wuhan', id: 12, enabled: true }
-]
+const cities = CITY_LIST
 
 const handleCityClick = (city) => {
   if (!city.enabled) {
     ElMessage.info(`${city.name}站即将开通`)
     return
   }
-  cityStore.setCity(city.id, city.name)
-  ElMessage.success(`已切换到${city.name}`)
+  navigateToCity(city, '/')
 }
 
 const doSearch = () => {
@@ -416,8 +403,6 @@ const doSearch = () => {
 const handleLogout = () => { userStore.logout(); router.push('/') }
 
 onMounted(async () => {
-  cityStore.loadFromStorage()
-
   if (userStore.isLoggedIn) {
     userStore.fetchNickname()
   }

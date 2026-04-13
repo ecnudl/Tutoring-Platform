@@ -51,7 +51,6 @@ const { universities: localUniversities } = useCityData()
 const universities = ref([])
 
 onMounted(async () => {
-  cityStore.loadFromStorage()
   try {
     const res = await get('/user/api/dict/university/list', { cityId: cityStore.cityId })
     if (res.code === 200 && res.data && res.data.length) {

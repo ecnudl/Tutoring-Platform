@@ -2,8 +2,8 @@
   <div class="zf-page-wrapper">
     <div class="container zf-page">
     <Head>
-      <Title>家教价格参考 - 591家教网</Title>
-      <Meta name="description" content="上海家教收费标准参考，涵盖大学生、专职教员、在职教师各年级段课时费。" />
+      <Title>{{ cityStore.cityName }}家教价格参考 - 591家教网</Title>
+      <Meta name="description" :content="`${cityStore.cityName}家教收费标准参考，涵盖大学生、专职教员、在职教师各年级段课时费。`" />
     </Head>
 
     <el-breadcrumb separator="/" style="margin-bottom:20px">
