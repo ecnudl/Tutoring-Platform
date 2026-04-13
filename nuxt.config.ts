@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
   css: ['~/assets/styles/main.scss'],
   runtimeConfig: {
-    public: { apiBase: process.env.API_BASE || 'http://localhost:7700' }
+    public: { apiBase: process.env.API_BASE || '' }
   },
   app: {
     head: {
