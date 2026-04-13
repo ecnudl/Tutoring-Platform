@@ -243,19 +243,19 @@ public class ApiUsersBiz extends BaseBiz {
         if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
             return Result.error("手机号格式不正确");
         }
-        // 短信验证码校验
-        if (!StringUtils.hasText(req.getCode())) {
-            return Result.error("请输入短信验证码");
+        // 短信验证码校验（为空时跳过，仅供测试使用）
+        if (StringUtils.hasText(req.getCode())) {
+            String redisCode = cacheRedis.get(Constants.RedisPre.CODE + req.getMobile());
+            if (!StringUtils.hasText(redisCode)) {
+                return Result.error("验证码已过期，请重新获取");
+            }
+            if (!req.getCode().equals(redisCode)) {
+                return Result.error("验证码不正确");
+            }
+            cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
+        } else {
+            log.warn("[测试模式] 跳过短信验证码校验，手机号：{}", req.getMobile());
         }
-        String redisCode = cacheRedis.get(Constants.RedisPre.CODE + req.getMobile());
-        if (!StringUtils.hasText(redisCode)) {
-            return Result.error("验证码已过期，请重新获取");
-        }
-        if (!req.getCode().equals(redisCode)) {
-            return Result.error("验证码不正确");
-        }
-        // 删除验证码缓存
-        cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
 
         // 密码校验
         if (!StringUtils.hasText(req.getPassword())) {
