@@ -109,7 +109,11 @@ const cities = [
   { name: '合肥', pinyin: 'hefei', id: 3, enabled: true },
   { name: '福州', pinyin: 'fuzhou', id: 6, enabled: true },
   { name: '南昌', pinyin: 'nanchang', id: 8, enabled: true },
-  { name: '济南', pinyin: 'jinan', id: 7, enabled: true }
+  { name: '济南', pinyin: 'jinan', id: 7, enabled: true },
+  { name: '北京', pinyin: 'beijing', id: 9, enabled: true },
+  { name: '天津', pinyin: 'tianjin', id: 10, enabled: true },
+  { name: '广州', pinyin: 'guangzhou', id: 11, enabled: true },
+  { name: '武汉', pinyin: 'wuhan', id: 12, enabled: true }
 ]
 
 const handleCityClick = (city) => {
