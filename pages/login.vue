@@ -127,6 +127,7 @@ const handlePasswordLogin = async () => {
     const res = await post('/user/api/users/login/simple', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
+      userStore.fetchNickname()
       ElMessage.success('登录成功')
       router.push(route.query.redirect || '/')
     } else {
@@ -151,6 +152,7 @@ const handleSmsLogin = async () => {
     const res = await post('/user/api/login/sms', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
+      userStore.fetchNickname()
       ElMessage.success('登录成功')
       router.push(route.query.redirect || '/')
     } else {

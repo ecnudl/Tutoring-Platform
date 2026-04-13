@@ -75,7 +75,7 @@
           <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
-            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile ? userStore.mobile.slice(0,3) + '***' + userStore.mobile.slice(-2) : '个人中心' }}</NuxtLink>
+            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
             <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
           </template>
           <template v-else>
@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Location, ArrowDown, Phone, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
@@ -98,6 +98,12 @@ import { useCityStore } from '~/stores/city'
 const userStore = useUserStore()
 const cityStore = useCityStore()
 const router = useRouter()
+
+onMounted(() => {
+  if (userStore.isLoggedIn) {
+    userStore.fetchNickname()
+  }
+})
 
 const searchKeyword = ref('')
 

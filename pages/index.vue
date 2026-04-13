@@ -85,7 +85,7 @@
               <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
               <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
               <template v-if="userStore.isLoggedIn">
-                <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.mobile ? userStore.mobile.slice(0,3) + '***' + userStore.mobile.slice(-2) : '个人中心' }}</NuxtLink>
+                <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
                 <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
               </template>
               <template v-else>
@@ -417,6 +417,10 @@ const handleLogout = () => { userStore.logout(); router.push('/') }
 
 onMounted(async () => {
   cityStore.loadFromStorage()
+
+  if (userStore.isLoggedIn) {
+    userStore.fetchNickname()
+  }
 
   // 加载轮播图
   const stored = localStorage.getItem('carousel_slides')
