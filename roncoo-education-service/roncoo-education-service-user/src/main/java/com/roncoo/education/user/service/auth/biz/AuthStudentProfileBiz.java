@@ -28,5 +28,15 @@ public class AuthStudentProfileBiz extends BaseBiz {
     }
 
     public Result<?> view() { return Result.success(studentProfileDao.getByUserId(ThreadContext.userId())); }
-    public Result<String> save(com.roncoo.education.user.service.auth.req.AuthStudentProfileSaveReq req) { return Result.success("操作成功"); }
+    public Result<String> save(com.roncoo.education.user.service.auth.req.AuthStudentProfileSaveReq req) {
+        Long userId = ThreadContext.userId();
+        com.roncoo.education.user.dao.impl.mapper.entity.StudentProfile profile = studentProfileDao.getByUserId(userId);
+        if (profile == null) {
+            return Result.error("学员资料不存在");
+        }
+        com.roncoo.education.user.dao.impl.mapper.entity.StudentProfile update = BeanUtil.copyProperties(req, com.roncoo.education.user.dao.impl.mapper.entity.StudentProfile.class);
+        update.setId(profile.getId());
+        studentProfileDao.updateById(update);
+        return Result.success("保存成功");
+    }
 }

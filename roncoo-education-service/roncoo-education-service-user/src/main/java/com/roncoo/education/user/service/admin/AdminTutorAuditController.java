@@ -25,4 +25,6 @@ public class AdminTutorAuditController {
     public Result<String> approve(@RequestBody java.util.Map<String, Object> req) { return biz.approve(req); }
     @SysLog(value = "审核拒绝") @ApiOperation(value = "审核拒绝") @PutMapping("/reject")
     public Result<String> reject(@RequestBody java.util.Map<String, Object> req) { return biz.reject(req); }
+    @ApiOperation(value = "教员证书列表") @GetMapping("/cert/list")
+    public Result<?> certList(@RequestParam Long tutorId) { return biz.certList(tutorId); }
 }

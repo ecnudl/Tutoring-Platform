@@ -261,6 +261,10 @@ public class ApiUsersBiz extends BaseBiz {
         if (!StringUtils.hasText(req.getPassword())) {
             return Result.error("密码不能为空");
         }
+        // 姓名/尊称校验
+        if (!StringUtils.hasText(req.getRealName())) {
+            return Result.error("请填写姓名或尊称");
+        }
         // userType 校验
         if (req.getUserType() == null || (!UserTypeEnum.TUTOR.getCode().equals(req.getUserType()) && !UserTypeEnum.STUDENT.getCode().equals(req.getUserType()))) {
             return Result.error("用户类型不合法，只能为1(教员)或2(学员)");
@@ -273,6 +277,23 @@ public class ApiUsersBiz extends BaseBiz {
 
         // 注册（直接明文密码，内部会SHA1加盐哈希存储）
         Users user = register(req.getMobile(), req.getPassword(), 1, null, null, req.getUserType());
+
+        // 保存真实姓名/尊称到档案
+        if (StringUtils.hasText(req.getRealName())) {
+            if (UserTypeEnum.TUTOR.getCode().equals(req.getUserType())) {
+                TutorProfile profile = tutorProfileDao.getByUserId(user.getId());
+                if (profile != null) {
+                    profile.setRealName(req.getRealName().trim());
+                    tutorProfileDao.updateById(profile);
+                }
+            } else if (UserTypeEnum.STUDENT.getCode().equals(req.getUserType())) {
+                StudentProfile profile = studentProfileDao.getByUserId(user.getId());
+                if (profile != null) {
+                    profile.setRealName(req.getRealName().trim());
+                    studentProfileDao.updateById(profile);
+                }
+            }
+        }
 
         // 构建登录响应
         UsersLog usersLog = new UsersLog();
@@ -543,9 +564,36 @@ public class ApiUsersBiz extends BaseBiz {
         resp.setMobile(mobile);
         resp.setToken(JwtUtil.create(userId, JwtUtil.DATE));
         resp.setUserType(dbUser != null ? dbUser.getUserType() : UserTypeEnum.UNSET.getCode());
+        // 生成显示名称
+        if (dbUser != null) {
+            resp.setNickname(generateDisplayName(dbUser));
+        }
         // token，放入缓存
         cacheRedis.set(resp.getToken(), userId, 1, TimeUnit.DAYS);
         return resp;
+    }
+
+    /**
+     * 生成用户显示名：教员→姓+教员，学员→直接使用尊称（如"张女士"）
+     */
+    private String generateDisplayName(Users user) {
+        if (UserTypeEnum.TUTOR.getCode().equals(user.getUserType())) {
+            TutorProfile profile = tutorProfileDao.getByUserId(user.getId());
+            if (profile != null && StringUtils.hasText(profile.getRealName())) {
+                return profile.getRealName().trim().substring(0, 1) + "教员";
+            }
+        } else if (UserTypeEnum.STUDENT.getCode().equals(user.getUserType())) {
+            StudentProfile profile = studentProfileDao.getByUserId(user.getId());
+            if (profile != null && StringUtils.hasText(profile.getRealName())) {
+                String realName = profile.getRealName().trim();
+                // 学员的 realName 是尊称格式（如"张女士"），短名直接使用
+                if (realName.length() <= 4) {
+                    return realName;
+                }
+                return realName.substring(0, 1) + "家长";
+            }
+        }
+        return null;
     }
 
     private void log(Long userId, LoginStatusEnum status, UsersLog record) {

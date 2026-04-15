@@ -82,4 +82,7 @@ public class TutorSearchResp implements Serializable {
 
     @ApiModelProperty(value = "展示编号")
     private String displayNo;
+
+    @ApiModelProperty(value = "是否已认证(0:否,1:是)")
+    private Integer isVerified;
 }

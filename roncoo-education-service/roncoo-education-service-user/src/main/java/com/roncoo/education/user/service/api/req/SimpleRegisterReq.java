@@ -25,4 +25,7 @@ public class SimpleRegisterReq implements Serializable {
 
     @ApiModelProperty(value = "用户类型 1教员 2学员", required = true)
     private Integer userType;
+
+    @ApiModelProperty(value = "真实姓名/尊称")
+    private String realName;
 }

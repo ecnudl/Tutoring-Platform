@@ -28,4 +28,7 @@ public class UsersLoginResp implements Serializable {
 
     @ApiModelProperty(value = "用户类型 0未设置 1教员 2学员")
     private Integer userType;
+
+    @ApiModelProperty(value = "用户昵称（显示名）")
+    private String nickname;
 }

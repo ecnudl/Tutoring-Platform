@@ -8,8 +8,10 @@ import com.roncoo.education.common.core.base.Result;
 import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
 import com.roncoo.education.common.tools.BeanUtil;
 import com.roncoo.education.user.dao.TutorAuditRecordDao;
+import com.roncoo.education.user.dao.TutorCertificationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorCertification;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfileExample;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -27,6 +30,8 @@ public class AdminTutorAuditBiz extends BaseBiz {
     private final TutorProfileDao tutorProfileDao;
     @NotNull
     private final TutorAuditRecordDao tutorAuditRecordDao;
+    @NotNull
+    private final TutorCertificationDao tutorCertificationDao;
 
     /**
      * 待审核教员分页列表
@@ -76,11 +81,12 @@ public class AdminTutorAuditBiz extends BaseBiz {
             return Result.error("当前状态不允许审核，仅待审核状态可操作");
         }
 
-        // 更新审核状态为通过
+        // 更新审核状态为通过，同时标记为已认证
         TutorProfile update = new TutorProfile();
         update.setId(id);
         update.setAuditStatus(TutorAuditStatusEnum.APPROVED.getCode());
         update.setAuditRemark(remark);
+        update.setIsVerified(1);
         tutorProfileDao.updateById(update);
 
         // 写审核记录
@@ -120,6 +126,17 @@ public class AdminTutorAuditBiz extends BaseBiz {
         saveAuditRecord(id, 2, remark);
 
         return Result.success("已驳回");
+    }
+
+    /**
+     * 查询教员的证书列表（管理端用）
+     */
+    public Result<List<TutorCertification>> certList(Long tutorId) {
+        if (tutorId == null) {
+            return Result.error("tutorId不能为空");
+        }
+        List<TutorCertification> certs = tutorCertificationDao.listByTutorId(tutorId);
+        return Result.success(certs);
     }
 
     /**
