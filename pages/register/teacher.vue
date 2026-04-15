@@ -167,6 +167,50 @@
             </el-form-item>
           </div>
 
+          <!-- 资质证书（选填） -->
+          <div class="form-section">
+            <div class="section-title">
+              资质证书
+              <span class="section-optional">选填，上传后可获得认证标识</span>
+            </div>
+            <p class="cert-tip">上传教师资格证、学生证、学历证等资质证明，审核通过后将获得<strong>已认证</strong>标识，提升信任度和接单率。您也可以注册后在个人中心补充上传。</p>
+
+            <div v-for="(cert, idx) in certList" :key="idx" class="cert-item">
+              <el-row :gutter="12" align="middle">
+                <el-col :span="6" :xs="12">
+                  <el-select v-model="cert.certType" placeholder="证书类型" size="large" style="width:100%">
+                    <el-option label="教师资格证" :value="3" />
+                    <el-option label="学生证" :value="2" />
+                    <el-option label="学历证" :value="4" />
+                    <el-option label="身份证" :value="1" />
+                    <el-option label="其他" :value="5" />
+                  </el-select>
+                </el-col>
+                <el-col :span="6" :xs="12">
+                  <el-input v-model="cert.certName" placeholder="证书名称" size="large" />
+                </el-col>
+                <el-col :span="8" :xs="16">
+                  <div v-if="cert.certUrl" class="cert-preview">
+                    <el-image :src="cert.certUrl" style="width:80px;height:56px;border-radius:4px" fit="cover" />
+                    <el-button size="small" text type="danger" @click="cert.certUrl = ''">移除</el-button>
+                  </div>
+                  <div v-else>
+                    <input type="file" :ref="el => certFileRefs[idx] = el" accept="image/*" style="display:none" @change="e => handleCertFileUpload(e, idx)" />
+                    <el-button size="small" :loading="cert.uploading" @click="certFileRefs[idx]?.click()">上传照片</el-button>
+                    <span class="cert-file-hint">jpg/png, 最大5MB</span>
+                  </div>
+                </el-col>
+                <el-col :span="4" :xs="8">
+                  <el-button text type="danger" @click="certList.splice(idx, 1)">删除</el-button>
+                </el-col>
+              </el-row>
+            </div>
+
+            <el-button v-if="certList.length < 3" type="primary" plain size="large" @click="addCert" style="margin-top:12px">
+              + 添加证书
+            </el-button>
+          </div>
+
           <!-- 协议 -->
           <div class="agreement-box" :class="{ error: agreementError }">
             <el-checkbox v-model="form.agreed" @change="agreementError = false">
@@ -205,10 +249,38 @@ const { districtNames } = useCityData()
 const router = useRouter()
 const { get, post } = useApi()
 
+const config = useRuntimeConfig()
 const formRef = ref(null)
 const submitting = ref(false)
 const agreementError = ref(false)
 const universityOptions = ref([])
+const certList = reactive([])
+const certFileRefs = ref([])
+
+const addCert = () => {
+  certList.push({ certType: 3, certName: '', certUrl: '', uploading: false })
+}
+
+const handleCertFileUpload = async (e, idx) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片不能超过5MB'); return }
+  certList[idx].uploading = true
+  try {
+    const fd = new FormData()
+    fd.append('picFile', file)
+    // 注册时无 token，用公开上传接口
+    const res = await $fetch(`${config.public.apiBase}/system/auth/upload/pic`, {
+      method: 'POST', body: fd,
+      headers: localStorage.getItem('token') ? { token: localStorage.getItem('token') } : {}
+    })
+    if (res.code === 200 && res.data) {
+      certList[idx].certUrl = res.data
+      ElMessage.success('照片上传成功')
+    } else { ElMessage.error(res.msg || '上传失败') }
+  } catch (err) { ElMessage.error('上传失败，请重试') }
+  finally { certList[idx].uploading = false; e.target.value = '' }
+}
 
 const subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理', '钢琴', '小提琴', '古筝', '吉他', '美术', '书法', '舞蹈', '编程', '日语', '法语', '德语', '韩语', '西班牙语', '学前教育', '小学全科']
 
@@ -283,6 +355,21 @@ const handleSubmit = async () => {
       realName: form.realName
     })
     if (res.code === 200) {
+      // 注册成功后，如有上传证书则尝试保存（需要先用返回的 token 认证）
+      if (certList.length > 0 && res.data?.token) {
+        const token = res.data.token
+        for (const cert of certList) {
+          if (cert.certType && cert.certName) {
+            try {
+              await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/cert/save`, {
+                method: 'POST',
+                body: { certType: cert.certType, certName: cert.certName, certUrl: cert.certUrl || '', certNo: '' },
+                headers: { 'Content-Type': 'application/json', token }
+              })
+            } catch (e) { /* 证书保存失败不影响注册流程 */ }
+          }
+        }
+      }
       ElMessage.success('注册成功！审核通过后即可接单。')
       router.push('/login')
     } else {
@@ -396,6 +483,44 @@ const handleSubmit = async () => {
   margin-bottom: var(--space-2xl);
   padding-bottom: var(--space-md);
   border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Section optional hint */
+.section-optional {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: normal;
+  margin-left: var(--space-sm);
+}
+
+.cert-tip {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-xl) 0;
+  line-height: 1.6;
+}
+.cert-tip strong {
+  color: #2563eb;
+}
+
+.cert-item {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.cert-item:last-child {
+  border-bottom: none;
+}
+
+.cert-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cert-file-hint {
+  font-size: 12px;
+  color: #999;
+  margin-left: 8px;
 }
 
 /* Code input */
