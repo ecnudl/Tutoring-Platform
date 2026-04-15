@@ -42,7 +42,7 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="教员详情" width="600px">
+    <el-dialog v-model="detailVisible" title="教员详情" width="700px">
       <el-descriptions :column="2" border v-if="detail">
         <el-descriptions-item label="姓名">{{ detail.realName }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ detail.mobile }}</el-descriptions-item>
@@ -53,11 +53,44 @@
         <el-descriptions-item label="专业">{{ detail.major }}</el-descriptions-item>
         <el-descriptions-item label="课时费">{{ detail.priceMin }}-{{ detail.priceMax }}元/时</el-descriptions-item>
         <el-descriptions-item label="自我介绍" :span="2">{{ detail.selfIntroduction || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="认证状态">
+          <el-tag :type="detail.isVerified === 1 ? 'success' : 'info'" size="small">
+            {{ detail.isVerified === 1 ? '已认证' : '未认证' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="审核状态">
           <el-tag :type="auditTagType(detail.auditStatus)">{{ auditLabel(detail.auditStatus) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="审核备注">{{ detail.auditRemark || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="审核备注" :span="2">{{ detail.auditRemark || '-' }}</el-descriptions-item>
       </el-descriptions>
+
+      <!-- 资质证书 -->
+      <div style="margin-top:20px" v-if="detailCerts.length > 0">
+        <h4 style="margin-bottom:12px;font-weight:600">资质证书（{{ detailCerts.length }}份）</h4>
+        <el-table :data="detailCerts" border stripe size="small">
+          <el-table-column label="类型" width="100">
+            <template #default="{ row }">{{ certTypeLabel(row.certType) }}</template>
+          </el-table-column>
+          <el-table-column prop="certName" label="名称" />
+          <el-table-column prop="certNo" label="编号" width="120">
+            <template #default="{ row }">{{ row.certNo || '-' }}</template>
+          </el-table-column>
+          <el-table-column label="照片" width="100">
+            <template #default="{ row }">
+              <el-image v-if="row.certUrl" :src="row.certUrl" style="width:50px;height:35px" fit="cover" :preview-src-list="[row.certUrl]" />
+              <span v-else style="color:#999;font-size:12px">未上传</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="80">
+            <template #default="{ row }">
+              <el-tag size="small" :type="{ 0:'warning', 1:'success', 2:'danger' }[row.auditStatus] || 'info'">
+                {{ { 0:'待审核', 1:'通过', 2:'驳回' }[row.auditStatus] || '未知' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div v-else style="margin-top:16px;color:#999;font-size:13px">暂无资质证书</div>
     </el-dialog>
 
     <!-- 审核弹窗 -->
@@ -90,6 +123,9 @@ const loading = ref(false)
 
 const detailVisible = ref(false)
 const detail = ref<any>(null)
+const detailCerts = ref<any[]>([])
+
+const certTypeLabel = (t: number) => ({ 1:'身份证', 2:'学生证', 3:'教师资格证', 4:'学历证', 5:'其他' }[t] || '未知')
 
 const auditVisible = ref(false)
 const auditAction = ref('')
@@ -125,6 +161,12 @@ const viewDetail = async (row: any) => {
     if (res.code === 200) {
       detail.value = res.data
       detailVisible.value = true
+      // 加载该教员的证书列表
+      detailCerts.value = []
+      try {
+        const certRes = await get('/user/admin/tutor-audit/cert/list', { tutorId: row.id })
+        if (certRes.code === 200) detailCerts.value = certRes.data || []
+      } catch (e) { /* 证书加载失败不影响详情展示 */ }
     }
   } catch (e) { console.error(e) }
 }
