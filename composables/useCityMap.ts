@@ -15,9 +15,11 @@ export interface CityEntry {
   enabled: boolean
 }
 
-/** 12 个城市，上海排第一 */
+/** 17 个城市，上海排第一 */
 export const CITY_LIST: CityEntry[] = [
   { id: 1,  name: '上海', pinyin: 'shanghai',  enabled: true },
+  { id: 9,  name: '北京', pinyin: 'beijing',   enabled: true },
+  { id: 11, name: '广州', pinyin: 'guangzhou',  enabled: true },
   { id: 5,  name: '南京', pinyin: 'nanjing',   enabled: true },
   { id: 2,  name: '苏州', pinyin: 'suzhou',    enabled: true },
   { id: 4,  name: '杭州', pinyin: 'hangzhou',  enabled: true },
@@ -25,10 +27,13 @@ export const CITY_LIST: CityEntry[] = [
   { id: 6,  name: '福州', pinyin: 'fuzhou',    enabled: true },
   { id: 8,  name: '南昌', pinyin: 'nanchang',  enabled: true },
   { id: 7,  name: '济南', pinyin: 'jinan',     enabled: true },
-  { id: 9,  name: '北京', pinyin: 'beijing',   enabled: true },
   { id: 10, name: '天津', pinyin: 'tianjin',   enabled: true },
-  { id: 11, name: '广州', pinyin: 'guangzhou',  enabled: true },
   { id: 12, name: '武汉', pinyin: 'wuhan',     enabled: true },
+  { id: 13, name: '郑州', pinyin: 'zhengzhou',  enabled: true },
+  { id: 14, name: '重庆', pinyin: 'chongqing',  enabled: true },
+  { id: 15, name: '西安', pinyin: 'xian',       enabled: true },
+  { id: 16, name: '成都', pinyin: 'chengdu',    enabled: true },
+  { id: 17, name: '长沙', pinyin: 'changsha',   enabled: true },
 ]
 
 /** pinyin → CityEntry 的 O(1) 查找 Map */

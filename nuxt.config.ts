@@ -42,6 +42,16 @@ export default defineNuxtConfig({
         { rel: 'dns-prefetch', href: '//tianjin.591jiajiao.com' },
         { rel: 'dns-prefetch', href: '//guangzhou.591jiajiao.com' },
         { rel: 'dns-prefetch', href: '//wuhan.591jiajiao.com' },
+        { rel: 'dns-prefetch', href: '//zhengzhou.591jiajiao.cn' },
+        { rel: 'dns-prefetch', href: '//chongqing.591jiajiao.cn' },
+        { rel: 'dns-prefetch', href: '//xian.591jiajiao.cn' },
+        { rel: 'dns-prefetch', href: '//chengdu.591jiajiao.cn' },
+        { rel: 'dns-prefetch', href: '//changsha.591jiajiao.cn' },
+        { rel: 'dns-prefetch', href: '//zhengzhou.591jiajiao.com' },
+        { rel: 'dns-prefetch', href: '//chongqing.591jiajiao.com' },
+        { rel: 'dns-prefetch', href: '//xian.591jiajiao.com' },
+        { rel: 'dns-prefetch', href: '//chengdu.591jiajiao.com' },
+        { rel: 'dns-prefetch', href: '//changsha.591jiajiao.com' },
       ]
     }
   },
