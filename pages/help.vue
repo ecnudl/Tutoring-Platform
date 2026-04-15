@@ -1,14 +1,5 @@
 <template>
   <div class="help-wrapper">
-    <div class="breadcrumb-bar">
-      <div class="container">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>帮助中心</el-breadcrumb-item>
-        </el-breadcrumb>
-      </div>
-    </div>
-
     <div class="container help-body">
       <aside class="help-sidebar">
         <div class="sidebar-title">帮助中心</div>
@@ -135,17 +126,6 @@ const categories = reactive([
 .help-wrapper {
   min-height: 100vh;
   background: var(--color-bg);
-}
-
-.breadcrumb-bar {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  padding: 14px 0;
-}
-.breadcrumb-bar .container {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 var(--space-xl);
 }
 
 .help-body {

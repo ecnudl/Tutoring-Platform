@@ -20,7 +20,7 @@
           <span v-for="d in districts" :key="d.id" class="ftag" :class="{ active: filters.district === d.id }" @click="setFilter('district', d.id)">{{ d.name }}</span>
         </div>
       </div>
-      <div class="filter-row" v-if="!route.query.subject">
+      <div class="filter-row">
         <span class="filter-label">科目：</span>
         <div class="filter-tags-wrap">
           <div class="filter-tags" :class="{ expanded: subjectExpanded }">

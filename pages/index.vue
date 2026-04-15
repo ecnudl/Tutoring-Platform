@@ -166,10 +166,10 @@
               >{{ tab.label }}</span>
             </div>
             <div class="notice-body">
-              <div v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" class="notice-item">
+              <NuxtLink v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" :to="'/notice/' + item.id" class="notice-item">
                 <span class="notice-dot"></span>
-                <span class="notice-text">{{ item }}</span>
-              </div>
+                <span class="notice-text">{{ item.title }}</span>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -357,28 +357,28 @@ const noticeTabs = [
   {
     label: '网站公告',
     items: [
-      '平台服务升级维护通知',
-      '五一假期客服时间调整',
-      '教员认证流程优化公告',
-      '新增苏州、南京站点上线',
+      { id: 'service-upgrade', title: '平台服务升级维护通知' },
+      { id: 'holiday-schedule', title: '五一假期客服时间调整' },
+      { id: 'cert-optimization', title: '教员认证流程优化公告' },
+      { id: 'new-cities', title: '新增多个城市站点上线' },
     ]
   },
   {
     label: '教育资讯',
     items: [
-      '2025年上海中考政策解读',
-      '小学数学思维训练方法分享',
-      '初中英语听力提分技巧',
-      '高考志愿填报注意事项',
+      { id: 'zhongkao-policy', title: '2025年上海中考政策解读' },
+      { id: 'math-training', title: '小学数学思维训练方法分享' },
+      { id: 'english-listening', title: '初中英语听力提分技巧' },
+      { id: 'gaokao-guide', title: '高考志愿填报注意事项' },
     ]
   },
   {
     label: '教/学员须知',
     items: [
-      '首次试讲免费，满意后再上课',
-      '课时费由家长与教员直接结算',
-      '教员需通过实名认证方可接单',
-      '如遇问题请拨打客服热线反馈',
+      { id: 'free-trial', title: '首次试讲免费，满意后再上课' },
+      { id: 'payment-policy', title: '课时费由家长与教员直接结算' },
+      { id: 'cert-required', title: '教员需通过实名认证方可接单' },
+      { id: 'contact-support', title: '如遇问题请拨打客服热线反馈' },
     ]
   }
 ]
