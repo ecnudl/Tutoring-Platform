@@ -2,7 +2,6 @@
   <div class="agreement-page">
     <div class="agreement-wrapper">
       <div class="agreement-header">
-        <NuxtLink to="/" class="logo">591家教网</NuxtLink>
         <h1>免责声明</h1>
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
@@ -128,12 +127,6 @@
   margin-bottom: 36px;
   padding-bottom: 24px;
   border-bottom: 2px solid #f0f0f0;
-}
-.agreement-header .logo {
-  font-size: 18px;
-  font-weight: 700;
-  color: #409eff;
-  text-decoration: none;
 }
 .agreement-header h1 {
   font-size: 28px;

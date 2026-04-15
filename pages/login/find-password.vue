@@ -2,8 +2,7 @@
   <div class="find-pwd-page">
     <div class="find-pwd-container">
       <div style="text-align:center;margin-bottom:24px">
-        <NuxtLink to="/" class="find-pwd-brand">★ 591家教网</NuxtLink>
-        <h2 style="margin-top:16px;color:#333">找回密码</h2>
+        <h2 style="margin-top:0;color:#333">找回密码</h2>
       </div>
       <el-card>
         <el-form :model="form">
