@@ -146,7 +146,7 @@
                   <div class="qr-corner qr-corner-bl"></div>
                   <div class="qr-corner qr-corner-br"></div>
                   <div class="qr-placeholder">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="120" height="120"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
+                    <img src="/wechat-qr.png" alt="微信二维码" class="qr-image" />
                   </div>
                 </div>
               </div>
@@ -813,6 +813,14 @@ onMounted(async () => {
   justify-content: center;
   color: var(--color-primary-light);
   background: var(--color-primary-lighter);
+  overflow: hidden;
+}
+
+.qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .qr-tip {

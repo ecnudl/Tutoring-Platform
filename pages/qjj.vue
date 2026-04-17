@@ -60,7 +60,9 @@
         <h2>微信咨询</h2>
         <p class="method-desc">扫描二维码添加客服微信，一对一咨询</p>
         <div class="wechat-qr">
-          <div class="qr-placeholder">微信二维码</div>
+          <div class="qr-placeholder">
+            <img src="/wechat-qr.png" alt="微信二维码" class="qr-image" />
+          </div>
           <p style="margin-top:8px;font-size:13px;color:var(--color-text-muted)">扫码添加客服微信</p>
         </div>
       </el-card>
@@ -188,7 +190,10 @@ const handleSubmit = async () => {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   background: var(--color-bg);
+  overflow: hidden;
+  padding: 6px;
 }
+.qr-image { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 .browse-links { margin-top: var(--space-lg); }
 
