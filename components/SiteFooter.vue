@@ -52,6 +52,7 @@ const DEFAULT_GROUPS = [
     { label: '服务号', href: '/about/wechat' },
     { label: '联系我们', href: '/about/contact' },
     { label: '公司简介', href: '/about/intro' },
+    { label: '免责声明', href: '/agreement/disclaimer' },
     { label: '隐私保护', href: '/agreement/privacy' }
   ]}
 ]
