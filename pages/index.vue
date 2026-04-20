@@ -81,6 +81,11 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- ========== 轮播图 + 功能区（独立卡片，与顶栏拉开距离）========== -->
+      <div class="home-card home-card--banner">
+
         <!-- ▸ 板块二：轮播图 -->
         <div class="card-banner">
           <el-carousel height="380px" :interval="5000" arrow="hover">
@@ -482,6 +487,10 @@ onMounted(async () => {
   overflow: hidden;
   margin-bottom: var(--space-2xl);
 }
+/* 方案 A：banner 卡片拉开距离 */
+.home-card--banner {
+  margin-top: var(--space-xl);
+}
 
 /* ============================================
    板块一：顶部导航栏
@@ -489,7 +498,6 @@ onMounted(async () => {
 .card-nav {
   display: flex;
   align-items: stretch;
-  border-bottom: 1px solid var(--color-border-light);
   min-height: 100px;
 }
 
@@ -499,53 +507,57 @@ onMounted(async () => {
   flex-direction: column;
   justify-content: center;
   padding: var(--space-sm) var(--space-xl);
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .nav-center-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
+/* 方案 ⓑ：标签小灰 tracking，弱化副标 */
 .nav-center-label {
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  min-width: 60px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  letter-spacing: 3px;
+  min-width: 54px;
 }
 
-/* 城市按钮 */
-.city-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  cursor: pointer;
-  padding: 3px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-.city-btn:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: var(--color-primary-lighter);
-}
-
+/* 方案 ⓑ：城市按钮和电话号码采用同一胶囊结构，视觉一致 */
+.city-btn,
 .nav-phone {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-text);
+  height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
 }
+
+.city-btn:hover,
+.nav-phone:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.nav-phone { cursor: default; }
+
 .phone-num {
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 15px;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* 左：品牌名 + 域名 */

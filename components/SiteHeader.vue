@@ -136,45 +136,48 @@ const handleLogout = () => {
 .nav-center-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .nav-center-label {
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  min-width: 60px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  letter-spacing: 3px;
+  min-width: 54px;
 }
 
-.city-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  cursor: pointer;
-  padding: 3px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-.city-btn:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: var(--color-primary-lighter);
-}
-
+.city-btn,
 .nav-phone {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-text);
+  height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
 }
+
+.city-btn:hover,
+.nav-phone:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.nav-phone { cursor: default; }
+
 .phone-num {
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 15px;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* 城市弹窗 */
