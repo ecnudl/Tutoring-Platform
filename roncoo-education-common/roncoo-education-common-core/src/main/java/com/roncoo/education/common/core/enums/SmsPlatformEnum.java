@@ -24,7 +24,7 @@ public enum SmsPlatformEnum {
     /**
      * 腾讯云
      */
-    TENCENT_YUN(3, "腾讯云(待接入)", "tencent%", "tencentSms"),
+    TENCENT_YUN(3, "腾讯云", "tencent%", "tencentSms"),
 
     /**
      * 华为云

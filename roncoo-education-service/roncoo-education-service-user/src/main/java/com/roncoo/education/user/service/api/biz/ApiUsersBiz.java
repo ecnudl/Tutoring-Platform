@@ -353,6 +353,30 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
+     * 短信验证码登录：校验 Redis 里的验证码后免密登录
+     */
+    public Result<UsersLoginResp> loginBySms(String mobile, String code) {
+        if (!StringUtils.hasText(mobile)) {
+            return Result.error("手机号不能为空");
+        }
+        if (!mobile.matches("^1[3-9]\\d{9}$")) {
+            return Result.error("手机号格式不正确");
+        }
+        if (!StringUtils.hasText(code)) {
+            return Result.error("验证码不能为空");
+        }
+        String redisCode = cacheRedis.get(Constants.RedisPre.CODE + mobile);
+        if (!StringUtils.hasText(redisCode)) {
+            return Result.error("验证码已过期，请重新获取");
+        }
+        if (!code.equals(redisCode)) {
+            return Result.error("验证码不正确");
+        }
+        cacheRedis.delete(Constants.RedisPre.CODE + mobile);
+        return loginByMobileOnly(mobile);
+    }
+
+    /**
      * 通过手机号重置密码（短信验证码已在上层校验）
      */
     public Result<String> resetPasswordByMobile(String mobile, String newPassword) {
@@ -366,6 +390,33 @@ public class ApiUsersBiz extends BaseBiz {
         record.setMobilePsw(DigestUtil.sha1Hex(record.getMobileSalt() + newPassword));
         usersDao.updateById(record);
         return Result.success("密码重置成功");
+    }
+
+    /**
+     * 找回密码：短信验证码 + 新密码
+     */
+    public Result<String> resetPasswordBySms(String mobile, String code, String newPassword) {
+        if (!StringUtils.hasText(mobile)) {
+            return Result.error("手机号不能为空");
+        }
+        if (!mobile.matches("^1[3-9]\\d{9}$")) {
+            return Result.error("手机号格式不正确");
+        }
+        if (!StringUtils.hasText(code)) {
+            return Result.error("验证码不能为空");
+        }
+        if (!StringUtils.hasText(newPassword) || newPassword.length() < 6) {
+            return Result.error("密码不能少于6位");
+        }
+        String redisCode = cacheRedis.get(Constants.RedisPre.CODE + mobile);
+        if (!StringUtils.hasText(redisCode)) {
+            return Result.error("验证码已过期，请重新获取");
+        }
+        if (!code.equals(redisCode)) {
+            return Result.error("验证码不正确");
+        }
+        cacheRedis.delete(Constants.RedisPre.CODE + mobile);
+        return resetPasswordByMobile(mobile, newPassword);
     }
 
     public Result<String> sendCode(SendCodeReq req) {

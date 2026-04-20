@@ -339,4 +339,12 @@ VALUES
 (5, 1, 1, '网站标题', 'websiteTitle', '家教在线平台', 1, 0),
 (6, 1, 1, '网站关键词', 'websiteKeyword', '家教,在线家教,找家教,做家教', 1, 0),
 (7, 1, 1, '网站描述', 'websiteDesc', '家教在线平台 - 找家教、做家教、一站式服务', 1, 0),
-(8, 1, 1, '网站版权', 'websiteCopyright', '© 2024 家教在线平台', 1, 0);
+(8, 1, 1, '网站版权', 'websiteCopyright', '© 2024 家教在线平台', 1, 0),
+-- ===== 腾讯云短信配置（由管理员在后台填入）=====
+(20, 5, 1, '腾讯云短信签名', 'tencentSmsSignName', '', 0, 20),
+(21, 5, 1, '腾讯云短信AppID', 'tencentSmsSdkAppId', '', 0, 21),
+(22, 5, 1, '腾讯云SecretId', 'tencentSmsAccessKeyId', '', 0, 22),
+(23, 5, 1, '腾讯云SecretKey', 'tencentSmsAccessKeySecret', '', 0, 23),
+(24, 5, 1, '腾讯云验证码模板ID', 'tencentSmsAuthCode', '', 0, 24),
+(25, 5, 1, '腾讯云购买通知模板ID', 'tencentSmsPurchaseCode', '', 0, 25),
+(26, 5, 1, '腾讯云地域', 'tencentSmsRegion', 'ap-guangzhou', 0, 26);

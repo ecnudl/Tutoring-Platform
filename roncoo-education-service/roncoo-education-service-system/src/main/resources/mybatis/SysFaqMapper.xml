@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roncoo.education.system.dao.impl.mapper.SysFaqMapper">
+    <resultMap id="BaseResultMap" type="com.roncoo.education.system.dao.impl.mapper.entity.SysFaq">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="status_id" jdbcType="TINYINT" property="statusId"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="category" jdbcType="VARCHAR" property="category"/>
+        <result column="category_icon" jdbcType="VARCHAR" property="categoryIcon"/>
+        <result column="category_label" jdbcType="VARCHAR" property="categoryLabel"/>
+        <result column="question" jdbcType="VARCHAR" property="question"/>
+        <result column="answer" jdbcType="LONGVARCHAR" property="answer"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, gmt_create, gmt_modified, status_id, sort, category, category_icon, category_label, question, answer
+    </sql>
+
+    <insert id="insert" parameterType="com.roncoo.education.system.dao.impl.mapper.entity.SysFaq">
+        insert into sys_faq
+        (id, status_id, sort, category, category_icon, category_label, question, answer)
+        values
+        (#{id}, #{statusId}, #{sort}, #{category}, #{categoryIcon}, #{categoryLabel}, #{question}, #{answer})
+    </insert>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from sys_faq where id = #{id}
+    </delete>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.system.dao.impl.mapper.entity.SysFaq">
+        update sys_faq
+        <set>
+            <if test="statusId != null">status_id = #{statusId},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="categoryIcon != null">category_icon = #{categoryIcon},</if>
+            <if test="categoryLabel != null">category_label = #{categoryLabel},</if>
+            <if test="question != null">question = #{question},</if>
+            <if test="answer != null">answer = #{answer},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from sys_faq where id = #{id}
+    </select>
+
+    <sql id="Where_Clause">
+        <where>
+            <if test="category != null and category != ''">and category = #{category}</if>
+            <if test="statusId != null">and status_id = #{statusId}</if>
+            <if test="keyword != null and keyword != ''">and (question like concat('%', #{keyword}, '%') or answer like concat('%', #{keyword}, '%'))</if>
+        </where>
+    </sql>
+
+    <select id="countForPage" resultType="int">
+        select count(1) from sys_faq
+        <include refid="Where_Clause"/>
+    </select>
+
+    <select id="selectForPage" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from sys_faq
+        <include refid="Where_Clause"/>
+        order by category asc, sort asc, id desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="listAllActive" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from sys_faq
+        where status_id = 1
+        order by sort asc, id desc
+    </select>
+</mapper>

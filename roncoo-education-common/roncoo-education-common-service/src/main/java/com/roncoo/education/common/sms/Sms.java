@@ -30,4 +30,13 @@ public class Sms implements Serializable {
     private String aliyunSmsAuthCode;
     private String aliyunSmsPurchaseCode;
 
+    // Tencent短信签名
+    private String tencentSmsSignName;
+    private String tencentSmsSdkAppId;
+    private String tencentSmsAccessKeyId;
+    private String tencentSmsAccessKeySecret;
+    private String tencentSmsAuthCode;
+    private String tencentSmsPurchaseCode;
+    private String tencentSmsRegion;
+
 }

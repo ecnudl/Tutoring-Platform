@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roncoo.education.system.dao.impl.mapper.SysAnnouncementMapper">
+    <resultMap id="BaseResultMap" type="com.roncoo.education.system.dao.impl.mapper.entity.SysAnnouncement">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="status_id" jdbcType="TINYINT" property="statusId"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="category" jdbcType="VARCHAR" property="category"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="link_url" jdbcType="VARCHAR" property="linkUrl"/>
+        <result column="is_top" jdbcType="TINYINT" property="isTop"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, gmt_create, gmt_modified, status_id, sort, category, title, content, link_url, is_top
+    </sql>
+
+    <insert id="insert" parameterType="com.roncoo.education.system.dao.impl.mapper.entity.SysAnnouncement">
+        insert into sys_announcement
+        (id, status_id, sort, category, title, content, link_url, is_top)
+        values
+        (#{id}, #{statusId}, #{sort}, #{category}, #{title}, #{content}, #{linkUrl}, #{isTop})
+    </insert>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from sys_announcement where id = #{id}
+    </delete>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.system.dao.impl.mapper.entity.SysAnnouncement">
+        update sys_announcement
+        <set>
+            <if test="statusId != null">status_id = #{statusId},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="linkUrl != null">link_url = #{linkUrl},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from sys_announcement where id = #{id}
+    </select>
+
+    <sql id="Where_Clause">
+        <where>
+            <if test="category != null and category != ''">and category = #{category}</if>
+            <if test="statusId != null">and status_id = #{statusId}</if>
+            <if test="keyword != null and keyword != ''">and title like concat('%', #{keyword}, '%')</if>
+        </where>
+    </sql>
+
+    <select id="countForPage" resultType="int">
+        select count(1) from sys_announcement
+        <include refid="Where_Clause"/>
+    </select>
+
+    <select id="selectForPage" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from sys_announcement
+        <include refid="Where_Clause"/>
+        order by is_top desc, sort asc, id desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="listByCategory" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from sys_announcement
+        where status_id = 1
+        <if test="category != null and category != ''">and category = #{category}</if>
+        order by is_top desc, sort asc, id desc
+        <if test="limit &gt; 0">limit #{limit}</if>
+    </select>
+</mapper>
