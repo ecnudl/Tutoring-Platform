@@ -1,9 +1,13 @@
 <template>
   <div class="site-header-outer">
     <div class="site-header-card container">
-      <!-- 左：Logo -->
-      <div class="nav-logo">
-        <SiteLogo />
+      <!-- 左：品牌名 + 域名 -->
+      <div class="nav-brand">
+        <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
+        <div class="nav-brand-domains">
+          <span>www.591jiajiao.com</span>
+          <span>www.591jiajiao.cn</span>
+        </div>
       </div>
 
       <!-- 中：城市 + 电话 + 搜索 -->
@@ -49,15 +53,6 @@
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
-        </div>
-      </div>
-
-      <!-- 中右：品牌名 + 域名 -->
-      <div class="nav-brand">
-        <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
-        <div class="nav-brand-domains">
-          <span>www.591jiajiao.com</span>
-          <span>www.591jiajiao.cn</span>
         </div>
       </div>
 
@@ -148,15 +143,6 @@ const handleLogout = () => {
   border-bottom: 1px solid var(--color-border-light);
 }
 
-/* 左：Logo */
-.nav-logo {
-  display: flex;
-  align-items: center;
-  padding: 0 var(--space-xl);
-  flex-shrink: 0;
-  border-right: 1px solid var(--color-border-light);
-}
-
 /* 中：城市+电话 / 搜索 */
 .nav-center {
   display: flex;
@@ -239,13 +225,13 @@ const handleLogout = () => {
   cursor: not-allowed;
 }
 
-/* 中右：品牌名 + 域名 */
+/* 左：品牌名 + 域名 */
 .nav-brand {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-xl);
   border-right: 1px solid var(--color-border-light);
   flex-shrink: 0;
 }
@@ -261,14 +247,14 @@ const handleLogout = () => {
   font-family: "SimHei", "STHeiti", "Heiti SC", sans-serif;
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #000;
   letter-spacing: 2px;
 }
 
 .brand-sub {
   font-size: 15px;
   font-weight: 400;
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   letter-spacing: 1px;
 }
 
@@ -342,12 +328,6 @@ const handleLogout = () => {
   .site-header-card {
     flex-direction: column;
     border-radius: 8px 8px 0 0;
-  }
-  .nav-logo {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-light);
-    justify-content: center;
-    padding: var(--space-md);
   }
   .nav-center {
     border-right: none;
