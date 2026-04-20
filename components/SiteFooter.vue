@@ -66,10 +66,11 @@ onMounted(() => { load() })
 </script>
 
 <style scoped>
+/* 深蓝底 + 浅蓝卡片浮在上面：卡片像一块"漂浮"在深蓝海面上的光板 */
 .site-footer {
-  background: var(--color-bg, #f5f6f8);
+  background: var(--color-primary-dark, #163B6B);
   margin-top: auto;
-  padding: 60px 0 28px;
+  padding: 56px 0 24px;
 }
 
 .footer-inner {
@@ -81,25 +82,29 @@ onMounted(() => { load() })
 .footer-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  gap: 24px;
 }
 
 .footer-card {
-  background: #f3f4f6;
+  /* 浅蓝——在深蓝底色上是"更浅的蓝"，仍然含蓝色调 */
+  background: #eaf1fa;
   border-radius: 10px;
-  padding: 36px 40px;
+  padding: 34px 38px;
   min-height: 260px;
-  transition: box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  box-shadow: 0 2px 10px rgba(8, 22, 44, 0.18);
 }
 
 .footer-card:hover {
-  box-shadow: 0 6px 24px rgba(22, 59, 107, 0.08);
+  background: #f2f7fd;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(8, 22, 44, 0.28);
 }
 
 .card-title {
   font-size: 20px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-primary-dark, #163B6B);
   margin: 0 0 24px;
   letter-spacing: 1px;
 }
@@ -112,7 +117,7 @@ onMounted(() => { load() })
 
 .card-link {
   font-size: 15px;
-  color: #525b68;
+  color: #4a5a72;
   text-decoration: none;
   transition: color 0.18s ease;
   width: fit-content;
@@ -122,12 +127,13 @@ onMounted(() => { load() })
   color: var(--color-primary);
 }
 
+/* 底部版权条：深蓝底色、白色淡文字 */
 .footer-bottom {
-  margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 13px;
-  color: #94a3b8;
+  color: rgba(255, 255, 255, 0.5);
   text-align: center;
   display: flex;
   justify-content: center;
@@ -136,9 +142,9 @@ onMounted(() => { load() })
   flex-wrap: wrap;
 }
 
-.footer-bottom .sep { color: #cbd5e1; }
-.footer-bottom a { color: #94a3b8; text-decoration: none; }
-.footer-bottom a:hover { color: var(--color-primary); }
+.footer-bottom .sep { color: rgba(255, 255, 255, 0.2); }
+.footer-bottom a { color: rgba(255, 255, 255, 0.5); text-decoration: none; }
+.footer-bottom a:hover { color: #fff; }
 
 @media (max-width: 768px) {
   .site-footer { padding: 36px 0 20px; }
