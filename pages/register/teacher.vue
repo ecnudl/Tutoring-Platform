@@ -295,7 +295,7 @@ const handleCertFileUpload = async (e, idx) => {
   finally { certList[idx].uploading = false; e.target.value = '' }
 }
 
-const subjectOptions = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理', '钢琴', '小提琴', '古筝', '吉他', '美术', '书法', '舞蹈', '编程', '日语', '法语', '德语', '韩语', '西班牙语', '学前教育', '小学全科']
+import { SUBJECT_NAMES as subjectOptions } from '~/composables/subjectList'
 
 const form = reactive({
   mobile: '',

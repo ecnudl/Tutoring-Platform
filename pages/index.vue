@@ -337,19 +337,7 @@ const testimonials = computed(() => testimonialsData.value.length ? testimonials
 const subjectExpanded = ref(false)
 const universityExpanded = ref(false)
 
-const allSubjects = [
-  { name: '幼儿学前' }, { name: '小学全科' }, { name: '初中理科' }, { name: '初中文科' },
-  { name: '高中理科' }, { name: '高中文科' }, { name: '语文' }, { name: '英语' },
-  { name: '数学' }, { name: '奥数' }, { name: '物理' }, { name: '化学' },
-  { name: '生物' }, { name: '历史' }, { name: '地理' }, { name: '政治' },
-  { name: '钢琴' }, { name: '小提琴' }, { name: '古筝' }, { name: '跳绳' },
-  { name: '篮球' }, { name: '游泳' }, { name: '围棋' }, { name: '书法' },
-  { name: '美术' }, { name: '英语口语' }, { name: '四级' }, { name: '托福' },
-  { name: '雅思' }, { name: 'SAT' }, { name: 'AP' }, { name: 'A-level' },
-  { name: 'IB' }, { name: 'IGCSE' }, { name: '日语' }, { name: '德语' },
-  { name: '高数' }, { name: '计算机' }, { name: '初中' }, { name: '高中' },
-  { name: '大学考研' }, { name: '高考志愿填报' }, { name: '生涯规划' }, { name: '心理辅导' }
-]
+import { SUBJECT_OBJECTS as allSubjects } from '~/composables/subjectList'
 
 // 公告栏 tab 配置（与后端 category 对应）
 const NOTICE_CATEGORIES = [
