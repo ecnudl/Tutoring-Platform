@@ -61,9 +61,10 @@
         <span class="filter-label">授课方式：</span>
         <div class="filter-tags">
           <span class="ftag" :class="{ active: !filters.teachingMethod }" @click="setFilter('teachingMethod', null)">不限</span>
-          <span class="ftag" :class="{ active: filters.teachingMethod === 1 }" @click="setFilter('teachingMethod', 1)">上门家教</span>
-          <span class="ftag" :class="{ active: filters.teachingMethod === 2 }" @click="setFilter('teachingMethod', 2)">在线辅导</span>
-          <span class="ftag" :class="{ active: filters.teachingMethod === 3 }" @click="setFilter('teachingMethod', 3)">均可</span>
+          <span class="ftag" :class="{ active: filters.teachingMethod === 1 }" @click="setFilter('teachingMethod', 1)">教师上门</span>
+          <span class="ftag" :class="{ active: filters.teachingMethod === 2 }" @click="setFilter('teachingMethod', 2)">学生上门</span>
+          <span class="ftag" :class="{ active: filters.teachingMethod === 3 }" @click="setFilter('teachingMethod', 3)">在线辅导</span>
+          <span class="ftag" :class="{ active: filters.teachingMethod === 4 }" @click="setFilter('teachingMethod', 4)">均可</span>
         </div>
       </div>
       <div class="filter-row">

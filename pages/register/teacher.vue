@@ -129,9 +129,10 @@
               <el-col :span="12" :xs="24">
                 <el-form-item label="授课方式">
                   <el-select v-model="form.teachingMethod" placeholder="请选择" size="large" style="width:100%">
-                    <el-option label="上门家教" :value="1" />
-                    <el-option label="在线辅导" :value="2" />
-                    <el-option label="均可" :value="3" />
+                    <el-option label="教师上门" :value="1" />
+                    <el-option label="学生上门" :value="2" />
+                    <el-option label="在线辅导" :value="3" />
+                    <el-option label="均可" :value="4" />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -309,7 +310,7 @@ const form = reactive({
   universityId: null,
   major: '',
   gradeYear: '',
-  teachingMethod: 3,
+  teachingMethod: 4,
   subjects: [],
   districts: [],
   expectedSalary: '',

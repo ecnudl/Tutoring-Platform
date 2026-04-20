@@ -131,7 +131,7 @@ const activeTab = ref('basic')
 const genderMap = { 1: '男', 2: '女' }
 const degreeMap = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
-const teachingMethodMap = { 1: '上门家教', 2: '在线辅导', 3: '均可' }
+const teachingMethodMap = { 1: '教师上门', 2: '学生上门', 3: '在线辅导', 4: '均可' }
 
 const loadTutor = async () => {
   loading.value = true
