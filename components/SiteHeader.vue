@@ -136,33 +136,29 @@ const handleLogout = () => {
 .nav-center-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .nav-center-label {
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-  font-size: 13px;
-  color: #64748b;
-  letter-spacing: 4px;
-  font-weight: 400;
-  min-width: 62px;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  min-width: 60px;
 }
 
 .city-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: "Songti SC", "STSong", serif;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   cursor: pointer;
   padding: 3px 12px;
   border: 1px solid var(--color-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   white-space: nowrap;
-  letter-spacing: 1px;
 }
 .city-btn:hover {
   color: var(--color-primary);
@@ -174,13 +170,11 @@ const handleLogout = () => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 .phone-num {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 城市弹窗 */
