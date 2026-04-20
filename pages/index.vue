@@ -11,9 +11,13 @@
 
         <!-- ▸ 板块一：顶部导航栏 -->
         <div class="card-nav">
-          <!-- 左：Logo -->
-          <div class="nav-logo">
-            <SiteLogo />
+          <!-- 左：品牌名 + 域名 -->
+          <div class="nav-brand">
+            <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
+            <div class="nav-brand-domains">
+              <span>www.591jiajiao.com</span>
+              <span>www.591jiajiao.cn</span>
+            </div>
           </div>
 
           <!-- 中：城市 + 电话 + 搜索（居中偏右） -->
@@ -59,15 +63,6 @@
                   <el-icon><Search /></el-icon>
                 </template>
               </el-input>
-            </div>
-          </div>
-
-          <!-- 中右：品牌名 + 域名 -->
-          <div class="nav-brand">
-            <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
-            <div class="nav-brand-domains">
-              <span>www.591jiajiao.com</span>
-              <span>www.591jiajiao.cn</span>
             </div>
           </div>
 
@@ -460,15 +455,6 @@ onMounted(async () => {
   min-height: 100px;
 }
 
-/* 左：Logo */
-.nav-logo {
-  display: flex;
-  align-items: center;
-  padding: 0 var(--space-xl);
-  flex-shrink: 0;
-  border-right: 1px solid var(--color-border-light);
-}
-
 /* 中：城市+电话 / 搜索 */
 .nav-center {
   display: flex;
@@ -522,13 +508,13 @@ onMounted(async () => {
   border-radius: var(--radius-sm);
 }
 
-/* 中右：品牌名 + 域名 */
+/* 左：品牌名 + 域名 */
 .nav-brand {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-xl);
   border-right: 1px solid var(--color-border-light);
   flex-shrink: 0;
 }
@@ -544,14 +530,14 @@ onMounted(async () => {
   font-family: "SimHei", "STHeiti", "Heiti SC", sans-serif;
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #000;
   letter-spacing: 2px;
 }
 
 .brand-sub {
   font-size: 15px;
   font-weight: 400;
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   letter-spacing: 1px;
 }
 
@@ -1243,12 +1229,6 @@ onMounted(async () => {
   /* 导航栏：竖排 */
   .card-nav {
     flex-direction: column;
-  }
-  .nav-logo {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-light);
-    justify-content: center;
-    padding: var(--space-md);
   }
   .nav-center {
     border-right: none;
