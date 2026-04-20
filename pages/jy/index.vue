@@ -125,7 +125,7 @@
           </div>
           <div class="tutor-right">
             <div class="tutor-price" v-if="t.priceMin">{{ t.priceMin }}-{{ t.priceMax }}元/时</div>
-            <NuxtLink :to="'/jy/t' + (t.displayNo || t.id)">
+            <NuxtLink :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)">
               <el-button type="primary" size="small">查看详情</el-button>
             </NuxtLink>
           </div>

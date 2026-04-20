@@ -213,7 +213,7 @@
           <NuxtLink to="/jy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
         <div v-if="tutors.length" class="tutor-grid">
-          <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo || t.id)" class="tutor-card">
+          <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)" class="tutor-card">
             <div class="tutor-avatar-wrap">
               <el-avatar :size="56" :src="t.avatar" />
               <span v-if="t.isVerified === 1" class="verified-badge" title="已认证">
