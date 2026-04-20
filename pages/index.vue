@@ -20,13 +20,14 @@
             </div>
           </div>
 
-          <!-- 中：城市 + 电话 + 搜索（居中偏右） -->
+          <!-- 中：城市 / 热线（两行竖排） -->
           <div class="nav-center">
-            <div class="nav-center-top">
+            <div class="nav-center-row">
+              <span class="nav-center-label">切换城市</span>
               <el-popover placement="bottom-start" :width="300" trigger="click">
                 <template #reference>
                   <span class="city-btn">
-                    <el-icon size="14"><Location /></el-icon>
+                    <el-icon size="13"><Location /></el-icon>
                     {{ cityStore.cityName }}
                     <el-icon size="10"><ArrowDown /></el-icon>
                   </span>
@@ -45,24 +46,13 @@
                   </div>
                 </div>
               </el-popover>
+            </div>
+            <div class="nav-center-row">
+              <span class="nav-center-label">家教热线</span>
               <span class="nav-phone">
                 <el-icon size="13"><Phone /></el-icon>
-                13795420591
+                <span class="phone-num">13795420591</span>
               </span>
-            </div>
-            <div class="nav-center-bottom">
-              <el-input
-                v-model="searchKeyword"
-                placeholder="搜索科目"
-                size="small"
-                clearable
-                class="nav-search"
-                @keyup.enter="doSearch"
-              >
-                <template #prefix>
-                  <el-icon><Search /></el-icon>
-                </template>
-              </el-input>
             </div>
           </div>
 
@@ -110,8 +100,30 @@
 
         <!-- ▸ 板块三：三栏功能区 -->
         <div class="card-actions">
-          <!-- 框1：热线 + 两个入口按钮 -->
+          <!-- 框1：搜索 + 热线 + 两个入口按钮 -->
           <div class="action-panel">
+            <div class="panel-search">
+              <div class="panel-search-head">
+                <span class="ps-en">Search</span>
+                <span class="ps-rule"></span>
+                <span class="ps-cn">搜索家教科目</span>
+              </div>
+              <el-input
+                v-model="searchKeyword"
+                placeholder="请输入科目、年级或区域，如「高一数学」"
+                class="panel-search-input"
+                size="large"
+                clearable
+                @keyup.enter="doSearch"
+              >
+                <template #prefix>
+                  <el-icon :size="16"><Search /></el-icon>
+                </template>
+                <template #append>
+                  <button type="button" class="ps-go-btn" @click="doSearch">搜索</button>
+                </template>
+              </el-input>
+            </div>
             <div class="panel-hotline">
               <span class="hotline-label">家教热线</span>
               <span class="hotline-number">13795420591</span>
@@ -455,36 +467,49 @@ onMounted(async () => {
   min-height: 100px;
 }
 
-/* 中：城市+电话 / 搜索 */
+/* 中：切换城市 / 家教热线（两行竖排） */
 .nav-center {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: var(--space-sm) var(--space-xl);
-  gap: 6px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.nav-center-top {
+.nav-center-row {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
+  gap: 14px;
 }
 
-/* 城市按钮样式 */
+.nav-center-label {
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 13px;
+  color: #64748b;
+  letter-spacing: 4px;
+  font-weight: 400;
+  min-width: 62px;
+  /* 末字后的 letter-spacing 会在单元右侧产生视觉边距，消掉 */
+  padding-right: 0;
+}
+
+/* 城市按钮 */
 .city-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
-  padding: 4px 14px;
+  padding: 3px 12px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: 1px;
 }
 .city-btn:hover {
   color: var(--color-primary);
@@ -495,17 +520,14 @@ onMounted(async () => {
 .nav-phone {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: var(--font-size-md);
-  color: var(--color-text);
-  font-weight: var(--font-weight-semibold);
+  gap: 6px;
+  color: #1a1a1a;
 }
-
-.nav-search {
-  width: 220px;
-}
-.nav-search :deep(.el-input__wrapper) {
-  border-radius: var(--radius-sm);
+.phone-num {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 /* 左：品牌名 + 域名 */
@@ -697,6 +719,92 @@ onMounted(async () => {
 }
 .action-panel:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* --- 框1：搜索（新头部）--- */
+.panel-search {
+  padding: 4px 20px var(--space-md);
+  margin-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.panel-search-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ps-en {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.ps-rule {
+  flex: 0 0 18px;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-primary), transparent);
+  opacity: 0.55;
+}
+
+.ps-cn {
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 3px;
+}
+
+.panel-search-input :deep(.el-input__wrapper) {
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  background: var(--color-surface);
+  padding-left: 12px;
+  transition: box-shadow var(--transition-fast);
+}
+.panel-search-input :deep(.el-input__wrapper.is-focus) {
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.panel-search-input :deep(.el-input__inner) {
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #1a1a1a;
+}
+.panel-search-input :deep(.el-input__inner::placeholder) {
+  color: #94a3b8;
+  font-style: italic;
+}
+.panel-search-input :deep(.el-input-group__append) {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ps-go-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 22px;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+  background: #1a1a1a;
+  border: none;
+  border-radius: 0 2px 2px 0;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.ps-go-btn:hover {
+  background: var(--color-primary);
 }
 
 /* --- 框1：热线 + 两个入口按钮 --- */

@@ -10,13 +10,14 @@
         </div>
       </div>
 
-      <!-- 中：城市 + 电话 + 搜索 -->
+      <!-- 中：切换城市 / 家教热线（两行竖排） -->
       <div class="nav-center">
-        <div class="nav-center-top">
+        <div class="nav-center-row">
+          <span class="nav-center-label">切换城市</span>
           <el-popover placement="bottom-start" :width="300" trigger="click">
             <template #reference>
               <span class="city-btn">
-                <el-icon size="14"><Location /></el-icon>
+                <el-icon size="13"><Location /></el-icon>
                 {{ cityStore.cityName }}
                 <el-icon size="10"><ArrowDown /></el-icon>
               </span>
@@ -35,24 +36,13 @@
               </div>
             </div>
           </el-popover>
+        </div>
+        <div class="nav-center-row">
+          <span class="nav-center-label">家教热线</span>
           <span class="nav-phone">
             <el-icon size="13"><Phone /></el-icon>
-            13795420591
+            <span class="phone-num">13795420591</span>
           </span>
-        </div>
-        <div class="nav-center-bottom">
-          <el-input
-            v-model="searchKeyword"
-            placeholder="搜索科目"
-            size="small"
-            clearable
-            class="nav-search"
-            @keyup.enter="doSearch"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
         </div>
       </div>
 
@@ -84,8 +74,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Location, ArrowDown, Phone, Search } from '@element-plus/icons-vue'
+import { onMounted } from 'vue'
+import { Location, ArrowDown, Phone } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
@@ -101,8 +91,6 @@ onMounted(() => {
   }
 })
 
-const searchKeyword = ref('')
-
 const cities = CITY_LIST
 
 const handleCityClick = (city) => {
@@ -111,14 +99,6 @@ const handleCityClick = (city) => {
     return
   }
   navigateToCity(city, '/')
-}
-
-const doSearch = () => {
-  if (!searchKeyword.value.trim()) {
-    ElMessage.warning('请输入搜索关键词')
-    return
-  }
-  router.push(`/jy?keyword=${encodeURIComponent(searchKeyword.value)}`)
 }
 
 const handleLogout = () => {
@@ -143,35 +123,46 @@ const handleLogout = () => {
   border-bottom: 1px solid var(--color-border-light);
 }
 
-/* 中：城市+电话 / 搜索 */
+/* 中：切换城市 / 家教热线（两行竖排） */
 .nav-center {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: var(--space-sm) var(--space-xl);
-  gap: 6px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.nav-center-top {
+.nav-center-row {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
+  gap: 14px;
+}
+
+.nav-center-label {
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 13px;
+  color: #64748b;
+  letter-spacing: 4px;
+  font-weight: 400;
+  min-width: 62px;
 }
 
 .city-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
-  padding: 4px 14px;
+  padding: 3px 12px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: 1px;
 }
 .city-btn:hover {
   color: var(--color-primary);
@@ -182,14 +173,15 @@ const handleLogout = () => {
 .nav-phone {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: var(--font-size-md);
-  color: var(--color-text);
-  font-weight: var(--font-weight-semibold);
+  gap: 6px;
+  color: #1a1a1a;
 }
-
-.nav-search { width: 220px; }
-.nav-search :deep(.el-input__wrapper) { border-radius: var(--radius-sm); }
+.phone-num {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
 
 /* 城市弹窗 */
 .city-popover { padding: var(--space-md); }
