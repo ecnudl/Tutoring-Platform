@@ -37,7 +37,13 @@ public class ApiSiteConfigResp implements Serializable {
     private String agreementPrivacyHtml;
 
     // 帮助页正文
-    private String helpRequestProcessHtml;
+    private String helpRequestProcessHtml;   // 请家教流程
+    private String helpFindTutorHtml;        // 怎样快速找到老师
+    private String helpRequestFaqHtml;       // 请家教常见问题
+    private String helpBecomeTutorHtml;      // 成为家教老师
+    private String helpTutorFaqHtml;         // 做家教常见问题
+    private String helpTutorPricingHtml;     // 做家教收费标准
+    private String helpPaymentMethodHtml;    // 收费方式
 
     // 请家教表单
     private String qjjSubtitle;
