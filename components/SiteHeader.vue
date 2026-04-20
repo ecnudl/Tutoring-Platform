@@ -3,7 +3,7 @@
     <div class="site-header-card container">
       <!-- 左：品牌名 + 域名 -->
       <div class="nav-brand">
-        <div class="nav-brand-name"><span class="brand-main">591家教网</span><span class="brand-sub">名校名师优质家教平台</span></div>
+        <div class="nav-brand-name"><span class="brand-main"><span class="brand-num">591</span><span class="brand-cn">家教网</span></span><span class="brand-sub">名校名师 · 优质家教平台</span></div>
         <div class="nav-brand-domains">
           <span>www.591jiajiao.com</span>
           <span>www.591jiajiao.cn</span>
@@ -239,23 +239,42 @@ const handleLogout = () => {
 .nav-brand-name {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
   white-space: nowrap;
 }
 
 .brand-main {
-  font-family: "SimHei", "STHeiti", "Heiti SC", sans-serif;
+  display: inline-flex;
+  align-items: baseline;
   font-size: 22px;
+  line-height: 1;
+}
+
+.brand-num {
+  font-family: Georgia, "Playfair Display", "Times New Roman", serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 24px;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  margin-right: 4px;
+  /* 斜体挂钩与中文对齐的微调 */
+  transform: translateY(1px);
+}
+
+.brand-cn {
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
   font-weight: 700;
-  color: #000;
-  letter-spacing: 2px;
+  color: #1a1a1a;
+  letter-spacing: 3px;
 }
 
 .brand-sub {
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
   font-size: 15px;
   font-weight: 400;
   color: var(--color-primary);
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .nav-brand-domains {
@@ -263,15 +282,16 @@ const handleLogout = () => {
   justify-content: center;
   gap: 14px;
   width: 100%;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .nav-brand-domains span {
-  font-family: "Times New Roman", Times, serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: #000;
-  letter-spacing: 0.5px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 13px;
+  font-weight: 500;
+  font-style: italic;
+  color: #64748b;
+  letter-spacing: 0.6px;
 }
 
 /* 右：5列等宽网格 */
