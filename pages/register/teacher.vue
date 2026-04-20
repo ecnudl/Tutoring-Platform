@@ -5,16 +5,14 @@
       <Meta name="description" content="注册成为家教教员，接单赚取课时费。大学生、专职教员、在职教师均可注册。" />
     </Head>
 
-    <!-- 顶部横幅 -->
-    <div class="register-banner">
-      <div class="container">
+    <div class="container">
+      <!-- 顶部横幅 -->
+      <div class="register-banner">
         <h1>教员注册</h1>
         <p>加入我们，开启您的家教之旅</p>
       </div>
-    </div>
 
-    <!-- 注册步骤指示 -->
-    <div class="container">
+      <!-- 注册步骤指示 -->
       <div class="steps-wrapper">
         <div class="step-item active">
           <div class="step-number">1</div>
@@ -426,18 +424,21 @@ const handleSubmit = async () => {
   background: var(--color-bg);
 }
 
-/* Banner */
+/* Banner — 限宽 hero，与 /help 页保持一致 */
 .register-banner {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary, #163B6B), #264e82);
   color: white;
-  padding: 40px var(--space-xl);
+  padding: 36px 40px;
   text-align: center;
+  border-radius: 12px;
+  margin-top: var(--space-xl, 20px);
 }
 
 .register-banner h1 {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0 0 var(--space-sm) 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin: 0 0 6px 0;
 }
 
 .register-banner p {
@@ -620,10 +621,12 @@ const handleSubmit = async () => {
 
 @media (max-width: 768px) {
   .register-banner {
-    padding: var(--space-3xl) var(--space-lg);
+    padding: 28px 20px;
+    border-radius: 8px;
   }
   .register-banner h1 {
-    font-size: var(--font-size-2xl);
+    font-size: 22px;
+    letter-spacing: 2px;
   }
   .form-container {
     padding: 0 var(--space-md) 40px;
