@@ -517,13 +517,13 @@ onMounted(async () => {
   gap: 14px;
 }
 
-/* 方案 ⓑ：标签小灰 tracking，弱化副标 */
+/* 方案 ⓑ：标签 tracking，与胶囊视觉并列 */
 .nav-center-label {
-  font-size: 12px;
-  font-weight: 400;
-  color: #94a3b8;
-  letter-spacing: 3px;
-  min-width: 54px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  letter-spacing: 2px;
+  min-width: 62px;
 }
 
 /* 方案 ⓑ：城市按钮和电话号码采用同一胶囊结构，视觉一致 */

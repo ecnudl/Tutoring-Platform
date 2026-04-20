@@ -140,11 +140,11 @@ const handleLogout = () => {
 }
 
 .nav-center-label {
-  font-size: 12px;
-  font-weight: 400;
-  color: #94a3b8;
-  letter-spacing: 3px;
-  min-width: 54px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  letter-spacing: 2px;
+  min-width: 62px;
 }
 
 .city-btn,
