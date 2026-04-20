@@ -423,8 +423,6 @@ const handleSubmit = async () => {
 
 <style scoped>
 .register-wrapper {
-  height: 100vh;
-  overflow: auto;
   background: var(--color-bg);
 }
 

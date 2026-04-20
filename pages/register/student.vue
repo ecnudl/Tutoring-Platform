@@ -151,8 +151,7 @@ const handleSubmit = async () => {
 
 <style scoped>
 .student-register-page {
-  height: 100vh;
-  overflow: auto;
+  min-height: 100vh;
   background: var(--color-bg);
   display: flex;
   align-items: center;
