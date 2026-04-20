@@ -17,6 +17,7 @@ export interface SiteConfig {
   agreementUserHtml?: string
   agreementDisclaimerHtml?: string
   agreementPrivacyHtml?: string
+  helpRequestProcessHtml?: string
   qjjSubtitle?: string
   qjjSuccessTip?: string
   siteFriendLinksJson?: string

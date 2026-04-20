@@ -37,7 +37,7 @@ const { config, load, footerMenus } = useSiteConfig()
 
 const DEFAULT_GROUPS = [
   { group: '我是学员', items: [
-    { label: '请家教流程', href: '/help' },
+    { label: '请家教流程', href: '/help/request-process' },
     { label: '请家教收费标准', href: '/zf' },
     { label: '请家教常见问题', href: '/help' },
     { label: '怎样快速找到老师', href: '/help' }
