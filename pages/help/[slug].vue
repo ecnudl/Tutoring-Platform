@@ -31,7 +31,7 @@
           <!-- 内置默认版本 -->
           <div v-else class="hp-content">
             <h1 class="hp-title">{{ article.title }}</h1>
-            <p class="hp-lead" v-if="article.lead">{{ article.lead }}</p>
+            <p class="hp-lead" v-if="article.lead" v-html="article.lead"></p>
 
             <!-- 步骤型 -->
             <div v-if="article.steps" class="steps">
