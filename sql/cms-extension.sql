@@ -1,6 +1,14 @@
 -- ==========================================================
 -- 591 家教网 CMS 扩展 - 公告/FAQ 表 + sys_config 站点配置键
+--
+-- 运行方式：docker exec -i tutor-mysql mysql -u root -p'***' \
+--           --default-character-set=utf8mb4 roncoo_education < cms-extension.sql
+-- ⚠️ 务必带 --default-character-set=utf8mb4，否则中文会被 Latin-1 解释再编码成双层 UTF-8 乱码。
 -- ==========================================================
+SET NAMES utf8mb4;
+SET character_set_client = utf8mb4;
+SET character_set_connection = utf8mb4;
+SET character_set_results = utf8mb4;
 
 -- ========== 1. 公告表 ==========
 DROP TABLE IF EXISTS `sys_announcement`;

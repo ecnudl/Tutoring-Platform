@@ -57,8 +57,10 @@ public class ApiTutorBiz extends BaseBiz {
     public Result<Page<TutorSearchResp>> search(TutorSearchReq req) {
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
-        // 只展示审核通过的教员
-        c.andAuditStatusEqualTo(TutorAuditStatusEnum.APPROVED.getCode());
+        // 展示审核通过及已发布的教员（兼容历史数据）
+        c.andAuditStatusIn(java.util.Arrays.asList(
+                TutorAuditStatusEnum.APPROVED.getCode(),
+                TutorAuditStatusEnum.PUBLISHED.getCode()));
         if (req.getTutorType() != null) {
             c.andTutorTypeEqualTo(req.getTutorType());
         }

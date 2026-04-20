@@ -81,12 +81,17 @@ public class AdminTutorAuditBiz extends BaseBiz {
             return Result.error("当前状态不允许审核，仅待审核状态可操作");
         }
 
-        // 更新审核状态为通过，同时标记为已认证
+        // 方案 C：审核通过直接 PUBLISHED，同时标记为已认证
+        // 这样教员在首页推荐、教员库搜索、详情页全部立即可见；admin 未来如果要加"下架"再把状态改回 APPROVED 即可
         TutorProfile update = new TutorProfile();
         update.setId(id);
-        update.setAuditStatus(TutorAuditStatusEnum.APPROVED.getCode());
+        update.setAuditStatus(TutorAuditStatusEnum.PUBLISHED.getCode());
         update.setAuditRemark(remark);
         update.setIsVerified(1);
+        // 兜底：历史数据 display_no 可能为空，此时补一个，避免详情页 404
+        if (profile.getDisplayNo() == null || profile.getDisplayNo().isEmpty()) {
+            update.setDisplayNo("T" + (100000 + id % 900000));
+        }
         tutorProfileDao.updateById(update);
 
         // 写审核记录

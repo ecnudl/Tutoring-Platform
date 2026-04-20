@@ -218,11 +218,13 @@ public class ApiUsersBiz extends BaseBiz {
     private void createProfileForUser(Long userId, Integer userType, String mobile) {
         if (UserTypeEnum.TUTOR.getCode().equals(userType)) {
             TutorProfile profile = new TutorProfile();
+            profile.setId(IdUtil.getSnowflakeNextId());
             profile.setUserId(userId);
             profile.setMobile(mobile);
             profile.setAuditStatus(TutorAuditStatusEnum.DRAFT.getCode());
+            profile.setDisplayNo("T" + (100000 + profile.getId() % 900000));
             tutorProfileDao.save(profile);
-            log.info("教员资料已创建, userId={}", userId);
+            log.info("教员资料已创建, userId={}, displayNo={}", userId, profile.getDisplayNo());
         } else if (UserTypeEnum.STUDENT.getCode().equals(userType)) {
             StudentProfile profile = new StudentProfile();
             profile.setUserId(userId);

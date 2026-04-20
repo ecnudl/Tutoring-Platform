@@ -36,6 +36,9 @@ public class ApiSiteConfigResp implements Serializable {
     private String agreementDisclaimerHtml;
     private String agreementPrivacyHtml;
 
+    // 帮助页正文
+    private String helpRequestProcessHtml;
+
     // 请家教表单
     private String qjjSubtitle;
     private String qjjSuccessTip;
