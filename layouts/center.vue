@@ -1,83 +1,160 @@
 <template>
   <div class="layout-center">
+    <!-- 面包屑 -->
+    <div class="container">
+      <div class="center-crumbs">
+        <NuxtLink to="/">
+          <el-icon :size="14"><Location /></el-icon>首页
+        </NuxtLink>
+        <span class="sep">/</span>
+        <NuxtLink to="/center">个人中心</NuxtLink>
+      </div>
+    </div>
+
     <div class="container">
       <div class="center-wrapper">
-        <aside class="sidebar">
-          <div class="user-card">
-            <el-avatar :size="56" :src="userStore.avatar" />
-            <div class="user-name">{{ userStore.mobile || '用户' }}</div>
-            <div class="user-type">{{ userStore.userType === 1 ? '教员' : '学员/家长' }}</div>
+        <!-- 左菜单（仿 ttgood 列表式） -->
+        <aside class="user-nav-link">
+          <NuxtLink to="/center" class="nav-head">个人中心</NuxtLink>
+
+          <div class="nav-group">
+            <NuxtLink to="/center/messages">我的消息</NuxtLink>
+            <NuxtLink to="/center/applications" v-if="userStore.isTutor">申请记录</NuxtLink>
+            <NuxtLink to="/center/received-applications" v-else>收到的申请</NuxtLink>
+            <NuxtLink to="/center/reservations">我的预约</NuxtLink>
+            <NuxtLink to="/center/orders">我的订单</NuxtLink>
           </div>
 
-          <div class="menu-box">
-            <div class="menu-section">
-              <div class="menu-title">个人中心</div>
-              <NuxtLink to="/center" class="menu-link">
-                <span class="icon">🏠</span>
-                <span>首页</span>
-              </NuxtLink>
-              <NuxtLink to="/center/profile" class="menu-link">
-                <span class="icon">👤</span>
-                <span>个人资料</span>
-              </NuxtLink>
-              <NuxtLink to="/center/favorites" class="menu-link">
-                <span class="icon">⭐</span>
-                <span>备选教员</span>
-              </NuxtLink>
-            </div>
+          <div class="nav-group" v-if="userStore.isTutor">
+            <NuxtLink to="/center/certifications">证件认证</NuxtLink>
+            <NuxtLink to="/center/head-photo">形象照片</NuxtLink>
+            <NuxtLink to="/center/photos">我的相册</NuxtLink>
+          </div>
 
-            <div class="menu-section" v-if="userStore.userType === 1">
-              <div class="menu-title">教员中心</div>
-              <NuxtLink to="/center/tutor-profile" class="menu-link">
-                <span class="icon">📝</span>
-                <span>教员资料</span>
-              </NuxtLink>
-              <NuxtLink to="/center/orders" class="menu-link">
-                <span class="icon">📋</span>
-                <span>我的订单</span>
-              </NuxtLink>
-            </div>
+          <div class="nav-group" v-if="userStore.isTutor">
+            <NuxtLink to="/center/tutor-profile">修改简历</NuxtLink>
+            <NuxtLink to="/center/tutor-preview">简历预览</NuxtLink>
+            <a href="javascript:;" @click="openResume">简历控制</a>
+          </div>
 
-            <div class="menu-section">
-              <div class="menu-title">需求管理</div>
-              <NuxtLink to="/center/requirements" class="menu-link">
-                <span class="icon">📄</span>
-                <span>我的需求</span>
-              </NuxtLink>
-              <NuxtLink to="/qjj" class="menu-link">
-                <span class="icon">➕</span>
-                <span>发布需求</span>
-              </NuxtLink>
-            </div>
+          <div class="nav-group" v-if="!userStore.isTutor">
+            <NuxtLink to="/center/favorites">备选教员</NuxtLink>
+            <NuxtLink to="/center/shortlist">已备选</NuxtLink>
+            <NuxtLink to="/center/footprint">浏览足迹</NuxtLink>
+            <NuxtLink to="/center/requirements">我的需求</NuxtLink>
+          </div>
 
-            <div class="menu-section">
-              <div class="menu-title">账户设置</div>
-              <NuxtLink to="/center/password" class="menu-link">
-                <span class="icon">🔒</span>
-                <span>安全设置</span>
-              </NuxtLink>
-              <a href="javascript:;" @click="handleLogout" class="menu-link">
-                <span class="icon">🚪</span>
-                <span>退出登录</span>
-              </a>
-            </div>
+          <div class="nav-group">
+            <NuxtLink to="/center/credit" v-if="userStore.isTutor">信誉记录</NuxtLink>
+            <NuxtLink to="/center/feedback">{{ userStore.isTutor ? '家教感言' : '意见反馈' }}</NuxtLink>
+            <a href="javascript:;" @click="openPush">推送控制</a>
+          </div>
+
+          <div class="nav-group">
+            <NuxtLink to="/center/profile">基本资料</NuxtLink>
+            <a href="javascript:;" @click="openPwd">修改密码</a>
+            <a href="javascript:;" @click="handleLogout">退出登录</a>
           </div>
         </aside>
 
-        <main class="main-content">
+        <!-- 右侧主内容 -->
+        <main class="center-main">
           <slot />
         </main>
       </div>
     </div>
+
+    <el-dialog v-model="resumeVisible" title="简历显示" width="420px">
+      <el-radio-group v-model="resumeStatus">
+        <el-radio :label="1">做家教，公开简历</el-radio>
+        <el-radio :label="2">做家教，但不公开简历</el-radio>
+        <el-radio :label="3">不做家教、不公开简历</el-radio>
+      </el-radio-group>
+      <template #footer>
+        <el-button @click="resumeVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitResume">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="pushVisible" title="推送控制" width="420px">
+      <div style="margin-bottom:16px">
+        <div style="font-size:14px;color:#374151;margin-bottom:6px">接受"手机短信"订单推荐</div>
+        <el-radio-group v-model="smsAccept">
+          <el-radio :label="1">接受</el-radio>
+          <el-radio :label="2">不接受</el-radio>
+        </el-radio-group>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#374151;margin-bottom:6px">接受"微信推送"订单推荐</div>
+        <el-radio-group v-model="wxAccept">
+          <el-radio :label="1">接受</el-radio>
+          <el-radio :label="2">不接受</el-radio>
+        </el-radio-group>
+      </div>
+      <template #footer>
+        <el-button @click="pushVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitPush">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="pwdVisible" title="修改密码" width="420px">
+      <el-form :model="pwdForm" label-width="80px">
+        <el-form-item label="原密码">
+          <el-input v-model="pwdForm.oldPwd" type="password" show-password />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="pwdForm.newPwd" type="password" show-password placeholder="6-20 位" />
+        </el-form-item>
+        <el-form-item label="确认新">
+          <el-input v-model="pwdForm.confirmPwd" type="password" show-password />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="pwdVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitPwd">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
 import { ElMessage } from 'element-plus'
+import { Location } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()
+
+const resumeVisible = ref(false)
+const resumeStatus = ref(1)
+const pushVisible = ref(false)
+const smsAccept = ref(1)
+const wxAccept = ref(1)
+const pwdVisible = ref(false)
+const pwdForm = ref({ oldPwd: '', newPwd: '', confirmPwd: '' })
+
+const openResume = () => { resumeVisible.value = true }
+const openPush = () => { pushVisible.value = true }
+const openPwd = () => { pwdVisible.value = true; pwdForm.value = { oldPwd: '', newPwd: '', confirmPwd: '' } }
+
+const submitResume = () => {
+  ElMessage.success('申请已提交，待审核后生效')
+  resumeVisible.value = false
+}
+
+const submitPush = () => {
+  ElMessage.success('已保存推送偏好')
+  pushVisible.value = false
+}
+
+const submitPwd = () => {
+  if (!pwdForm.value.oldPwd || !pwdForm.value.newPwd) { ElMessage.warning('请填写完整'); return }
+  if (pwdForm.value.newPwd.length < 6) { ElMessage.warning('新密码不少于 6 位'); return }
+  if (pwdForm.value.newPwd !== pwdForm.value.confirmPwd) { ElMessage.warning('两次密码不一致'); return }
+  ElMessage.info('修改密码接口暂未接入，请拨打客服热线协助')
+  pwdVisible.value = false
+}
 
 const handleLogout = () => {
   userStore.logout()
@@ -88,101 +165,83 @@ const handleLogout = () => {
 
 <style scoped>
 .layout-center {
-  background: var(--color-bg);
-  min-height: calc(100vh - 56px);
-  padding: var(--space-xl) 0;
+  background: var(--color-bg, #f5f6f8);
+  min-height: 100vh;
+  padding: 20px 0 60px;
 }
 
 .container {
-  max-width: var(--content-width);
+  max-width: var(--content-width, 1200px);
   margin: 0 auto;
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-xl, 20px);
 }
+
+.center-crumbs {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.center-crumbs a {
+  color: #64748b;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.center-crumbs a:hover { color: var(--color-primary); }
+.center-crumbs .sep { margin: 0 6px; color: #cbd5e1; }
 
 .center-wrapper {
   display: flex;
-  gap: var(--space-xl);
+  gap: 24px;
+  align-items: flex-start;
 }
 
-.sidebar {
-  width: var(--sidebar-width);
+.user-nav-link {
+  width: 160px;
   flex-shrink: 0;
+  font-size: 15px;
 }
 
-.user-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2xl);
-  text-align: center;
-  margin-bottom: var(--space-lg);
+.nav-head {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary, #163B6B);
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-primary, #163B6B);
+  margin-bottom: 16px;
+  text-decoration: none;
+  letter-spacing: 1px;
 }
 
-.user-name {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-top: var(--space-md);
+.nav-group {
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 6px;
 }
+.nav-group:last-child { border-bottom: none; }
 
-.user-type {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin-top: 4px;
+.nav-group a {
+  display: block;
+  padding: 7px 0;
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.18s ease;
 }
+.nav-group a:hover { color: var(--color-primary); }
+.nav-group a.router-link-active { color: var(--color-primary); font-weight: 600; }
 
-.menu-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-sm) 0;
-}
-
-.menu-section {
-  margin-bottom: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--color-border-light);
-}
-.menu-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-
-.menu-title {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  padding: var(--space-sm) var(--space-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.menu-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: 10px var(--space-lg);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-base);
-  transition: all var(--transition-fast);
-  cursor: pointer;
-}
-.menu-link:hover { background: var(--color-bg); color: var(--color-primary); }
-.menu-link.router-link-active { background: var(--color-primary-lighter); color: var(--color-primary); font-weight: var(--font-weight-medium); }
-
-.icon { font-size: var(--font-size-lg); width: 20px; text-align: center; }
-
-.main-content {
-  flex: 1;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2xl);
-  min-height: 500px;
-}
+.center-main { flex: 1; min-width: 0; }
 
 @media (max-width: 768px) {
   .center-wrapper { flex-direction: column; }
-  .sidebar { width: 100%; }
-  .menu-box { display: flex; overflow-x: auto; padding: var(--space-sm); gap: var(--space-sm); }
-  .menu-section { display: flex; gap: 4px; margin-bottom: 0; padding-bottom: 0; border-bottom: none; flex-shrink: 0; }
-  .menu-title { display: none; }
-  .menu-link { white-space: nowrap; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--font-size-sm); }
-  .main-content { padding: var(--space-lg); }
+  .user-nav-link { width: 100%; }
+  .nav-head { font-size: 18px; padding-bottom: 10px; margin-bottom: 10px; }
+  .nav-group { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 0; }
+  .nav-group a { padding: 4px 0; font-size: 13px; }
 }
 </style>
