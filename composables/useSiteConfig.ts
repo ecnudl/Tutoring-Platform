@@ -29,6 +29,7 @@ export interface SiteConfig {
   siteFriendLinksJson?: string
   siteFooterMenusJson?: string
   sitePriceNotesJson?: string
+  sitePricingData?: string
 }
 
 export interface FriendLink { name: string; url: string }
