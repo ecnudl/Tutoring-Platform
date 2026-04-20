@@ -13,7 +13,7 @@
         <div class="card-nav">
           <!-- 左：品牌名 + 域名 -->
           <div class="nav-brand">
-            <div class="nav-brand-name"><span class="brand-main"><span class="brand-num">591</span><span class="brand-cn">家教网</span></span><span class="brand-sub">名校名师 · 优质家教平台</span></div>
+            <div class="nav-brand-name"><span class="brand-main"><span class="brand-num">591</span><span class="brand-cn">家教网</span></span><span class="brand-sub">名校名师优质家教平台</span></div>
             <div class="nav-brand-domains">
               <span>www.591jiajiao.com</span>
               <span>www.591jiajiao.cn</span>
