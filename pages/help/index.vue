@@ -1,5 +1,34 @@
 <template>
   <div class="help-wrapper">
+    <div class="container">
+      <!-- Hero + 分类导航 -->
+      <div class="help-hero">
+        <div class="hero-title">帮助中心</div>
+        <div class="hero-sub">找答案 / 解惑 / 联系我们</div>
+      </div>
+
+      <div class="help-articles">
+        <div class="art-col">
+          <div class="art-title"><span class="dot dot-student"></span>我是学员</div>
+          <NuxtLink v-for="a in studentArticles" :key="a.href" :to="a.href" class="art-link">
+            <span class="art-arrow">›</span>{{ a.label }}
+          </NuxtLink>
+        </div>
+        <div class="art-col">
+          <div class="art-title"><span class="dot dot-tutor"></span>我是教员</div>
+          <NuxtLink v-for="a in tutorArticles" :key="a.href" :to="a.href" class="art-link">
+            <span class="art-arrow">›</span>{{ a.label }}
+          </NuxtLink>
+        </div>
+        <div class="art-col">
+          <div class="art-title"><span class="dot dot-common"></span>通用</div>
+          <NuxtLink v-for="a in commonArticles" :key="a.href" :to="a.href" class="art-link">
+            <span class="art-arrow">›</span>{{ a.label }}
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+
     <div class="container help-body">
       <aside class="help-sidebar">
         <div class="sidebar-title">帮助中心</div>
@@ -68,6 +97,18 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { HELP_SIDE_LINKS } from '~/composables/helpArticles'
+
+const studentArticles = HELP_SIDE_LINKS.student
+const tutorArticles = HELP_SIDE_LINKS.tutor
+const commonArticles = [
+  { label: '收费方式', href: '/help/payment-method' },
+  { label: '联系我们', href: '/about/contact' },
+  { label: '服务号', href: '/about/wechat' },
+  { label: '公司简介', href: '/about/intro' },
+  { label: '免责声明', href: '/agreement/disclaimer' },
+  { label: '隐私保护', href: '/agreement/privacy' }
+]
 import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const activeCategory = ref(0)
@@ -110,6 +151,61 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* === Hero / 分类导航（新）=== */
+.help-hero {
+  background: linear-gradient(135deg, var(--color-primary, #163B6B), #264e82);
+  color: #fff;
+  padding: 40px 40px 44px;
+  border-radius: 12px 12px 0 0;
+  margin-top: var(--space-xl, 20px);
+  text-align: center;
+}
+.hero-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; }
+.hero-sub { margin-top: 6px; font-size: 14px; opacity: 0.8; letter-spacing: 1px; }
+
+.help-articles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 28px 0;
+  margin-bottom: var(--space-2xl, 24px);
+}
+.art-col {
+  padding: 0 36px;
+  border-right: 1px solid #f1f5f9;
+}
+.art-col:last-child { border-right: none; }
+.art-title {
+  font-size: 16px; font-weight: 700; color: #111827;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot-student { background: var(--color-primary, #163B6B); }
+.dot-tutor   { background: #f59e0b; }
+.dot-common  { background: #64748b; }
+.art-link {
+  display: flex; align-items: center; gap: 4px;
+  padding: 7px 0;
+  font-size: 14px; color: #475569;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.art-link:hover { color: var(--color-primary); }
+.art-arrow { color: #cbd5e1; transition: color 0.2s; }
+.art-link:hover .art-arrow { color: var(--color-primary); }
+
+@media (max-width: 768px) {
+  .help-hero { padding: 28px 20px; }
+  .hero-title { font-size: 22px; }
+  .help-articles { grid-template-columns: 1fr; padding: 18px 0; }
+  .art-col { padding: 16px 24px; border-right: none; border-bottom: 1px solid #f1f5f9; }
+  .art-col:last-child { border-bottom: none; }
+}
+
+/* === 原 FAQ 样式 === */
 .help-wrapper {
   min-height: 100vh;
   background: var(--color-bg);

@@ -39,14 +39,14 @@ const DEFAULT_GROUPS = [
   { group: '我是学员', items: [
     { label: '请家教流程', href: '/help/request-process' },
     { label: '请家教收费标准', href: '/zf' },
-    { label: '请家教常见问题', href: '/help' },
-    { label: '怎样快速找到老师', href: '/help' }
+    { label: '请家教常见问题', href: '/help/request-faq' },
+    { label: '怎样快速找到老师', href: '/help/find-tutor' }
   ]},
   { group: '我是教员', items: [
-    { label: '成为家教老师', href: '/register/teacher' },
+    { label: '成为家教老师', href: '/help/become-tutor' },
     { label: '家教课时费参考标准', href: '/zf' },
-    { label: '做家教收费标准', href: '/zf' },
-    { label: '做家教常见问题', href: '/help' }
+    { label: '做家教收费标准', href: '/help/tutor-pricing' },
+    { label: '做家教常见问题', href: '/help/tutor-faq' }
   ]},
   { group: '关于我们', items: [
     { label: '服务号', href: '/about/wechat' },

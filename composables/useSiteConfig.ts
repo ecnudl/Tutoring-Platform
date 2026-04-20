@@ -18,6 +18,12 @@ export interface SiteConfig {
   agreementDisclaimerHtml?: string
   agreementPrivacyHtml?: string
   helpRequestProcessHtml?: string
+  helpFindTutorHtml?: string
+  helpRequestFaqHtml?: string
+  helpBecomeTutorHtml?: string
+  helpTutorFaqHtml?: string
+  helpTutorPricingHtml?: string
+  helpPaymentMethodHtml?: string
   qjjSubtitle?: string
   qjjSuccessTip?: string
   siteFriendLinksJson?: string
