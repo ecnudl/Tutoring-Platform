@@ -53,4 +53,7 @@ public class ApiSiteConfigResp implements Serializable {
     private String siteFriendLinksJson;
     private String siteFooterMenusJson;
     private String sitePriceNotesJson;
+
+    // 结构化家教价格（4 大类 × 若干表）
+    private String sitePricingData;
 }
