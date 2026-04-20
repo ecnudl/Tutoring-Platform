@@ -3,9 +3,12 @@ package com.roncoo.education.user.service.auth.biz;
 import com.roncoo.education.common.base.BaseBiz;
 import com.roncoo.education.common.base.ThreadContext;
 import com.roncoo.education.common.core.base.Result;
+import com.roncoo.education.common.core.enums.UserTypeEnum;
 import com.roncoo.education.user.dao.FeedbackDao;
+import com.roncoo.education.user.dao.UsersDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.Feedback;
 import com.roncoo.education.user.dao.impl.mapper.entity.FeedbackExample;
+import com.roncoo.education.user.dao.impl.mapper.entity.Users;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,8 @@ import java.util.Map;
 public class AuthFeedbackBiz extends BaseBiz {
     @NotNull
     private final FeedbackDao feedbackDao;
+    @NotNull
+    private final UsersDao usersDao;
 
     public Result<?> page(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
@@ -31,6 +36,11 @@ public class AuthFeedbackBiz extends BaseBiz {
 
     public Result<String> submit(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
+        // 家教感言仅限教员发布
+        Users user = usersDao.getById(userId);
+        if (user == null || !UserTypeEnum.TUTOR.getCode().equals(user.getUserType())) {
+            return Result.error("家教感言仅限教员发布");
+        }
         String content = req.get("content") != null ? req.get("content").toString() : "";
         String contact = req.get("contact") != null ? req.get("contact").toString() : "";
         if (!StringUtils.hasText(content)) return Result.error("反馈内容不能为空");
