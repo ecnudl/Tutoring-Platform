@@ -6,7 +6,8 @@
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
-      <div class="agreement-content">
+      <div v-if="overrideHtml" class="agreement-content" v-html="overrideHtml"></div>
+      <div v-else class="agreement-content">
         <div class="agreement-intro">
           <p>591家教网（以下简称"我们"）深知个人信息对您的重要性，我们将按照法律法规的规定，采取相应的安全保护措施，保护您的个人信息安全可控。本政策适用于您通过591家教网网站、移动应用、小程序等渠道使用我们的服务。</p>
           <p><strong>请您在使用我们的服务前，仔细阅读并了解本隐私保护政策。</strong></p>
@@ -152,6 +153,14 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useSiteConfig } from '~/composables/useSiteConfig'
+const { config, load } = useSiteConfig()
+const overrideHtml = computed(() => (config.value.agreementPrivacyHtml || '').trim())
+onMounted(() => { load() })
+</script>
 
 <style scoped>
 .agreement-page {

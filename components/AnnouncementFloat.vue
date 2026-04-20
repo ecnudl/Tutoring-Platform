@@ -57,34 +57,9 @@ const currentAnnouncement = ref(null)
 const announcements = ref([])
 const readIds = ref([])
 
-// 模拟数据（后续可以从后端API获取）
-const mockAnnouncements = [
-  {
-    id: 1,
-    title: '欢迎使用591家教网',
-    content: '591家教网致力于为学员和家长提供优质的家教服务，我们拥有大量经过认证的优秀教员，覆盖小学、初中、高中各个年级和科目。',
-    gmtCreate: new Date().toISOString(),
-    status: 1
-  },
-  {
-    id: 2,
-    title: '平台服务升级通知',
-    content: '为了给您提供更好的服务体验，我们将在本周末进行系统升级维护，届时部分功能可能暂时无法使用，预计维护时间为2小时，给您带来的不便敬请谅解。',
-    gmtCreate: new Date(Date.now() - 86400000).toISOString(),
-    status: 1
-  },
-  {
-    id: 3,
-    title: '教员认证流程优化',
-    content: '为了提高教员认证效率，我们优化了认证流程，现在只需要上传学生证或教师资格证即可快速完成认证，审核时间缩短至24小时内。',
-    gmtCreate: new Date(Date.now() - 172800000).toISOString(),
-    status: 1
-  }
-]
-
-const unreadCount = computed(() => {
-  return announcements.value.filter(a => !readIds.value.includes(a.id)).length
-})
+const unreadCount = computed(() =>
+  announcements.value.filter(a => !readIds.value.includes(a.id)).length
+)
 
 const isNew = (item) => {
   const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000
@@ -100,49 +75,31 @@ const formatDate = (date) => {
 const showDetail = (item) => {
   currentAnnouncement.value = item
   detailVisible.value = true
-
-  // 标记为已读
   if (!readIds.value.includes(item.id)) {
     readIds.value.push(item.id)
-    localStorage.setItem('announcement_read_ids', JSON.stringify(readIds.value))
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('announcement_read_ids', JSON.stringify(readIds.value))
+    }
   }
 }
 
-onMounted(() => {
-  // 加载公告数据
-  const stored = localStorage.getItem('announcements')
-  if (stored) {
-    try {
-      announcements.value = JSON.parse(stored)
-    } catch (e) {
-      announcements.value = mockAnnouncements
+onMounted(async () => {
+  try {
+    const { get } = useApi()
+    const res = await get('/system/api/announcement/list', { category: 'float', limit: 20 })
+    if (res?.code === 200 && Array.isArray(res.data)) {
+      announcements.value = res.data
     }
-  } else {
-    announcements.value = mockAnnouncements
-    // 初始化到localStorage
-    localStorage.setItem('announcements', JSON.stringify(mockAnnouncements))
+  } catch (e) {
+    console.warn('[announcement] load failed', e)
   }
 
-  // 加载已读记录
-  const readStored = localStorage.getItem('announcement_read_ids')
-  if (readStored) {
-    try {
-      readIds.value = JSON.parse(readStored)
-    } catch (e) {
-      readIds.value = []
+  if (typeof localStorage !== 'undefined') {
+    const readStored = localStorage.getItem('announcement_read_ids')
+    if (readStored) {
+      try { readIds.value = JSON.parse(readStored) } catch { readIds.value = [] }
     }
   }
-
-  // 监听localStorage变化（管理员发布新公告时自动更新）
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'announcements' && e.newValue) {
-      try {
-        announcements.value = JSON.parse(e.newValue)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  })
 })
 </script>
 

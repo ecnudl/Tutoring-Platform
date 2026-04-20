@@ -29,12 +29,7 @@
     <div class="notes-section">
       <h2>价格说明</h2>
       <ul class="notes-list">
-        <li>以上价格为上门一对一辅导参考价格，在线辅导一般可享 <strong>8-9折</strong> 优惠。</li>
-        <li>艺术类（钢琴、美术、书法等）价格另议，通常高于文化课 20%-50%。</li>
-        <li>小语种（日语、法语、德语等）价格参考大学/成人栏目。</li>
-        <li>首次上课可安排免费试讲30分钟（需与教员协商）。</li>
-        <li>平台不收取中介费，教员课时费由教员自定，家长与教员直接结算。</li>
-        <li>以上价格仅供参考，具体价格请与教员沟通确认。</li>
+        <li v-for="(n, i) in displayedNotes" :key="i" v-html="n"></li>
       </ul>
     </div>
 
@@ -50,12 +45,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCityStore } from '~/stores/city'
+import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const cityStore = useCityStore()
 const { get } = useApi()
 const loading = ref(false)
+const { load: loadSiteConfig, priceNotes } = useSiteConfig()
+
+const DEFAULT_NOTES = [
+  '以上价格为上门一对一辅导参考价格，在线辅导一般可享 <strong>8-9折</strong> 优惠。',
+  '艺术类（钢琴、美术、书法等）价格另议，通常高于文化课 20%-50%。',
+  '小语种（日语、法语、德语等）价格参考大学/成人栏目。',
+  '首次上课可安排免费试讲30分钟（需与教员协商）。',
+  '平台不收取中介费，教员课时费由教员自定，家长与教员直接结算。',
+  '以上价格仅供参考，具体价格请与教员沟通确认。'
+]
+const displayedNotes = computed(() => priceNotes.value.length ? priceNotes.value : DEFAULT_NOTES)
 
 const defaultPriceData = [
   { tutorType: '大学生', primary: '80-120', juniorMiddle: '100-150', juniorThird: '120-180', seniorFirst: '150-200', seniorThird: '180-250', college: '150-250' },
@@ -68,6 +75,7 @@ const defaultPriceData = [
 const priceData = ref(defaultPriceData)
 
 onMounted(async () => {
+  loadSiteConfig()
   loading.value = true
   try {
     const res = await get('/user/api/homepage/price-reference', { cityId: cityStore.cityId })

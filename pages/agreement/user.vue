@@ -6,7 +6,8 @@
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
-      <div class="agreement-content">
+      <div v-if="overrideHtml" class="agreement-content" v-html="overrideHtml"></div>
+      <div v-else class="agreement-content">
         <div class="agreement-intro">
           <p>欢迎您使用591家教网（以下简称"本平台"）。本平台由上海五一教育信息科技有限公司运营，为家长/学员与教员之间提供家教信息撮合服务。请您在注册或使用本平台服务前，仔细阅读并充分理解以下协议条款。</p>
           <p><strong>当您点击"注册"或"同意"按钮，或以其他方式实际使用本平台服务时，即视为您已充分阅读、理解并同意接受本协议的全部内容，本协议即在您与平台之间产生法律效力。</strong></p>
@@ -115,6 +116,14 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useSiteConfig } from '~/composables/useSiteConfig'
+const { config, load } = useSiteConfig()
+const overrideHtml = computed(() => (config.value.agreementUserHtml || '').trim())
+onMounted(() => { load() })
+</script>
 
 <style scoped>
 .agreement-page {

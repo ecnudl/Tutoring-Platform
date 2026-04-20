@@ -51,7 +51,7 @@
               <span class="nav-center-label">家教热线</span>
               <span class="nav-phone">
                 <el-icon size="13"><Phone /></el-icon>
-                <span class="phone-num">13795420591</span>
+                <span class="phone-num">{{ hotline }}</span>
               </span>
             </div>
           </div>
@@ -104,7 +104,7 @@
           <div class="action-panel">
             <div class="panel-hotline">
               <span class="hotline-label">家教热线</span>
-              <span class="hotline-number">13795420591</span>
+              <span class="hotline-number">{{ hotline }}</span>
             </div>
             <NuxtLink to="/qjj" class="action-entry">
               <div class="entry-icon find-icon">
@@ -151,7 +151,7 @@
               >{{ tab.label }}</span>
             </div>
             <div class="notice-body">
-              <NuxtLink v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" :to="'/notice/' + item.id" class="notice-item">
+              <NuxtLink v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" :to="item.linkUrl || ('/notice/' + item.id)" class="notice-item">
                 <span class="notice-dot"></span>
                 <span class="notice-text">{{ item.title }}</span>
               </NuxtLink>
@@ -276,7 +276,7 @@
       <div class="section-box links-section">
         <div class="links-row">
           <span class="links-label">友情链接：</span>
-          <a href="https://www.ttgood.com" target="_blank" rel="noopener noreferrer" class="links-item">天天家教网</a>
+          <a v-for="l in friendLinks" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="links-item">{{ l.name }}</a>
         </div>
         <div class="links-row">
           <span class="links-label">热门城市：</span>
@@ -288,25 +288,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Phone, Search, Location, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 import { CITY_LIST, buildCityUrl, navigateToCity } from '~/composables/useCityMap'
+import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const userStore = useUserStore()
 const cityStore = useCityStore()
 const { districts, universities } = useCityData()
-const { post } = useApi()
+const { post, get } = useApi()
 const router = useRouter()
+const { config, load: loadSiteConfig, friendLinks } = useSiteConfig()
+
+const hotline = computed(() => config.value.siteHotline || '13795420591')
 
 const searchKeyword = ref('')
 const tutors = ref([])
 const activeNoticeTab = ref(0)
 
-const latestOrders = [
+const DEFAULT_ORDERS = [
   { tag: '急', tagClass: 'tag-urgent', title: '高二数学，每周两次上门辅导', area: '浦东新区', time: '1小时前' },
   { tag: '新', tagClass: 'tag-new', title: '小学三年级英语，启蒙阶段', area: '徐汇区', time: '2小时前' },
   { tag: '新', tagClass: 'tag-new', title: '初三物理化学，冲刺中考', area: '闵行区', time: '3小时前' },
@@ -314,13 +318,17 @@ const latestOrders = [
   { tag: '新', tagClass: 'tag-new', title: '高一语文作文专项提升', area: '杨浦区', time: '5小时前' },
   { tag: '新', tagClass: 'tag-new', title: '雅思口语7分冲刺辅导', area: '静安区', time: '6小时前' },
 ]
+const latestOrdersData = ref([])
+const latestOrders = computed(() => latestOrdersData.value.length ? latestOrdersData.value : DEFAULT_ORDERS)
 
-const testimonials = [
+const DEFAULT_TESTIMONIALS = [
   { name: '张女士', role: '学生家长', content: '老师非常耐心，孩子数学从70分提到了95分，非常感谢平台推荐的教员！' },
   { name: '李同学', role: '大学生教员', content: '平台派单很快，家长也很好沟通，一个月接了5个学生，课时费准时结算。' },
   { name: '王先生', role: '学生家长', content: '给孩子找了一位复旦的英语家教，口语提升很明显，试讲免费这个政策很好。' },
   { name: '陈老师', role: '专职教员', content: '在平台上教了两年了，学生资源稳定，平台不收中介费，比之前的机构好很多。' },
 ]
+const testimonialsData = ref([])
+const testimonials = computed(() => testimonialsData.value.length ? testimonialsData.value : DEFAULT_TESTIMONIALS)
 const subjectExpanded = ref(false)
 const universityExpanded = ref(false)
 
@@ -338,35 +346,29 @@ const allSubjects = [
   { name: '大学考研' }, { name: '高考志愿填报' }, { name: '生涯规划' }, { name: '心理辅导' }
 ]
 
-const noticeTabs = [
-  {
-    label: '网站公告',
-    items: [
-      { id: 'service-upgrade', title: '平台服务升级维护通知' },
-      { id: 'holiday-schedule', title: '五一假期客服时间调整' },
-      { id: 'cert-optimization', title: '教员认证流程优化公告' },
-      { id: 'new-cities', title: '新增多个城市站点上线' },
-    ]
-  },
-  {
-    label: '教育资讯',
-    items: [
-      { id: 'zhongkao-policy', title: '2025年上海中考政策解读' },
-      { id: 'math-training', title: '小学数学思维训练方法分享' },
-      { id: 'english-listening', title: '初中英语听力提分技巧' },
-      { id: 'gaokao-guide', title: '高考志愿填报注意事项' },
-    ]
-  },
-  {
-    label: '教/学员须知',
-    items: [
-      { id: 'free-trial', title: '首次试讲免费，满意后再上课' },
-      { id: 'payment-policy', title: '课时费由家长与教员直接结算' },
-      { id: 'cert-required', title: '教员需通过实名认证方可接单' },
-      { id: 'contact-support', title: '如遇问题请拨打客服热线反馈' },
-    ]
-  }
+// 公告栏 tab 配置（与后端 category 对应）
+const NOTICE_CATEGORIES = [
+  { key: 'notice', label: '网站公告' },
+  { key: 'edu',    label: '教育资讯' },
+  { key: 'notify', label: '教/学员须知' }
 ]
+
+const noticeTabs = ref(NOTICE_CATEGORIES.map(c => ({ ...c, items: [] })))
+
+const loadAnnouncements = async () => {
+  await Promise.all(NOTICE_CATEGORIES.map(async (c, idx) => {
+    try {
+      const res = await get('/system/api/announcement/list', { category: c.key, limit: 8 })
+      if (res?.code === 200 && Array.isArray(res.data)) {
+        noticeTabs.value[idx].items = res.data.map(a => ({
+          id: a.linkUrl ? a.linkUrl.replace(/^\/notice\//, '') : a.id,
+          title: a.title,
+          linkUrl: a.linkUrl || ''
+        }))
+      }
+    } catch (e) { console.warn('[announcement]', c.key, e) }
+  }))
+}
 
 // 轮播图数据
 const slides = ref([
@@ -395,6 +397,46 @@ const doSearch = () => {
 
 const handleLogout = () => { userStore.logout(); router.push('/') }
 
+const loadLatestOrders = async () => {
+  try {
+    const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
+    if (res?.code === 200 && Array.isArray(res.data) && res.data.length) {
+      latestOrdersData.value = res.data.map((r, i) => ({
+        tag: i < 2 ? '急' : '新',
+        tagClass: i < 2 ? 'tag-urgent' : 'tag-new',
+        title: `${r.grade || ''}${r.subject || '家教需求'}`,
+        area: r.districtName || r.cityName || '',
+        time: r.gmtCreate ? timeAgo(r.gmtCreate) : ''
+      }))
+    }
+  } catch (e) { /* keep default */ }
+}
+
+const loadTestimonials = async () => {
+  try {
+    const res = await get('/user/api/feedback/latest', { limit: 4 })
+    if (res?.code === 200 && Array.isArray(res.data) && res.data.length) {
+      testimonialsData.value = res.data.map(f => ({
+        name: f.author || '热心用户',
+        role: '用户反馈',
+        content: f.content || ''
+      }))
+    }
+  } catch (e) { /* keep default */ }
+}
+
+const timeAgo = (iso) => {
+  try {
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 60) return `${Math.max(1, m)}分钟前`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `${h}小时前`
+    const d = Math.floor(h / 24)
+    return `${d}天前`
+  } catch { return '' }
+}
+
 onMounted(async () => {
   if (userStore.isLoggedIn) {
     userStore.fetchNickname()
@@ -408,6 +450,12 @@ onMounted(async () => {
       if (parsed.length) slides.value = parsed
     } catch (e) { /* use defaults */ }
   }
+
+  // 并行加载 site config / 公告 / 最新订单 / 感言 / 推荐教员
+  loadSiteConfig()
+  loadAnnouncements()
+  loadLatestOrders()
+  loadTestimonials()
 
   try {
     const tRes = await post('/user/api/tutor/search', { pageCurrent: 1, pageSize: 8 })

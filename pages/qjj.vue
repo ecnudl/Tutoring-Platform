@@ -8,15 +8,15 @@
 
 
     <h1 class="page-title">请家教 - 快速提交您的需求</h1>
-    <p class="page-sub">我们提供多种方式帮您找到满意的家教老师</p>
+    <p class="page-sub">{{ subtitle }}</p>
 
     <div class="methods-grid">
       <el-card shadow="never" class="method-card">
         <div class="method-num">方式一</div>
         <h2>拨打服务热线</h2>
         <p class="method-desc">直接拨打我们的服务热线，专业顾问为您推荐教员</p>
-        <div class="phone-number">13795420591</div>
-        <p class="phone-time">工作时间：9:00 - 21:00（周一至周日）</p>
+        <div class="phone-number">{{ hotline }}</div>
+        <p class="phone-time">工作时间：{{ workTime }}</p>
       </el-card>
 
       <el-card shadow="never" class="method-card method-form-card">
@@ -72,7 +72,7 @@
       <div style="text-align:center;padding:20px">
         <el-icon :size="48" color="#2E7D32"><CircleCheck /></el-icon>
         <h3 style="margin-top:12px">需求提交成功！</h3>
-        <p style="color:var(--color-text-secondary);margin-top:8px">我们将在24小时内联系您，请保持电话畅通。</p>
+        <p style="color:var(--color-text-secondary);margin-top:8px">{{ successTip }}</p>
       </div>
       <template #footer>
         <el-button type="primary" @click="successVisible = false; $router.push('/')">返回首页</el-button>
@@ -84,13 +84,22 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CircleCheck } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
+import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const cityStore = useCityStore()
 const { post } = useApi()
+const { config, load } = useSiteConfig()
+
+const hotline = computed(() => config.value.siteHotline || '13795420591')
+const workTime = computed(() => config.value.siteWorkTime || '周一至周日 9:00-21:00')
+const subtitle = computed(() => config.value.qjjSubtitle || '我们提供多种方式帮您找到满意的家教老师')
+const successTip = computed(() => config.value.qjjSuccessTip || '我们将在24小时内联系您，请保持电话畅通。')
+
+onMounted(() => { load() })
 
 const formRef = ref(null)
 const submitting = ref(false)

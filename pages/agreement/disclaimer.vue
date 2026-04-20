@@ -6,7 +6,8 @@
         <p class="update-date">生效日期：2026年1月1日 | 最近更新：2026年4月1日</p>
       </div>
 
-      <div class="agreement-content">
+      <div v-if="overrideHtml" class="agreement-content" v-html="overrideHtml"></div>
+      <div v-else class="agreement-content">
         <div class="agreement-intro">
           <p><strong>重要提示：</strong>本免责声明是<NuxtLink to="/agreement/user" class="link">《用户服务协议》</NuxtLink>的组成部分。请您在使用591家教网（以下简称"本平台"）服务前仔细阅读本声明。使用本平台即表示您已了解并接受以下全部条款。</p>
         </div>
@@ -107,6 +108,14 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useSiteConfig } from '~/composables/useSiteConfig'
+const { config, load } = useSiteConfig()
+const overrideHtml = computed(() => (config.value.agreementDisclaimerHtml || '').trim())
+onMounted(() => { load() })
+</script>
 
 <style scoped>
 .agreement-page {
