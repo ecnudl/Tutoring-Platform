@@ -19,6 +19,8 @@ const routes = [
     { path: 'dict/tag', component: () => import('@/views/dict/TagList.vue') },
     { path: 'content/banner', component: () => import('@/views/content/BannerList.vue') },
     { path: 'content/article', component: () => import('@/views/content/ArticleList.vue') },
+    { path: 'content/announcement', component: () => import('@/views/content/AnnouncementList.vue') },
+    { path: 'content/faq', component: () => import('@/views/content/FaqList.vue') },
     // 地理配置
     { path: 'city/list', component: () => import('@/views/city/CityList.vue') },
     { path: 'district/list', component: () => import('@/views/city/DistrictList.vue') },
