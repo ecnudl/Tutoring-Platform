@@ -213,7 +213,7 @@ onMounted(async () => {
   try {
     if (isTutor.value) {
       // 拉教员简历信息
-      const res = await get('/user/auth/tutor-profile/info')
+      const res = await get('/user/auth/tutor-profile/view')
       if (res?.code === 200 && res.data) {
         profile.value = res.data
         displayNo.value = res.data.displayNo || 'T' + (String(res.data.id || '000000').slice(-6))
@@ -221,7 +221,7 @@ onMounted(async () => {
         stats.value.loginCount = res.data.loginCount || 0
       }
     } else {
-      const res = await get('/user/auth/student-profile/info').catch(() => null)
+      const res = await get('/user/auth/student-profile/view').catch(() => null)
       if (res?.code === 200 && res.data) profile.value = res.data
     }
   } catch (e) { /* silent */ }
