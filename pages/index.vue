@@ -398,11 +398,12 @@ const handleCityClick = (city) => {
 }
 
 const doSearch = () => {
-  if (searchKeyword.value.trim()) {
-    router.push({ path: '/jy', query: { keyword: searchKeyword.value.trim() } })
-  } else {
-    router.push('/jy')
-  }
+  const kw = searchKeyword.value.trim()
+  if (!kw) { router.push('/jy'); return }
+  // 命中已知科目（与"分类速查"一致）→ 走 subject 参数，让科目筛选标签高亮
+  // 否则 → 走 keyword 走姓名/内容模糊查
+  const isKnownSubject = allSubjects.some(s => s.name === kw)
+  router.push({ path: '/jy', query: isKnownSubject ? { subject: kw } : { keyword: kw } })
 }
 
 const handleLogout = () => { userStore.logout(); router.push('/') }
