@@ -217,14 +217,12 @@
           </template>
 
           <!-- 生活住址：当前城市 + 区 -->
-          <el-form-item label="生活住址" required>
+          <el-form-item label="生活住址" prop="districtId" required>
             <div class="two-col">
-              <el-input :model-value="cityStore.cityName" disabled />
-              <el-form-item prop="districtId" style="flex:1">
-                <el-select v-model="step2.districtId" placeholder="选择所在区" style="width:100%">
-                  <el-option v-for="d in districtsRef" :key="d.id" :label="d.name" :value="d.id" />
-                </el-select>
-              </el-form-item>
+              <el-input :model-value="cityStore.cityName" disabled style="flex:1" />
+              <el-select v-model="step2.districtId" placeholder="选择所在区" style="flex:1">
+                <el-option v-for="d in districtsRef" :key="d.id" :label="d.name" :value="d.id" />
+              </el-select>
             </div>
           </el-form-item>
 
