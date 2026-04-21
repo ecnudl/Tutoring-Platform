@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7ED"/>
+      <stop offset="100%" stop-color="#FED7AA" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg3)"/>
+
+  <!-- 背景大字淡印 -->
+  <text x="1200" y="440" font-family="'STKaiti','KaiTi','Microsoft YaHei',serif" font-size="320" font-weight="bold" fill="#F97316" fill-opacity="0.1">学</text>
+
+  <!-- 主标语 -->
+  <text x="140" y="200" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif" font-size="82" font-weight="700" fill="#163B6B" letter-spacing="6">授人以渔</text>
+  <text x="140" y="300" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif" font-size="82" font-weight="700" fill="#163B6B" letter-spacing="6">伴学更伴心</text>
+
+  <line x1="140" y1="340" x2="380" y2="340" stroke="#F97316" stroke-width="4" stroke-linecap="round"/>
+
+  <text x="140" y="395" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="26" fill="#64748b" letter-spacing="3">因材施教 · 小班精品 · 让每个孩子找到属于自己的节奏</text>
+
+  <!-- 右侧装饰：文房四宝 风格 —— 毛笔 + 砚台 + 卷轴 -->
+  <g transform="translate(1050,140)">
+    <!-- 卷轴背景 -->
+    <g transform="translate(40,80)">
+      <rect x="0" y="10" width="340" height="140" fill="#FDF6E4" stroke="#8B4513" stroke-width="2" rx="2"/>
+      <!-- 卷轴顶轴 -->
+      <rect x="-8" y="0" width="356" height="16" rx="8" fill="#8B4513"/>
+      <rect x="-12" y="2" width="8" height="12" rx="2" fill="#A0522D"/>
+      <rect x="352" y="2" width="8" height="12" rx="2" fill="#A0522D"/>
+      <!-- 卷轴底轴 -->
+      <rect x="-8" y="144" width="356" height="16" rx="8" fill="#8B4513"/>
+      <rect x="-12" y="146" width="8" height="12" rx="2" fill="#A0522D"/>
+      <rect x="352" y="146" width="8" height="12" rx="2" fill="#A0522D"/>
+      <!-- 卷轴上的书法 -->
+      <text x="170" y="70" text-anchor="middle" font-family="'STKaiti','KaiTi',serif" font-size="44" font-weight="700" fill="#8B0000">教学相长</text>
+      <text x="170" y="115" text-anchor="middle" font-family="'STKaiti','KaiTi',serif" font-size="22" fill="#64748b" letter-spacing="4">— 礼记 · 学记 —</text>
+    </g>
+
+    <!-- 毛笔（悬挂在上方） -->
+    <g transform="translate(270,0) rotate(-18)">
+      <!-- 笔杆 -->
+      <rect x="0" y="0" width="10" height="100" fill="#8B4513"/>
+      <!-- 笔杆装饰 -->
+      <rect x="0" y="8" width="10" height="3" fill="#F97316"/>
+      <rect x="0" y="20" width="10" height="3" fill="#F97316"/>
+      <!-- 笔头（毛） -->
+      <path d="M0,100 Q5,140 5,150 Q5,155 10,155 Q15,150 10,100 Z" fill="#1e293b"/>
+      <!-- 笔顶 -->
+      <rect x="-2" y="-6" width="14" height="8" rx="2" fill="#DAA520"/>
+    </g>
+
+    <!-- 印章（右下角贴卷轴上） -->
+    <g transform="translate(340,200)">
+      <rect x="0" y="0" width="40" height="40" fill="#DC2626" rx="3"/>
+      <text x="20" y="26" text-anchor="middle" font-family="'STKaiti',serif" font-size="24" font-weight="700" fill="#fff">教</text>
+    </g>
+  </g>
+
+  <!-- 品牌印章 -->
+  <g transform="translate(1470,420)">
+    <circle cx="30" cy="30" r="34" fill="#F97316"/>
+    <text x="30" y="26" text-anchor="middle" font-family="'PingFang SC',sans-serif" font-size="16" font-weight="700" fill="#fff">591</text>
+    <text x="30" y="44" text-anchor="middle" font-family="'PingFang SC',sans-serif" font-size="12" fill="#fff">家教网</text>
+  </g>
+</svg>
