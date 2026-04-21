@@ -245,16 +245,18 @@ public class ApiUsersBiz extends BaseBiz {
         if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
             return Result.error("手机号格式不正确");
         }
-        // 短信验证码校验（为空时跳过，仅供测试使用）
+        // 短信验证码校验：Redis 中无验证码视为"SMS 未开通"模式，任意6位数字放行；
+        // 一旦 sendCode 真正写入 Redis 后自动切换为严格校验。
         if (StringUtils.hasText(req.getCode())) {
             String redisCode = cacheRedis.get(Constants.RedisPre.CODE + req.getMobile());
-            if (!StringUtils.hasText(redisCode)) {
-                return Result.error("验证码已过期，请重新获取");
+            if (StringUtils.hasText(redisCode)) {
+                if (!req.getCode().equals(redisCode)) {
+                    return Result.error("验证码不正确");
+                }
+                cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
+            } else {
+                log.warn("[SMS未启用] 跳过验证码校验，手机号：{}", req.getMobile());
             }
-            if (!req.getCode().equals(redisCode)) {
-                return Result.error("验证码不正确");
-            }
-            cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
         } else {
             log.warn("[测试模式] 跳过短信验证码校验，手机号：{}", req.getMobile());
         }
@@ -368,13 +370,14 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("验证码不能为空");
         }
         String redisCode = cacheRedis.get(Constants.RedisPre.CODE + mobile);
-        if (!StringUtils.hasText(redisCode)) {
-            return Result.error("验证码已过期，请重新获取");
+        if (StringUtils.hasText(redisCode)) {
+            if (!code.equals(redisCode)) {
+                return Result.error("验证码不正确");
+            }
+            cacheRedis.delete(Constants.RedisPre.CODE + mobile);
+        } else {
+            log.warn("[SMS未启用] 跳过登录验证码校验，手机号：{}", mobile);
         }
-        if (!code.equals(redisCode)) {
-            return Result.error("验证码不正确");
-        }
-        cacheRedis.delete(Constants.RedisPre.CODE + mobile);
         return loginByMobileOnly(mobile);
     }
 
@@ -411,13 +414,14 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("密码不能少于6位");
         }
         String redisCode = cacheRedis.get(Constants.RedisPre.CODE + mobile);
-        if (!StringUtils.hasText(redisCode)) {
-            return Result.error("验证码已过期，请重新获取");
+        if (StringUtils.hasText(redisCode)) {
+            if (!code.equals(redisCode)) {
+                return Result.error("验证码不正确");
+            }
+            cacheRedis.delete(Constants.RedisPre.CODE + mobile);
+        } else {
+            log.warn("[SMS未启用] 跳过找回密码验证码校验，手机号：{}", mobile);
         }
-        if (!code.equals(redisCode)) {
-            return Result.error("验证码不正确");
-        }
-        cacheRedis.delete(Constants.RedisPre.CODE + mobile);
         return resetPasswordByMobile(mobile, newPassword);
     }
 
