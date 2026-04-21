@@ -568,7 +568,17 @@ const handleSubmit = async () => {
       headers: { 'Content-Type': 'application/json', token }
     })
 
-    ElMessage.success('注册成功！资料已提交，审核通过后即可接单。')
+    // 3. 自动提交审核，让简历进入 admin"待审核"列表
+    try {
+      await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/submit-audit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', token }
+      })
+    } catch (e) {
+      console.warn('自动提交审核失败，用户可在个人中心手动提交', e)
+    }
+
+    ElMessage.success('注册成功！资料已提交审核，通过后即可接单。')
     // 退出登录状态，引导用户重新登录
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('token')
