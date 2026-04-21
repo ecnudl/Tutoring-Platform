@@ -134,9 +134,9 @@
         <h2>第十条 联系我们</h2>
         <p>如您对本隐私保护政策有任何疑问、意见或建议，或需要行使您的个人信息权利，请通过以下方式联系我们：</p>
         <div class="contact-info">
-          <p>平台名称：591家教网</p>
-          <p>隐私保护邮箱：privacy@591jiajiao.com</p>
-          <p>客服邮箱：service@591jiajiao.com</p>
+          <p>平台名称：{{ siteBrand }}</p>
+          <p>隐私保护邮箱：{{ privacyEmail }}</p>
+          <p>客服邮箱：{{ csEmail }}</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>通讯地址：上海市</p>
         </div>
@@ -159,6 +159,13 @@ import { computed, onMounted } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 const { config, load } = useSiteConfig()
 const overrideHtml = computed(() => (config.value.agreementPrivacyHtml || '').trim())
+const siteBrand = computed(() => config.value.siteBrandName || '591家教网')
+const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
+const privacyEmail = computed(() => {
+  // 默认用 siteCsEmail 替换 prefix；sys_config 有 privacy 字段时优先
+  const cs = csEmail.value
+  return cs.startsWith('privacy@') ? cs : cs.replace(/^[^@]+@/, 'privacy@')
+})
 onMounted(() => { load() })
 </script>
 

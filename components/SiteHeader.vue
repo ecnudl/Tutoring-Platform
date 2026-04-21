@@ -5,8 +5,7 @@
       <div class="nav-brand">
         <div class="nav-brand-name"><NuxtLink to="/" class="brand-main" aria-label="返回首页"><span class="brand-num">591</span><span class="brand-cn">家教网</span></NuxtLink><span class="brand-sub">名校名师优质家教平台</span></div>
         <div class="nav-brand-domains">
-          <span>www.591jiajiao.com</span>
-          <span>www.591jiajiao.cn</span>
+          <span v-for="d in brandDomains" :key="d">{{ d }}</span>
         </div>
       </div>
 
@@ -84,6 +83,8 @@ import { CITY_LIST, navigateToCity } from '~/composables/useCityMap'
 const userStore = useUserStore()
 const cityStore = useCityStore()
 const router = useRouter()
+const runtimeConfig = useRuntimeConfig()
+const brandDomains = runtimeConfig.public.brandDomains || ['www.591jiajiao.com', 'www.591jiajiao.cn']
 
 onMounted(() => {
   if (userStore.isLoggedIn) {

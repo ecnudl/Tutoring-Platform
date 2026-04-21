@@ -2,25 +2,37 @@ import { defineStore } from 'pinia'
 
 /**
  * Cookie 工具函数
- * token/userType/mobile 写入 cookie (domain=.591jiajiao.cn / .591jiajiao.com),
- * 所有子域名共享, 实现跨城市保持登录
+ * token/userType/mobile 写入 cookie (所有站点域下写同一 cookie)
+ * 所有子域名共享，实现跨城市保持登录
+ * 域名来自 runtimeConfig.public.cookieDomains，env BASE_DOMAINS 可覆盖
  */
 
-const COOKIE_DOMAINS = ['.591jiajiao.cn', '.591jiajiao.com']
 const COOKIE_MAX_AGE = 7 * 86400 // 7 天
+
+function getCookieDomains(): string[] {
+  try {
+    const cfg = useRuntimeConfig?.()
+    const list = cfg?.public?.cookieDomains as string[] | undefined
+    if (list && list.length) return list
+  } catch { /* 非 Nuxt 上下文 */ }
+  return ['.591jiajiao.cn', '.591jiajiao.com']
+}
+
+function getBaseDomains(): string[] {
+  return getCookieDomains().map(d => d.startsWith('.') ? d.slice(1) : d)
+}
 
 function isProductionHost(): boolean {
   if (typeof window === 'undefined') return false
   const h = window.location.hostname
-  return h.endsWith('591jiajiao.cn') || h.endsWith('591jiajiao.com') ||
-         h === '591jiajiao.cn' || h === '591jiajiao.com'
+  return getBaseDomains().some(base => h === base || h.endsWith(`.${base}`))
 }
 
 function setCookie(name: string, value: string) {
   if (typeof document === 'undefined') return
   if (isProductionHost()) {
-    // 对两个域都写 cookie
-    for (const domain of COOKIE_DOMAINS) {
+    // 对所有配置域都写 cookie（支持多个生产域）
+    for (const domain of getCookieDomains()) {
       document.cookie = `${name}=${encodeURIComponent(value)}; domain=${domain}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`
     }
   } else {
@@ -32,7 +44,7 @@ function setCookie(name: string, value: string) {
 function deleteCookie(name: string) {
   if (typeof document === 'undefined') return
   if (isProductionHost()) {
-    for (const domain of COOKIE_DOMAINS) {
+    for (const domain of getCookieDomains()) {
       document.cookie = `${name}=; domain=${domain}; path=/; max-age=0; SameSite=Lax`
     }
   } else {

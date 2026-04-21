@@ -44,8 +44,15 @@ export const PINYIN_TO_CITY: Map<string, CityEntry> = new Map(
 /** 上海的默认条目 */
 export const DEFAULT_CITY: CityEntry = CITY_LIST[0] // 上海
 
-/** 支持的主域名后缀 */
-const BASE_DOMAINS = ['591jiajiao.cn', '591jiajiao.com']
+/** 支持的主域名后缀（优先 runtimeConfig.public.baseDomains，fallback 默认两个） */
+function getBaseDomains(): string[] {
+  try {
+    const cfg = useRuntimeConfig?.()
+    const list = cfg?.public?.baseDomains as string[] | undefined
+    if (list && list.length) return list
+  } catch { /* SSR 前或非 Nuxt 上下文 */ }
+  return ['591jiajiao.cn', '591jiajiao.com']
+}
 
 /**
  * 从 hostname 提取子域名拼音
@@ -57,6 +64,7 @@ const BASE_DOMAINS = ['591jiajiao.cn', '591jiajiao.com']
 export function extractSubdomain(hostname: string): string | null {
   const h = hostname.toLowerCase()
 
+  const BASE_DOMAINS = getBaseDomains()
   for (const base of BASE_DOMAINS) {
     if (h === base || h === `www.${base}`) {
       return null // 裸域名 / www → 上海
@@ -90,13 +98,14 @@ export function resolveCityFromHostname(hostname: string): CityEntry {
  */
 function detectBaseDomain(hostname: string): string {
   const h = hostname.toLowerCase()
+  const BASE_DOMAINS = getBaseDomains()
   for (const base of BASE_DOMAINS) {
     if (h === base || h === `www.${base}` || h.endsWith(`.${base}`)) {
       return base
     }
   }
   // 开发环境 fallback
-  return BASE_DOMAINS[0] // 591jiajiao.cn
+  return BASE_DOMAINS[0]
 }
 
 /**

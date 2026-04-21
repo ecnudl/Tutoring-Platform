@@ -92,7 +92,7 @@
         <h2>第十一条 联系与投诉</h2>
         <p>如您在使用平台过程中遇到安全问题或需要投诉举报，请及时联系我们：</p>
         <div class="contact-info">
-          <p>投诉邮箱：service@591jiajiao.com</p>
+          <p>投诉邮箱：{{ csEmail }}</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>紧急情况请直接拨打110报警</p>
         </div>
@@ -114,6 +114,7 @@ import { computed, onMounted } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 const { config, load } = useSiteConfig()
 const overrideHtml = computed(() => (config.value.agreementDisclaimerHtml || '').trim())
+const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
 onMounted(() => { load() })
 </script>
 

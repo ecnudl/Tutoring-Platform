@@ -14,7 +14,7 @@
         </div>
 
         <h2>第一条 定义与解释</h2>
-        <p>1.1 <strong>"平台"</strong>：指591家教网网站（www.591jiajiao.com）及其关联的移动应用程序、小程序等。</p>
+        <p>1.1 <strong>"平台"</strong>：指{{ siteBrand }}网站（{{ primaryDomain }}）及其关联的移动应用程序、小程序等。</p>
         <p>1.2 <strong>"用户"</strong>：指注册并使用本平台服务的自然人，包括但不限于教员用户和家长/学员用户。</p>
         <p>1.3 <strong>"教员"</strong>：指在本平台注册并发布个人信息、提供家教服务的用户，包括大学生家教、专职教员、在职教师、海归外教等。</p>
         <p>1.4 <strong>"家长/学员"</strong>：指在本平台注册并发布家教需求、寻找教员的用户。</p>
@@ -99,8 +99,8 @@
         <h2>第十三条 联系方式</h2>
         <p>如对本协议有任何疑问、建议或投诉，请通过以下方式联系我们：</p>
         <div class="contact-info">
-          <p>平台名称：591家教网</p>
-          <p>客服邮箱：service@591jiajiao.com</p>
+          <p>平台名称：{{ siteBrand }}</p>
+          <p>客服邮箱：{{ csEmail }}</p>
           <p>工作时间：周一至周五 9:00-18:00</p>
           <p>通讯地址：上海市</p>
         </div>
@@ -121,7 +121,11 @@
 import { computed, onMounted } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 const { config, load } = useSiteConfig()
+const runtimeConfig = useRuntimeConfig()
 const overrideHtml = computed(() => (config.value.agreementUserHtml || '').trim())
+const siteBrand = computed(() => config.value.siteBrandName || '591家教网')
+const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
+const primaryDomain = computed(() => (runtimeConfig.public.brandDomains?.[0]) || 'www.591jiajiao.com')
 onMounted(() => { load() })
 </script>
 
