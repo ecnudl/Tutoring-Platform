@@ -123,6 +123,23 @@
               </div>
               <span>我要做家教</span>
             </NuxtLink>
+
+            <div class="panel-search">
+              <el-input
+                v-model="searchKeyword"
+                placeholder="科目搜索，如「数学」「钢琴」"
+                size="default"
+                clearable
+                @keyup.enter="doSearch"
+              >
+                <template #prefix>
+                  <el-icon :size="14"><Search /></el-icon>
+                </template>
+                <template #append>
+                  <button type="button" class="ps-go" @click="doSearch">搜索</button>
+                </template>
+              </el-input>
+            </div>
           </div>
 
           <!-- 框2：二维码 -->
@@ -808,6 +825,40 @@ onMounted(async () => {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
 }
+
+/* --- 框1：底部科目搜索 --- */
+.panel-search {
+  margin-top: var(--space-md);
+  padding: 0 4px;
+}
+.panel-search :deep(.el-input__wrapper) {
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  transition: box-shadow var(--transition-fast);
+}
+.panel-search :deep(.el-input__wrapper.is-focus) {
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.panel-search :deep(.el-input-group__append) {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.ps-go {
+  height: 30px;
+  padding: 0 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  letter-spacing: 1px;
+}
+.ps-go:hover { background: #0f2a4d; }
 
 /* --- 框2：二维码 --- */
 .contact-panel {
