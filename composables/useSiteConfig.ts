@@ -30,6 +30,13 @@ export interface SiteConfig {
   siteFooterMenusJson?: string
   sitePriceNotesJson?: string
   sitePricingData?: string
+
+  // 网站元数据
+  websiteTitle?: string
+  websiteDesc?: string
+  websiteKeyword?: string
+  websiteCopyright?: string
+  websiteDomain?: string
 }
 
 export interface FriendLink { name: string; url: string }
