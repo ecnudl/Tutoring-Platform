@@ -1,248 +1,311 @@
 <template>
   <div class="register-wrapper">
     <Head>
-      <Title>教员注册 - 591家教网</Title>
-      <Meta name="description" content="注册成为家教教员，接单赚取课时费。大学生、专职教员、在职教师均可注册。" />
+      <Title>{{ cityStore.cityName }}教员注册 - 591家教网</Title>
+      <Meta name="description" :content="`${cityStore.cityName}_注册成为家教老师。`" />
+      <Meta name="keywords" :content="`${cityStore.cityName}教员注册,注册成为${cityStore.cityName}家教老师`" />
     </Head>
 
-    <div class="container">
-      <!-- 顶部横幅 -->
-      <div class="register-banner">
-        <h1>教员注册</h1>
-        <p>加入我们，开启您的家教之旅</p>
+    <div class="reg-container">
+      <!-- 顶部 -->
+      <div class="reg-top">
+        <div class="reg-step-title">
+          <span v-if="currentStep > 1" class="back" @click="currentStep--">&lsaquo;</span>
+          <span>教员注册 {{ currentStep }}/3</span>
+        </div>
+        <NuxtLink to="/" class="reg-logo">
+          <SiteLogo :showText="true" />
+        </NuxtLink>
       </div>
 
-      <!-- 注册步骤指示 -->
-      <div class="steps-wrapper">
-        <div class="step-item active">
-          <div class="step-number">1</div>
-          <div class="step-text">填写信息</div>
+      <!-- 横向步骤指示 -->
+      <div class="steps-bar">
+        <div :class="['step-dot', currentStep >= 1 && 'active']">
+          <div class="dot">1</div>
+          <span>账号信息</span>
         </div>
-        <div class="step-line"></div>
-        <div class="step-item">
-          <div class="step-number">2</div>
-          <div class="step-text">等待审核</div>
+        <div class="step-line" :class="{ active: currentStep >= 2 }"></div>
+        <div :class="['step-dot', currentStep >= 2 && 'active']">
+          <div class="dot">2</div>
+          <span>完善简历</span>
         </div>
-        <div class="step-line"></div>
-        <div class="step-item">
-          <div class="step-number">3</div>
-          <div class="step-text">开始接单</div>
+        <div class="step-line" :class="{ active: currentStep >= 3 }"></div>
+        <div :class="['step-dot', currentStep >= 3 && 'active']">
+          <div class="dot">3</div>
+          <span>家教信息</span>
         </div>
       </div>
 
-      <!-- 注册表单 -->
-      <div class="form-container">
-        <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+      <!-- ============== 第一步：账号 + 城市 ============== -->
+      <div v-show="currentStep === 1" class="form-panel">
+        <div class="reg-tip">
+          <span class="tip-face">😊</span>
+          请您 <b class="text-orange">认真</b>选择所在城市与手机号，这是后续推荐订单的重要依据。
+        </div>
 
-          <!-- 账号信息 -->
-          <div class="form-section">
-            <div class="section-title">账号信息</div>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="手机号" prop="mobile">
-                  <el-input v-model="form.mobile" placeholder="请输入手机号" size="large" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="短信验证码" prop="code">
-                  <div class="code-input-group">
-                    <el-input v-model="form.code" placeholder="请输入短信验证码" size="large" />
-                    <el-button size="large" :disabled="countdown > 0" @click="sendCode">
-                      {{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}
-                    </el-button>
-                  </div>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="密码" prop="password">
-                  <el-input v-model="form.password" type="password" placeholder="6-20位密码" size="large" show-password />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </div>
+        <el-form :model="step1" :rules="step1Rules" ref="step1Ref" label-position="top" size="large">
+          <el-form-item label="所在城市" prop="cityId" required>
+            <el-select v-model="step1.cityId" placeholder="请选择所在城市" style="width:100%" @change="onCityChange">
+              <el-option v-for="c in CITY_LIST" :key="c.id" :label="c.name" :value="c.id" />
+            </el-select>
+            <div class="hint-muted">当前访问：{{ cityStore.cityName }}站（切换城市将跳转到对应子站注册）</div>
+          </el-form-item>
 
-          <!-- 个人信息 -->
-          <div class="form-section">
-            <div class="section-title">个人信息</div>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="真实姓名" prop="realName">
-                  <el-input v-model="form.realName" placeholder="请输入真实姓名" size="large" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="性别" prop="gender">
-                  <el-radio-group v-model="form.gender" size="large">
-                    <el-radio :label="1" border>男</el-radio>
-                    <el-radio :label="2" border>女</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="教员类型" prop="tutorType">
-                  <el-select v-model="form.tutorType" placeholder="请选择教员类型" size="large" style="width:100%">
-                    <el-option label="大学生" :value="1" />
-                    <el-option label="专职教员" :value="2" />
-                    <el-option label="在职教师" :value="3" />
-                    <el-option label="海归外教" :value="4" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="最高学历" prop="degree">
-                  <el-select v-model="form.degree" placeholder="请选择学历" size="large" style="width:100%">
-                    <el-option label="高中" :value="1" />
-                    <el-option label="大专" :value="2" />
-                    <el-option label="本科" :value="3" />
-                    <el-option label="硕士" :value="4" />
-                    <el-option label="博士" :value="5" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="毕业/在读院校" prop="universityId">
-                  <el-select v-model="form.universityId" filterable placeholder="请选择或搜索学校" size="large" style="width:100%" @change="onUniversityChange">
-                    <el-option v-for="u in universityOptions" :key="u.id" :label="u.uniName" :value="u.id" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="专业" prop="major">
-                  <el-input v-model="form.major" placeholder="请输入专业" size="large" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="年级/入职年份">
-                  <el-input v-model="form.gradeYear" placeholder="如：大三 / 2020年入职" size="large" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="授课方式">
-                  <el-select v-model="form.teachingMethod" placeholder="请选择" size="large" style="width:100%">
-                    <el-option label="教师上门" :value="1" />
-                    <el-option label="学生上门" :value="2" />
-                    <el-option label="在线辅导" :value="3" />
-                    <el-option label="均可" :value="4" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </div>
+          <el-form-item label="手机号" prop="mobile" required>
+            <el-input v-model="step1.mobile" placeholder="请输入11位手机号" maxlength="11" />
+          </el-form-item>
 
-          <!-- 家教信息 -->
-          <div class="form-section">
-            <div class="section-title">家教信息</div>
-            <el-form-item label="可教授科目" prop="subjects">
-              <el-select v-model="form.subjects" multiple collapse-tags placeholder="请选择可教授科目（可多选）" size="large" style="width:100%">
-                <el-option v-for="s in subjectOptions" :key="s" :label="s" :value="s" />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="可授课区域" prop="districts">
-              <el-select v-model="form.districts" multiple collapse-tags placeholder="请选择可授课区域（可多选）" size="large" style="width:100%">
-                <el-option v-for="d in districtNames" :key="d" :label="d" :value="d" />
-              </el-select>
-            </el-form-item>
-
-            <el-row :gutter="20">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="期望薪资">
-                  <el-input v-model="form.expectedSalary" placeholder="如：100-150" size="large">
-                    <template #append>元/小时</template>
-                  </el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" :xs="24">
-                <el-form-item label="家教经验">
-                  <el-select v-model="form.experience" placeholder="请选择" size="large" style="width:100%">
-                    <el-option label="无经验" :value="0" />
-                    <el-option label="1年以下" :value="1" />
-                    <el-option label="1-3年" :value="2" />
-                    <el-option label="3-5年" :value="3" />
-                    <el-option label="5年以上" :value="4" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-
-            <el-form-item label="自我介绍">
-              <el-input v-model="form.introduction" type="textarea" :rows="5" placeholder="请简要介绍您的教学经验、特长、获奖情况等（200字以内）" maxlength="200" show-word-limit />
-            </el-form-item>
-          </div>
-
-          <!-- 资质证书（选填） -->
-          <div class="form-section">
-            <div class="section-title">
-              资质证书
-              <span class="section-optional">选填，上传后可获得认证标识</span>
+          <el-form-item label="短信验证码" prop="code" required>
+            <div class="code-row">
+              <el-input v-model="step1.code" placeholder="请输入短信验证码" maxlength="6" style="flex:1" />
+              <el-button :disabled="countdown > 0" @click="sendCode">
+                {{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}
+              </el-button>
             </div>
-            <p class="cert-tip">上传教师资格证、学生证、学历证等资质证明，审核通过后将获得<strong>已认证</strong>标识，提升信任度和接单率。您也可以注册后在个人中心补充上传。</p>
+          </el-form-item>
 
-            <div v-for="(cert, idx) in certList" :key="idx" class="cert-item">
-              <el-row :gutter="12" align="middle">
-                <el-col :span="6" :xs="12">
-                  <el-select v-model="cert.certType" placeholder="证书类型" size="large" style="width:100%">
-                    <el-option label="教师资格证" :value="3" />
-                    <el-option label="学生证" :value="2" />
-                    <el-option label="学历证" :value="4" />
-                    <el-option label="身份证" :value="1" />
-                    <el-option label="其他" :value="5" />
-                  </el-select>
-                </el-col>
-                <el-col :span="6" :xs="12">
-                  <el-input v-model="cert.certName" placeholder="证书名称" size="large" />
-                </el-col>
-                <el-col :span="8" :xs="16">
-                  <div v-if="cert.certUrl" class="cert-preview">
-                    <el-image :src="cert.certUrl" style="width:80px;height:56px;border-radius:4px" fit="cover" />
-                    <el-button size="small" text type="danger" @click="cert.certUrl = ''">移除</el-button>
-                  </div>
-                  <div v-else>
-                    <input type="file" :ref="el => certFileRefs[idx] = el" accept="image/*" style="display:none" @change="e => handleCertFileUpload(e, idx)" />
-                    <el-button size="small" :loading="cert.uploading" @click="certFileRefs[idx]?.click()">上传照片</el-button>
-                    <span class="cert-file-hint">jpg/png, 最大5MB</span>
-                  </div>
-                </el-col>
-                <el-col :span="4" :xs="8">
-                  <el-button text type="danger" @click="certList.splice(idx, 1)">删除</el-button>
-                </el-col>
-              </el-row>
-            </div>
+          <el-form-item label="设置密码" prop="password" required>
+            <el-input v-model="step1.password" type="password" placeholder="6-20 位，字母+数字" show-password />
+          </el-form-item>
 
-            <el-button v-if="certList.length < 3" type="primary" plain size="large" @click="addCert" style="margin-top:12px">
-              + 添加证书
-            </el-button>
-          </div>
+          <el-form-item label="确认密码" prop="confirmPassword" required>
+            <el-input v-model="step1.confirmPassword" type="password" placeholder="再次输入密码" show-password />
+          </el-form-item>
 
-          <!-- 协议 -->
           <div class="agreement-box" :class="{ error: agreementError }">
-            <el-checkbox v-model="form.agreed" @change="agreementError = false">
+            <el-checkbox v-model="step1.agreed" @change="agreementError = false">
               我已阅读并同意
               <a href="/agreement/user" target="_blank">《用户服务协议》</a>
-              和
+              <a href="/agreement/disclaimer" target="_blank">《免责声明》</a>
               <a href="/agreement/privacy" target="_blank">《隐私政策》</a>
             </el-checkbox>
-            <div v-if="agreementError" class="error-msg">请先阅读并同意服务协议</div>
           </div>
 
-          <!-- 提交按钮 -->
-          <div class="submit-box">
-            <el-button type="primary" size="large" :loading="submitting" @click="handleSubmit" class="submit-btn">
-              立即注册
-            </el-button>
-            <div class="login-tip">
-              已有账号？<NuxtLink to="/login">立即登录</NuxtLink>
+          <el-button type="primary" class="next-btn" @click="goStep2">下一步</el-button>
+
+          <div class="bottom-tip">
+            已有账号？<NuxtLink to="/login?type=teacher">教员登录</NuxtLink>
+            <span class="sep">|</span>
+            <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+          </div>
+        </el-form>
+      </div>
+
+      <!-- ============== 第二步：详细简历 ============== -->
+      <div v-show="currentStep === 2" class="form-panel">
+        <div class="reg-tip">
+          <span class="tip-face">😊</span>
+          认真<b class="text-orange">详细</b>的简历，将<b class="text-orange">有助于</b>家长的选择，并获得我们<b class="text-orange">更多的推荐</b>。
+        </div>
+
+        <el-form :model="step2" :rules="step2Rules" ref="step2Ref" label-position="top" size="large">
+          <el-form-item label="真实姓名" prop="realName" required>
+            <el-input v-model="step2.realName" placeholder='前台只显示您的姓，如"王海"只显示为"王教员"。' />
+          </el-form-item>
+
+          <el-form-item label="目前身份" prop="tutorType" required>
+            <el-select v-model="step2.tutorType" placeholder="选择身份" @change="onTutorTypeChange" style="width:100%">
+              <el-option label="在校大学生/研究生,不含留学生" :value="1" />
+              <el-option label="教师(在职/培训机构/专职家教/进修/离职)" :value="3" />
+              <el-option label="外籍人士(留学生/外教)，海外归国" :value="4" />
+              <el-option label="其他(已经毕业离校的人员)" :value="2" />
+            </el-select>
+          </el-form-item>
+
+          <!-- 在校大学生 子字段 -->
+          <template v-if="step2.tutorType === 1">
+            <el-form-item label="详细身份" prop="identityDetail" required>
+              <el-select v-model="step2.identityDetail" placeholder="请选择详细身份" style="width:100%">
+                <el-option v-for="o in studentIdentityOptions" :key="o" :label="o" :value="o" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="籍贯（省份）" prop="hometownProvince" required>
+              <el-input v-model="step2.hometownProvince" placeholder="请输入籍贯" />
+            </el-form-item>
+          </template>
+
+          <!-- 其他（已毕业）子字段 -->
+          <template v-if="step2.tutorType === 2">
+            <el-form-item label="目前职业" prop="identityDetail" required>
+              <el-input v-model="step2.identityDetail" placeholder="目前职业，如：工程师、翻译、财务、自由职业者等" />
+            </el-form-item>
+            <el-form-item label="籍贯（省份）" prop="hometownProvince" required>
+              <el-input v-model="step2.hometownProvince" placeholder="请输入籍贯" />
+            </el-form-item>
+          </template>
+
+          <!-- 在职教师 子字段 -->
+          <template v-if="step2.tutorType === 3">
+            <el-form-item label="详细身份" prop="identityDetail" required>
+              <el-select v-model="step2.identityDetail" placeholder="请选择详细身份" style="width:100%">
+                <el-option-group v-for="g in teacherIdentityGroups" :key="g.label" :label="g.label">
+                  <el-option v-for="o in g.options" :key="o" :label="o" :value="o" />
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="籍贯（省份）" prop="hometownProvince" required>
+              <el-input v-model="step2.hometownProvince" placeholder="请输入籍贯" />
+            </el-form-item>
+          </template>
+
+          <!-- 外籍/海归 子字段 -->
+          <template v-if="step2.tutorType === 4">
+            <el-form-item label="目前职业" prop="identityDetail" required>
+              <el-input v-model="step2.identityDetail" placeholder="目前职业，如：工程师、翻译、财务、自由职业者等" />
+            </el-form-item>
+            <el-form-item label="国籍/留学国家或地区" prop="hometownProvince" required>
+              <el-input v-model="step2.hometownProvince" placeholder="以护照为准" />
+            </el-form-item>
+          </template>
+
+          <el-form-item label="性别" prop="gender" required>
+            <el-radio-group v-model="step2.gender">
+              <el-radio :label="1">男性</el-radio>
+              <el-radio :label="2">女性</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="出生年月" prop="birthDate" required>
+            <el-date-picker
+              v-model="step2.birthDate"
+              type="month"
+              value-format="YYYY-MM"
+              placeholder="选择年月"
+              style="width:100%" />
+          </el-form-item>
+
+          <el-form-item label="专业" prop="major" required>
+            <el-input v-model="step2.major" placeholder="例如：数学与应用数学" />
+          </el-form-item>
+
+          <el-form-item label="目前学历" prop="degree" required>
+            <el-select v-model="step2.degree" placeholder="选择学历" style="width:100%">
+              <el-option label="大专以下" :value="1" />
+              <el-option label="大专" :value="2" />
+              <el-option label="本科在读" :value="31" />
+              <el-option label="本科毕业" :value="32" />
+              <el-option label="硕士在读" :value="41" />
+              <el-option label="硕士毕业" :value="42" />
+              <el-option label="博士在读" :value="51" />
+              <el-option label="博士毕业" :value="52" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="身份证/护照号" prop="idCard" required>
+            <el-input v-model="step2.idCard" placeholder="此项将严格保密，不对外公开" />
+          </el-form-item>
+
+          <!-- 大学生：高中母校 + 所在大学 -->
+          <template v-if="step2.tutorType === 1">
+            <el-form-item label="高中母校" prop="highSchool" required>
+              <el-input v-model="step2.highSchool" placeholder="请填写全称" />
+            </el-form-item>
+            <el-form-item label="所在大学" prop="universityId" required>
+              <el-select v-model="step2.universityId" filterable allow-create placeholder="选择所在高校（或手动输入）" @change="onUniversityChange" style="width:100%">
+                <el-option v-for="u in universityList" :key="u" :label="u" :value="u" />
+              </el-select>
+            </el-form-item>
+          </template>
+
+          <!-- 其他 / 在职 / 外籍：大学 -->
+          <template v-if="step2.tutorType === 2 || step2.tutorType === 3 || step2.tutorType === 4">
+            <el-form-item label="所在大学/或毕业大学" prop="universityId" required>
+              <el-select v-model="step2.universityId" filterable allow-create placeholder="选择大学（或手动输入）" @change="onUniversityChange" style="width:100%">
+                <el-option v-for="u in universityList" :key="u" :label="u" :value="u" />
+              </el-select>
+            </el-form-item>
+          </template>
+
+          <!-- 生活住址：当前城市 + 区 -->
+          <el-form-item label="生活住址" required>
+            <div class="two-col">
+              <el-input :model-value="cityStore.cityName" disabled />
+              <el-form-item prop="districtId" style="flex:1">
+                <el-select v-model="step2.districtId" placeholder="选择所在区" style="width:100%">
+                  <el-option v-for="d in districtsRef" :key="d.id" :label="d.name" :value="d.id" />
+                </el-select>
+              </el-form-item>
             </div>
-          </div>
+          </el-form-item>
 
+          <el-form-item label="e-mail" prop="email" required>
+            <el-input v-model="step2.email" placeholder="用于接收订单推荐和系统通知" />
+          </el-form-item>
+
+          <el-form-item label="微信">
+            <el-input v-model="step2.wechat" placeholder="微信号（选填，方便家长联系）" />
+          </el-form-item>
+
+          <el-form-item label="通信地址" prop="address" required>
+            <el-input v-model="step2.address" type="textarea" :rows="3" placeholder="不对外公布，以方便地图定位，给您推荐家教。" />
+          </el-form-item>
+
+          <div class="btn-row">
+            <el-button class="prev-btn" @click="currentStep = 1">上一步</el-button>
+            <el-button type="primary" class="next-btn" @click="goStep3">下一步</el-button>
+          </div>
+        </el-form>
+      </div>
+
+      <!-- ============== 第三步：家教信息 ============== -->
+      <div v-show="currentStep === 3" class="form-panel">
+        <div class="reg-tip">
+          <span class="tip-face">😊</span>
+          家教信息是家长筛选的关键，请<b class="text-orange">尽可能详细</b>地填写您的授课范围与价格。
+        </div>
+
+        <el-form :model="step3" :rules="step3Rules" ref="step3Ref" label-position="top" size="large">
+          <el-form-item label="可教授科目" prop="subjects" required>
+            <el-select v-model="step3.subjects" multiple collapse-tags placeholder="请选择可教授科目（可多选）" style="width:100%">
+              <el-option v-for="s in SUBJECT_NAMES" :key="s" :label="s" :value="s" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="可授课区域" prop="districtList" required>
+            <el-select v-model="step3.districtList" multiple collapse-tags placeholder="请选择可授课区域（可多选）" style="width:100%">
+              <el-option v-for="d in districtsRef" :key="d.id" :label="d.name" :value="d.name" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="授课方式" prop="teachingMethod" required>
+            <el-select v-model="step3.teachingMethod" style="width:100%">
+              <el-option label="教师上门" :value="1" />
+              <el-option label="学生上门" :value="2" />
+              <el-option label="在线辅导" :value="3" />
+              <el-option label="均可" :value="4" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="期望薪资（元/小时）">
+            <div class="two-col">
+              <el-input v-model.number="step3.priceMin" type="number" placeholder="最低" />
+              <span class="dash">—</span>
+              <el-input v-model.number="step3.priceMax" type="number" placeholder="最高" />
+            </div>
+          </el-form-item>
+
+          <el-form-item label="家教经验">
+            <el-select v-model="step3.gradeYear" placeholder="请选择" style="width:100%">
+              <el-option label="无经验" value="无经验" />
+              <el-option label="1 年以下" value="1 年以下" />
+              <el-option label="1-3 年" value="1-3 年" />
+              <el-option label="3-5 年" value="3-5 年" />
+              <el-option label="5 年以上" value="5 年以上" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="自我介绍" prop="selfIntroduction" required>
+            <el-input v-model="step3.selfIntroduction" type="textarea" :rows="5" placeholder="请简要介绍您的教学经验、特长、获奖情况等（200字以内）" maxlength="400" show-word-limit />
+          </el-form-item>
+
+          <el-form-item label="资质证书说明（选填）">
+            <el-input v-model="step3.certificatesDesc" type="textarea" :rows="2" placeholder="例：持有高中数学教师资格证、华东师大本科毕业证。审核通过后可在个人中心补充上传证书照片。" />
+          </el-form-item>
+
+          <div class="btn-row">
+            <el-button class="prev-btn" @click="currentStep = 2">上一步</el-button>
+            <el-button type="primary" class="next-btn" :loading="submitting" @click="handleSubmit">提交注册</el-button>
+          </div>
         </el-form>
       </div>
     </div>
@@ -250,401 +313,472 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
+import { CITY_LIST, navigateToCity, PINYIN_TO_CITY } from '~/composables/useCityMap'
+import { SUBJECT_NAMES } from '~/composables/subjectList'
 
 const cityStore = useCityStore()
-const { districtNames } = useCityData()
+const { districts, universities } = useCityData()
 const router = useRouter()
-const { get, post } = useApi()
-
+const { post } = useApi()
 const config = useRuntimeConfig()
-const formRef = ref(null)
+
+const currentStep = ref(1)
 const submitting = ref(false)
+const countdown = ref(0)
 const agreementError = ref(false)
-const universityOptions = ref([])
-const certList = reactive([])
-const certFileRefs = ref([])
 
-const addCert = () => {
-  certList.push({ certType: 3, certName: '', certUrl: '', uploading: false })
-}
+const step1Ref = ref(null)
+const step2Ref = ref(null)
+const step3Ref = ref(null)
 
-const handleCertFileUpload = async (e, idx) => {
-  const file = e.target.files[0]
-  if (!file) return
-  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片不能超过5MB'); return }
-  certList[idx].uploading = true
-  try {
-    const fd = new FormData()
-    fd.append('picFile', file)
-    // 注册时无 token，用公开上传接口
-    const res = await $fetch(`${config.public.apiBase}/system/auth/upload/pic`, {
-      method: 'POST', body: fd,
-      headers: localStorage.getItem('token') ? { token: localStorage.getItem('token') } : {}
-    })
-    if (res.code === 200 && res.data) {
-      certList[idx].certUrl = res.data
-      ElMessage.success('照片上传成功')
-    } else { ElMessage.error(res.msg || '上传失败') }
-  } catch (err) { ElMessage.error('上传失败，请重试') }
-  finally { certList[idx].uploading = false; e.target.value = '' }
-}
+const districtsRef = computed(() => districts.value)
+const universityList = computed(() => universities.value)
 
-import { SUBJECT_NAMES as subjectOptions } from '~/composables/subjectList'
-
-const form = reactive({
+// —— Step1: 账号信息 ——
+const step1 = reactive({
+  cityId: cityStore.cityId,
   mobile: '',
   code: '',
   password: '',
-  agreed: false,
-  realName: '',
-  gender: null,
-  tutorType: null,
-  degree: null,
-  university: '',
-  universityId: null,
-  major: '',
-  gradeYear: '',
-  teachingMethod: 4,
-  subjects: [],
-  districts: [],
-  expectedSalary: '',
-  experience: null,
-  introduction: ''
+  confirmPassword: '',
+  agreed: false
 })
 
-const countdown = ref(0)
-
-const sendCode = async () => {
-  if (!form.mobile || !/^1[3-9]\d{9}$/.test(form.mobile)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  try {
-    const res = await post('/user/api/sms/send', { mobile: form.mobile })
-    if (res.code === 200) {
-      ElMessage.success('验证码已发送')
-      countdown.value = 60
-      const timer = setInterval(() => {
-        if (--countdown.value <= 0) clearInterval(timer)
-      }, 1000)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e) {
-    ElMessage.error('发送失败，请稍后重试')
-  }
-}
-
-const rules = {
+const step1Rules = {
+  cityId: [{ required: true, message: '请选择城市', trigger: 'change' }],
   mobile: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
   ],
   code: [{ required: true, message: '请输入短信验证码', trigger: 'blur' }],
   password: [
-    { required: true, message: '请设置密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度6-20位', trigger: 'blur' }
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度 6-20 位', trigger: 'blur' }
   ],
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
-  gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
-  tutorType: [{ required: true, message: '请选择教员类型', trigger: 'change' }],
-  degree: [{ required: true, message: '请选择学历', trigger: 'change' }],
-  universityId: [{ required: true, message: '请选择学校', trigger: 'change' }],
-  major: [{ required: true, message: '请输入专业', trigger: 'blur' }],
-  subjects: [{ required: true, message: '请选择至少一个科目', trigger: 'change', type: 'array', min: 1 }],
-  districts: [{ required: true, message: '请选择至少一个区域', trigger: 'change', type: 'array', min: 1 }]
+  confirmPassword: [
+    { required: true, message: '请再次输入密码', trigger: 'blur' },
+    { validator: (_, v, cb) => v === step1.password ? cb() : cb(new Error('两次密码不一致')), trigger: 'blur' }
+  ]
 }
 
-const onUniversityChange = (id) => {
-  const uni = universityOptions.value.find(u => u.id === id)
-  form.university = uni ? uni.uniName : ''
+const onCityChange = (newId) => {
+  if (newId === cityStore.cityId) return
+  const target = CITY_LIST.find(c => c.id === newId)
+  if (!target) return
+  // 跳转到目标城市子站的注册页
+  navigateToCity(target, '/register/teacher')
 }
 
-onMounted(async () => {
-  try {
-    const res = await get('/user/api/dict/university/list', { cityId: cityStore.cityId })
-    if (res.code === 200 && res.data) {
-      universityOptions.value = res.data
-    }
-  } catch (e) {
-    console.error('加载高校列表失败', e)
+const sendCode = async () => {
+  if (!step1.mobile || !/^1[3-9]\d{9}$/.test(step1.mobile)) {
+    ElMessage.warning('请输入正确的手机号'); return
   }
+  try {
+    const res = await post('/user/api/sms/send', { mobile: step1.mobile })
+    if (res.code === 200) {
+      ElMessage.success('验证码已发送')
+      countdown.value = 60
+      const timer = setInterval(() => { if (--countdown.value <= 0) clearInterval(timer) }, 1000)
+    } else {
+      ElMessage.error(res.msg || '发送失败')
+    }
+  } catch (e) { ElMessage.error('发送失败，请稍后重试') }
+}
+
+const goStep2 = async () => {
+  if (!step1Ref.value) return
+  const valid = await step1Ref.value.validate().catch(() => false)
+  if (!valid) return
+  if (!step1.agreed) { agreementError.value = true; ElMessage.warning('请先阅读并同意协议'); return }
+  // 预留同步 realName 到 step2
+  currentStep.value = 2
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// —— Step2: 简历 ——
+const step2 = reactive({
+  realName: '',
+  tutorType: null,
+  identityDetail: '',
+  hometownProvince: '',
+  gender: null,
+  birthDate: '',
+  major: '',
+  degree: null,
+  idCard: '',
+  highSchool: '',
+  universityId: '',
+  districtId: null,
+  email: '',
+  wechat: '',
+  address: ''
 })
 
+const studentIdentityOptions = [
+  '自学考试生', '函授（网络）学生', '成教学生', '大专在读学生',
+  '本科大一学生', '本科大二学生', '本科大三学生', '本科大四学生', '本科大五学生',
+  '在读硕士生', '硕士进修老师', '在读博士生', '其他学生'
+]
+
+const teacherIdentityGroups = [
+  { label: '专职家教', options: ['专职家教老师'] },
+  { label: '机构教师', options: ['离职专业培训机构教师', '退休专业培训机构教师', '进修专业培训机构教师', '在职专业培训机构教师'] },
+  { label: '幼儿教师', options: ['离职幼儿教师', '退休幼儿教师', '进修幼儿教师', '在职幼儿教师'] },
+  { label: '小学教师', options: ['离职小学教师', '退休小学教师', '进修小学教师', '在职小学教师'] },
+  { label: '初中教师', options: ['离职初中教师', '退休初中教师', '进修初中教师', '在职初中教师'] },
+  { label: '高中教师', options: ['离职高中教师', '退休高中教师', '进修高中教师', '在职高中教师'] },
+  { label: '大学教师', options: ['硕士进修老师', '离职大学教师', '退休大学教师', '在职大学教师'] },
+  { label: '其他教师', options: ['其它教师'] }
+]
+
+const onTutorTypeChange = () => {
+  step2.identityDetail = ''
+  step2.hometownProvince = ''
+}
+
+const onUniversityChange = (val) => {
+  // universityId 字段在这个表单里就是学校名
+}
+
+const step2Rules = {
+  realName: [
+    { required: true, message: '请输入真实姓名', trigger: 'blur' },
+    { min: 2, max: 12, message: '长度 2-12 个字符', trigger: 'blur' }
+  ],
+  tutorType: [{ required: true, message: '请选择身份', trigger: 'change' }],
+  identityDetail: [{ required: true, message: '请填写详细身份', trigger: 'blur' }],
+  hometownProvince: [{ required: true, message: '请填写籍贯/国籍', trigger: 'blur' }],
+  gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
+  birthDate: [{ required: true, message: '请选择出生年月', trigger: 'change' }],
+  major: [{ required: true, message: '请输入专业', trigger: 'blur' }],
+  degree: [{ required: true, message: '请选择学历', trigger: 'change' }],
+  idCard: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
+  highSchool: [{ required: true, message: '请填写高中母校', trigger: 'blur' }],
+  universityId: [{ required: true, message: '请选择或输入大学', trigger: 'change' }],
+  districtId: [{ required: true, message: '请选择所在区', trigger: 'change' }],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+  ],
+  address: [{ required: true, message: '请输入通信地址', trigger: 'blur' }]
+}
+
+const goStep3 = async () => {
+  if (!step2Ref.value) return
+  const valid = await step2Ref.value.validate().catch(() => false)
+  if (!valid) {
+    setTimeout(() => {
+      const err = document.querySelector('.is-error')
+      if (err) err.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 200)
+    return
+  }
+  currentStep.value = 3
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// —— Step3: 家教信息 ——
+const step3 = reactive({
+  subjects: [],
+  districtList: [],
+  teachingMethod: 4,
+  priceMin: null,
+  priceMax: null,
+  gradeYear: '',
+  selfIntroduction: '',
+  certificatesDesc: ''
+})
+
+const step3Rules = {
+  subjects: [{ type: 'array', required: true, min: 1, message: '请至少选择一个科目', trigger: 'change' }],
+  districtList: [{ type: 'array', required: true, min: 1, message: '请至少选择一个区域', trigger: 'change' }],
+  teachingMethod: [{ required: true, message: '请选择授课方式', trigger: 'change' }],
+  selfIntroduction: [
+    { required: true, message: '请填写自我介绍', trigger: 'blur' },
+    { min: 20, message: '自我介绍不少于 20 字', trigger: 'blur' }
+  ]
+}
+
 const handleSubmit = async () => {
-  if (!formRef.value) return
-  const valid = await formRef.value.validate().catch(() => false)
+  if (!step3Ref.value) return
+  const valid = await step3Ref.value.validate().catch(() => false)
   if (!valid) return
-  if (!form.agreed) { agreementError.value = true; ElMessage.warning('请先阅读并同意服务协议'); return }
 
   submitting.value = true
   try {
-    const res = await post('/user/api/users/register/simple', {
-      mobile: form.mobile,
-      password: form.password,
-      code: form.code,
+    // 1. 注册账号
+    const regRes = await post('/user/api/users/register/simple', {
+      mobile: step1.mobile,
+      password: step1.password,
+      code: step1.code,
       userType: 1,
-      realName: form.realName
+      realName: step2.realName
     })
-    if (res.code === 200) {
-      // 注册成功后，如有上传证书则尝试保存（需要先用返回的 token 认证）
-      if (certList.length > 0 && res.data?.token) {
-        const token = res.data.token
-        for (const cert of certList) {
-          if (cert.certType && cert.certName) {
-            try {
-              await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/cert/save`, {
-                method: 'POST',
-                body: { certType: cert.certType, certName: cert.certName, certUrl: cert.certUrl || '', certNo: '' },
-                headers: { 'Content-Type': 'application/json', token }
-              })
-            } catch (e) { /* 证书保存失败不影响注册流程 */ }
-          }
-        }
-      }
-      ElMessage.success('注册成功！审核通过后即可接单。')
-      router.push('/login')
-    } else {
-      ElMessage.error(res.msg || '注册失败，请稍后重试')
+    if (regRes.code !== 200) {
+      ElMessage.error(regRes.msg || '注册失败')
+      submitting.value = false
+      currentStep.value = 1
+      return
     }
+
+    const token = regRes.data?.token
+    if (!token) {
+      ElMessage.error('注册成功但未拿到 token，请登录后手动完善简历')
+      submitting.value = false
+      return
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('token', token)
+    }
+
+    // 2. 调用 tutor-profile/save 补全详细资料
+    const profilePayload = {
+      realName: step2.realName,
+      gender: step2.gender,
+      birthDate: step2.birthDate ? step2.birthDate + '-01' : null,
+      idCard: step2.idCard,
+      tutorType: step2.tutorType,
+      identityDetail: step2.identityDetail,
+      degree: mapDegreeForBackend(step2.degree),
+      university: step2.universityId,
+      major: step2.major,
+      highSchool: step2.highSchool,
+      hometownProvince: step2.hometownProvince,
+      email: step2.email,
+      wechat: step2.wechat,
+      selfIntroduction: step3.selfIntroduction,
+      certificatesDesc: step3.certificatesDesc,
+      teachingMethod: step3.teachingMethod,
+      subjects: step3.subjects.join(','),
+      gradeYear: step3.gradeYear,
+      cityId: cityStore.cityId,
+      districtId: step2.districtId,
+      address: step2.address,
+      priceMin: step3.priceMin || 0,
+      priceMax: step3.priceMax || 0,
+      tags: step3.districtList.join(','),  // 可授课区域暂存 tags
+      freeTrial: 0
+    }
+
+    await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/save`, {
+      method: 'POST',
+      body: profilePayload,
+      headers: { 'Content-Type': 'application/json', token }
+    })
+
+    ElMessage.success('注册成功！资料已提交，审核通过后即可接单。')
+    // 退出登录状态，引导用户重新登录
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('token')
+    }
+    router.push('/login?type=teacher')
   } catch (e) {
+    console.error(e)
     ElMessage.error('网络错误，请稍后重试')
   } finally {
     submitting.value = false
   }
 }
+
+/**
+ * 前端学历选项到后端 degree tinyint 的映射
+ * 1=大专以下, 2=大专, 3=本科, 4=硕士, 5=博士（后端口径）
+ */
+function mapDegreeForBackend(val) {
+  if (val == null) return null
+  if (val === 1 || val === 2) return val
+  if (val === 31 || val === 32) return 3
+  if (val === 41 || val === 42) return 4
+  if (val === 51 || val === 52) return 5
+  return val
+}
+
+onMounted(() => {
+  step1.cityId = cityStore.cityId
+})
 </script>
 
 <style scoped>
 .register-wrapper {
   background: var(--color-bg);
+  min-height: 100vh;
+  padding: 20px 0 60px;
+}
+.reg-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* Banner — 限宽 hero，与 /help 页保持一致 */
-.register-banner {
-  background: linear-gradient(135deg, var(--color-primary, #163B6B), #264e82);
-  color: white;
-  padding: 36px 40px;
-  text-align: center;
-  border-radius: 12px;
-  margin-top: var(--space-xl, 20px);
+/* 顶部 */
+.reg-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px 18px;
 }
-
-.register-banner h1 {
-  font-size: 28px;
+.reg-step-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 3px;
-  margin: 0 0 6px 0;
+  color: #111827;
 }
-
-.register-banner p {
-  font-size: var(--font-size-md);
-  opacity: 0.85;
-  margin: 0;
+.reg-step-title .back {
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  padding: 4px 8px;
 }
+.reg-step-title .back:hover { color: var(--color-primary); }
 
-/* Steps */
-.steps-wrapper {
+.reg-logo { line-height: 0; }
+
+/* 步骤条 */
+.steps-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3xl) 0;
-  gap: 0;
+  padding: 14px 0 26px;
+  gap: 4px;
 }
-
-.step-item {
+.step-dot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 13px;
 }
-
-.step-number {
-  width: 36px;
-  height: 36px;
+.step-dot .dot {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--color-border);
-  color: white;
+  background: #e2e8f0;
+  color: #fff;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-lg);
+  font-size: 14px;
+  transition: background 0.2s;
 }
-
-.step-item.active .step-number {
-  background: var(--color-primary);
-}
-
-.step-text {
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
-}
-
-.step-item.active .step-text {
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
-}
-
+.step-dot.active { color: var(--color-primary, #163B6B); }
+.step-dot.active .dot { background: var(--color-primary, #163B6B); }
 .step-line {
-  width: 80px;
+  width: 56px;
   height: 2px;
-  background: var(--color-border);
-  margin: 0 var(--space-lg);
-  margin-bottom: 22px;
+  background: #e2e8f0;
+  margin: 0 4px 22px;
+  transition: background 0.2s;
 }
+.step-line.active { background: var(--color-primary, #163B6B); }
 
-/* Form */
-.form-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 60px;
+/* 表单面板 */
+.form-panel {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 22px 24px 30px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
 }
+.reg-tip {
+  background: #f8fafc;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.tip-face { margin-right: 6px; }
+.text-orange { color: #f97316; font-weight: 600; }
 
-.form-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2xl) var(--space-3xl);
-  margin-bottom: var(--space-xl);
+:deep(.el-form-item__label) {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f97316;
+  padding-bottom: 4px;
 }
+:deep(.el-form-item) { margin-bottom: 16px; }
 
-.section-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--space-2xl);
-  padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-/* Section optional hint */
-.section-optional {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  font-weight: normal;
-  margin-left: var(--space-sm);
-}
-
-.cert-tip {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-xl) 0;
-  line-height: 1.6;
-}
-.cert-tip strong {
-  color: #2563eb;
-}
-
-.cert-item {
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--color-border-light);
-}
-.cert-item:last-child {
-  border-bottom: none;
-}
-
-.cert-preview {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.cert-file-hint {
+.hint-muted {
   font-size: 12px;
-  color: #999;
-  margin-left: 8px;
+  color: #94a3b8;
+  margin-top: 4px;
 }
 
-/* Code input */
-.code-input-group {
+.code-row {
   display: flex;
   gap: 10px;
   width: 100%;
 }
-.code-input-group .el-input { flex: 1; }
-.code-input-group .el-button { white-space: nowrap; min-width: 120px; }
+.code-row .el-button { min-width: 120px; }
 
-/* Agreement */
+.two-col {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+.two-col .el-input { flex: 1; }
+.two-col .dash { color: #94a3b8; font-size: 14px; }
+.two-col :deep(.el-form-item) { margin-bottom: 0; }
+
 .agreement-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl) var(--space-3xl);
-  margin-bottom: var(--space-xl);
-  transition: all var(--transition-normal);
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: 6px;
+  margin: 6px 0 18px;
+  font-size: 13px;
 }
+.agreement-box.error { background: #fef2f2; border: 1px solid #dc2626; }
+.agreement-box a { color: var(--color-primary); margin: 0 2px; }
 
-.agreement-box.error {
-  border-color: var(--color-error);
-  background: #fef2f2;
-}
-
-.agreement-box a {
-  color: var(--color-primary);
-}
-
-.agreement-box .error-msg {
-  color: var(--color-error);
-  font-size: var(--font-size-xs);
-  margin-top: var(--space-sm);
-  padding-left: 24px;
-}
-
-/* Submit */
-.submit-box {
-  text-align: center;
-  padding: 10px 0 40px;
-}
-
-.submit-btn {
-  width: 320px;
+.next-btn {
+  width: 100%;
   height: 48px;
-  font-size: var(--font-size-lg);
-  border-radius: var(--radius-lg);
+  font-size: 17px;
+  font-weight: 600;
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+.next-btn:hover, .next-btn:focus { background: #ea580c; border-color: #ea580c; color: #fff; }
+
+.prev-btn {
+  height: 48px;
+  font-size: 15px;
+  padding: 0 28px;
 }
 
-.login-tip {
-  margin-top: var(--space-lg);
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
 }
+.btn-row .prev-btn { flex: 0 0 auto; }
+.btn-row .next-btn { flex: 1; }
 
-.login-tip a {
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
+.bottom-tip {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #94a3b8;
 }
+.bottom-tip a { color: var(--color-primary); margin: 0 4px; }
+.bottom-tip .sep { margin: 0 4px; color: #cbd5e1; }
 
-@media (max-width: 768px) {
-  .register-banner {
-    padding: 28px 20px;
-    border-radius: 8px;
-  }
-  .register-banner h1 {
-    font-size: 22px;
-    letter-spacing: 2px;
-  }
-  .form-container {
-    padding: 0 var(--space-md) 40px;
-  }
-  .form-section {
-    padding: var(--space-xl) var(--space-lg);
-  }
-  .agreement-box {
-    padding: var(--space-lg);
-  }
-  .submit-btn {
-    width: 100%;
-  }
-  .step-line {
-    width: 40px;
-  }
-  .steps-wrapper {
-    padding: var(--space-xl) 0;
-  }
+@media (max-width: 640px) {
+  .reg-container { padding: 0 12px; }
+  .form-panel { padding: 16px 14px 22px; }
+  .step-line { width: 30px; }
+  .step-dot span { font-size: 12px; }
 }
 </style>
