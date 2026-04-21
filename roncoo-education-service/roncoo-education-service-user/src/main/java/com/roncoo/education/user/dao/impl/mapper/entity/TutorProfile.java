@@ -86,6 +86,12 @@ public class TutorProfile implements Serializable {
 
     private String hometownProvince;
 
+    private String email;
+
+    private String wechat;
+
+    private String identityDetail;
+
     private String certificatesDesc;
 
     private String salaryRemark;
@@ -418,6 +424,30 @@ public class TutorProfile implements Serializable {
 
     public void setHometownProvince(String hometownProvince) {
         this.hometownProvince = hometownProvince == null ? null : hometownProvince.trim();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
+    }
+
+    public String getWechat() {
+        return wechat;
+    }
+
+    public void setWechat(String wechat) {
+        this.wechat = wechat == null ? null : wechat.trim();
+    }
+
+    public String getIdentityDetail() {
+        return identityDetail;
+    }
+
+    public void setIdentityDetail(String identityDetail) {
+        this.identityDetail = identityDetail == null ? null : identityDetail.trim();
     }
 
     public String getCertificatesDesc() {

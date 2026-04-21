@@ -37,6 +37,9 @@
         <result column="university_id" jdbcType="BIGINT" property="universityId"/>
         <result column="high_school" jdbcType="VARCHAR" property="highSchool"/>
         <result column="hometown_province" jdbcType="VARCHAR" property="hometownProvince"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="wechat" jdbcType="VARCHAR" property="wechat"/>
+        <result column="identity_detail" jdbcType="VARCHAR" property="identityDetail"/>
         <result column="certificates_desc" jdbcType="VARCHAR" property="certificatesDesc"/>
         <result column="salary_remark" jdbcType="VARCHAR" property="salaryRemark"/>
         <result column="is_star" jdbcType="TINYINT" property="isStar"/>
@@ -111,8 +114,8 @@
     </sql>
     <sql id="Base_Column_List">
         id, gmt_create, gmt_modified, status_id, user_id, display_no, real_name, gender, birth_date, avatar,
-        mobile, id_card, tutor_type, degree, university, university_id, major, grade_year,
-        high_school, hometown_province, tags, city_id, district_id, address, latitude, longitude,
+        mobile, id_card, tutor_type, degree, university, university_id, major, grade_year, identity_detail,
+        high_school, hometown_province, email, wechat, tags, city_id, district_id, address, latitude, longitude,
         teaching_method, price_min, price_max, salary_remark, free_trial,
         audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
         login_count, last_login_time
@@ -323,6 +326,15 @@
             <if test="hometownProvince != null">
                 hometown_province,
             </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="wechat != null">
+                wechat,
+            </if>
+            <if test="identityDetail != null">
+                identity_detail,
+            </if>
             <if test="certificatesDesc != null">
                 certificates_desc,
             </if>
@@ -453,6 +465,15 @@
             </if>
             <if test="hometownProvince != null">
                 #{hometownProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="identityDetail != null">
+                #{identityDetail,jdbcType=VARCHAR},
             </if>
             <if test="certificatesDesc != null">
                 #{certificatesDesc,jdbcType=VARCHAR},
@@ -824,6 +845,15 @@
             </if>
             <if test="hometownProvince != null">
                 hometown_province = #{hometownProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="identityDetail != null">
+                identity_detail = #{identityDetail,jdbcType=VARCHAR},
             </if>
             <if test="certificatesDesc != null">
                 certificates_desc = #{certificatesDesc,jdbcType=VARCHAR},

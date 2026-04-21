@@ -75,12 +75,22 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setAvatar(req.getAvatar());
         update.setRealName(req.getRealName());
         update.setGender(req.getGender());
+        update.setBirthDate(req.getBirthDate());
+        update.setIdCard(req.getIdCard());
         update.setTutorType(req.getTutorType());
+        update.setIdentityDetail(req.getIdentityDetail());
         update.setDegree(req.getDegree());
         update.setUniversity(req.getUniversity());
+        update.setUniversityId(req.getUniversityId());
         update.setMajor(req.getMajor());
         update.setGradeYear(req.getGradeYear());
+        update.setHighSchool(req.getHighSchool());
+        update.setHometownProvince(req.getHometownProvince());
+        update.setEmail(req.getEmail());
+        update.setWechat(req.getWechat());
         update.setSelfIntroduction(req.getSelfIntroduction());
+        update.setCertificatesDesc(req.getCertificatesDesc());
+        update.setTeachingMethod(req.getTeachingMethod());
         update.setSubjects(req.getSubjects());
         update.setGrades(req.getGrades());
         update.setTags(req.getTags());
@@ -90,6 +100,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setAddress(req.getAddress());
         update.setPriceMin(req.getPriceMin());
         update.setPriceMax(req.getPriceMax());
+        update.setSalaryRemark(req.getSalaryRemark());
         update.setFreeTrial(req.getFreeTrial());
 
         // 如果之前被驳回，修改后回到草稿状态
