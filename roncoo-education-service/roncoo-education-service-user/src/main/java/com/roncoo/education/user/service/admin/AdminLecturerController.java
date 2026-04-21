@@ -26,8 +26,10 @@ import java.util.List;
 /**
  * ADMIN-讲师信息
  *
+ * @deprecated 家教平台使用 AdminTutorAuditController / AdminTutorController 代替。下一版本删除。
  * @author wujing
  */
+@Deprecated
 @Api(tags = "admin-讲师信息")
 @RestController
 @RequiredArgsConstructor

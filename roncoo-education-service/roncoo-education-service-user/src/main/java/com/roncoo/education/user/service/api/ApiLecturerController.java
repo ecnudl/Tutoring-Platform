@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 /**
  * API-讲师信息
  *
+ * @deprecated 讲师模型来自课程平台模板，家教平台已用 TutorProfile 取代。下一版本物理删除。
  * @author fengyw
  */
 @Api(tags = "api-讲师信息")

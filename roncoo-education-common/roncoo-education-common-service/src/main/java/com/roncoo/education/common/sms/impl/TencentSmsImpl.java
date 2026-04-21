@@ -25,18 +25,31 @@ public class TencentSmsImpl implements SmsFace {
     private static final String DEFAULT_REGION = "ap-guangzhou";
     private static final String ENDPOINT = "sms.tencentcloudapi.com";
 
+    /** 通用键优先，厂商前缀键兜底，任一有值即使用 */
+    private static String pick(String generic, String fallback) {
+        return StrUtil.isNotBlank(generic) ? generic : fallback;
+    }
+
     @Override
     public Boolean sendVerCode(String mobile, String code, Sms sms) {
-        return tencent(mobile, new String[]{code, "5"}, sms.getTencentSmsSignName(), sms.getTencentSmsAuthCode(),
-                sms.getTencentSmsSdkAppId(), sms.getTencentSmsAccessKeyId(), sms.getTencentSmsAccessKeySecret(),
-                sms.getTencentSmsRegion());
+        return tencent(mobile, new String[]{code, "5"},
+                pick(sms.getSmsSignName(), sms.getTencentSmsSignName()),
+                pick(sms.getSmsAuthCode(), sms.getTencentSmsAuthCode()),
+                pick(sms.getSmsSdkAppId(), sms.getTencentSmsSdkAppId()),
+                pick(sms.getSmsSecretId(), sms.getTencentSmsAccessKeyId()),
+                pick(sms.getSmsSecretKey(), sms.getTencentSmsAccessKeySecret()),
+                pick(sms.getSmsRegion(), sms.getTencentSmsRegion()));
     }
 
     @Override
     public Boolean sendPurchaseSuccess(String mobile, String courseName, Long orderNo, Sms sms) {
-        return tencent(mobile, new String[]{courseName, String.valueOf(orderNo)}, sms.getTencentSmsSignName(),
-                sms.getTencentSmsPurchaseCode(), sms.getTencentSmsSdkAppId(), sms.getTencentSmsAccessKeyId(),
-                sms.getTencentSmsAccessKeySecret(), sms.getTencentSmsRegion());
+        return tencent(mobile, new String[]{courseName, String.valueOf(orderNo)},
+                pick(sms.getSmsSignName(), sms.getTencentSmsSignName()),
+                pick(sms.getSmsPurchaseCode(), sms.getTencentSmsPurchaseCode()),
+                pick(sms.getSmsSdkAppId(), sms.getTencentSmsSdkAppId()),
+                pick(sms.getSmsSecretId(), sms.getTencentSmsAccessKeyId()),
+                pick(sms.getSmsSecretKey(), sms.getTencentSmsAccessKeySecret()),
+                pick(sms.getSmsRegion(), sms.getTencentSmsRegion()));
     }
 
     private static Boolean tencent(String phone, String[] templateParams, String signName, String templateId,

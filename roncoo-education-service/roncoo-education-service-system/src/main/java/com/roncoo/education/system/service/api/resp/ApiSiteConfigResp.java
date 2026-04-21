@@ -56,4 +56,11 @@ public class ApiSiteConfigResp implements Serializable {
 
     // 结构化家教价格（4 大类 × 若干表）
     private String sitePricingData;
+
+    // 网站元数据（用于 <title>, <meta name=description/keywords>）
+    private String websiteTitle;
+    private String websiteDesc;
+    private String websiteKeyword;
+    private String websiteCopyright;
+    private String websiteDomain;
 }

@@ -25,8 +25,10 @@ import jakarta.validation.constraints.NotNull;
 /**
  * 用户基本信息
  *
+ * @deprecated 家教平台使用 TutorProfile，Lecturer 是课程平台遗留模型。下一版本删除。
  * @author fengyw
  */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"user"})

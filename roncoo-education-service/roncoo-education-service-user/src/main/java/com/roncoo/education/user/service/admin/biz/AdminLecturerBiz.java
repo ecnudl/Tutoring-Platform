@@ -23,8 +23,10 @@ import jakarta.validation.constraints.NotNull;
 /**
  * ADMIN-讲师信息
  *
+ * @deprecated 家教平台使用 TutorProfile + AdminTutorAuditBiz/AdminTutorBiz，Lecturer 为课程平台遗留。下一版本删除。
  * @author wujing
  */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class AdminLecturerBiz extends BaseBiz {
