@@ -382,9 +382,9 @@ const loadAnnouncements = async () => {
 
 // 轮播图数据
 const slides = ref([
-  { id: 1, title: '专业家教上门辅导', imageUrl: '', link: '/qjj' },
-  { id: 2, title: '优质教员等你来', imageUrl: '', link: '/jy' },
-  { id: 3, title: '新学期辅导计划', imageUrl: '', link: '/qjj' }
+  { id: 1, title: '专业家教上门辅导', imageUrl: '/banners/banner-1.jpg', link: '/qjj' },
+  { id: 2, title: '优质教员等你来', imageUrl: '/banners/banner-2.jpg', link: '/jy' },
+  { id: 3, title: '新学期辅导计划', imageUrl: '/banners/banner-3.jpg', link: '/qjj' }
 ])
 
 const cities = CITY_LIST
