@@ -4,9 +4,7 @@
 
   <el-alert
     v-if="!userStore.isTutor"
-    type="info"
-    show-icon
-    :closable="false"
+    type="info" show-icon :closable="false"
     style="margin-bottom:16px"
     title="证件认证仅对教员账号开放"
     description="当前账号是家长/学员，没有教员资料。若你是教员，请用教员账号登录后再上传证件。"
@@ -25,21 +23,19 @@
       <div class="cert-label">
         <div class="cert-label-title">{{ slot.title }}</div>
         <div :class="['cert-label-hint', slot.required ? 'is-required' : '']">{{ slot.hint }}</div>
-        <div v-if="slotMap[slot.certType]" class="cert-status">
-          <el-tag size="small" :type="auditTagType(slotMap[slot.certType].auditStatus)">
-            {{ auditStatusLabel(slotMap[slot.certType].auditStatus) }}
-          </el-tag>
-          <span v-if="slotMap[slot.certType].auditRemark" class="cert-remark">
+        <div class="cert-status" v-if="statusOf(slot.certType)">
+          <el-tag size="small" :type="statusOf(slot.certType).tag">{{ statusOf(slot.certType).label }}</el-tag>
+          <span v-if="slotMap[slot.certType]?.auditRemark" class="cert-remark">
             备注：{{ slotMap[slot.certType].auditRemark }}
           </span>
         </div>
       </div>
 
       <div class="cert-action">
-        <div v-if="slotMap[slot.certType]?.certUrl" class="cert-preview">
+        <div v-if="previewOf(slot.certType)" class="cert-preview">
           <el-image
-            :src="slotMap[slot.certType].certUrl"
-            :preview-src-list="[slotMap[slot.certType].certUrl]"
+            :src="previewOf(slot.certType)"
+            :preview-src-list="[previewOf(slot.certType)]"
             fit="cover"
             class="cert-image"
           />
@@ -56,40 +52,64 @@
             />
           </label>
           <div class="upload-btn-text">
-            {{ slotMap[slot.certType]?.certUrl ? '重新上传' : '上传' }}
+            {{ previewOf(slot.certType) ? '重新上传' : '上传' }}
           </div>
         </div>
       </div>
     </div>
   </el-card>
+
+  <div class="submit-bar" v-if="userStore.isTutor">
+    <div class="submit-hint">
+      <template v-if="pendingCount > 0">
+        有 <strong>{{ pendingCount }}</strong> 个槽位已更新但<strong class="text-warn">尚未提交</strong>，点击右侧按钮提交审核。
+      </template>
+      <template v-else-if="hasCommitted">
+        暂无待提交的更新。证件已在后台审核。
+      </template>
+      <template v-else>
+        请至少上传必填证件（身份证正反面）后再提交审核。
+      </template>
+    </div>
+    <el-button
+      type="primary"
+      :disabled="pendingCount === 0"
+      :loading="submitting"
+      @click="submitAll"
+    >
+      提交审核{{ pendingCount > 0 ? `（${pendingCount}）` : '' }}
+    </el-button>
+  </div>
 </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, InfoFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-const userStore = useUserStore()
 
 definePageMeta({
   layout: 'center',
   middleware: 'auth'
 })
 
+const userStore = useUserStore()
 const { get, post } = useApi()
 const config = useRuntimeConfig()
 
 const slots = [
-  { certType: 1, title: '身份证正面/护照', hint: '(必填)',                                     required: true  },
-  { certType: 2, title: '身份证反面',       hint: '(必填)',                                     required: true  },
-  { certType: 3, title: '学生证/毕业证',    hint: '(大学生必填，请上传带名字内容的那一页)',    required: false },
-  { certType: 4, title: '教师资格证',       hint: '(专业老师必填)',                             required: false },
-  { certType: 5, title: '其他身份证件',     hint: '(选填)',                                     required: false },
+  { certType: 1, title: '身份证正面/护照', hint: '(必填)',                                 required: true  },
+  { certType: 2, title: '身份证反面',       hint: '(必填)',                                 required: true  },
+  { certType: 3, title: '学生证/毕业证',    hint: '(大学生必填，请上传带名字内容的那一页)', required: false },
+  { certType: 4, title: '教师资格证',       hint: '(专业老师必填)',                         required: false },
+  { certType: 5, title: '其他身份证件',     hint: '(选填)',                                 required: false },
 ]
 
-const certs = ref([])
+const certs = ref([])                    // 后端已保存的证件
+const pending = reactive({})             // { certType: url } 已上传到 MinIO 但还没提交后端
 const uploading = reactive([false, false, false, false, false])
+const submitting = ref(false)
 
 const slotMap = computed(() => {
   const m = {}
@@ -97,8 +117,19 @@ const slotMap = computed(() => {
   return m
 })
 
-const auditStatusLabel = (s) => ({ 0: '待审核', 1: '已通过', 2: '已驳回' }[s] ?? '未审核')
-const auditTagType = (s) => ({ 0: 'warning', 1: 'success', 2: 'danger' }[s] ?? 'info')
+const previewOf = (ct) => pending[ct] || slotMap.value[ct]?.certUrl || ''
+
+const pendingCount = computed(() => Object.keys(pending).length)
+const hasCommitted = computed(() => certs.value.length > 0)
+
+// 槽位显示状态：优先显示本地待提交，否则显示后端审核状态
+const statusOf = (ct) => {
+  if (pending[ct]) return { label: '待提交', tag: 'info' }
+  const c = slotMap.value[ct]
+  if (!c) return null
+  const map = { 0: { label: '待审核', tag: 'warning' }, 1: { label: '已通过', tag: 'success' }, 2: { label: '已驳回', tag: 'danger' } }
+  return map[c.auditStatus] || null
+}
 
 const loadCerts = async () => {
   try {
@@ -118,39 +149,70 @@ const uploadImage = async (file) => {
   throw new Error(res.msg || '上传失败')
 }
 
-const saveCert = async (slot, url) => {
-  return post('/user/auth/tutor-profile/cert/save', {
-    certType: slot.certType,
-    certName: slot.title,
-    certUrl: url,
-    certNo: ''
-  })
-}
-
 const handleUpload = async (e, slot) => {
   const file = e.target.files?.[0]
   e.target.value = ''
   if (!file) return
-
-  const isImg = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.type)
-  if (!isImg)               { ElMessage.error('只能上传图片格式'); return }
+  if (!/^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.type)) { ElMessage.error('只能上传图片'); return }
   if (file.size > 10 * 1024 * 1024) { ElMessage.error('图片不能超过 10MB'); return }
 
   const idx = slots.findIndex(s => s.certType === slot.certType)
   uploading[idx] = true
   try {
     const url = await uploadImage(file)
-    const saveRes = await saveCert(slot, url)
-    if (saveRes.code === 200) {
-      ElMessage.success(saveRes.msg || '上传成功，等待审核')
-      await loadCerts()
-    } else {
-      ElMessage.error(saveRes.msg || '保存失败')
-    }
+    pending[slot.certType] = url
+    ElMessage.success('图片已就绪，点击下方提交审核完成提交')
   } catch (err) {
-    ElMessage.error(err?.message || '上传失败，请重试')
+    ElMessage.error(err?.message || '上传失败')
   } finally {
     uploading[idx] = false
+  }
+}
+
+const submitAll = async () => {
+  if (pendingCount.value === 0) return
+  // 若是首次提交，必填（身份证正反面）若仍空则提醒
+  const missingRequired = slots
+    .filter(s => s.required)
+    .filter(s => !previewOf(s.certType))
+    .map(s => s.title)
+  if (missingRequired.length > 0) {
+    try {
+      await ElMessageBox.confirm(
+        `还缺少必填证件：${missingRequired.join('、')}，确定要继续仅提交当前已上传的证件吗？`,
+        '提示', { confirmButtonText: '继续提交', cancelButtonText: '返回补充', type: 'warning' }
+      )
+    } catch { return }
+  }
+
+  submitting.value = true
+  try {
+    const entries = Object.entries(pending)
+    let okCount = 0
+    for (const [certTypeStr, url] of entries) {
+      const ct = Number(certTypeStr)
+      const title = slots.find(s => s.certType === ct)?.title || '证件'
+      const res = await post('/user/auth/tutor-profile/cert/save', {
+        certType: ct,
+        certName: title,
+        certUrl: url,
+        certNo: ''
+      })
+      if (res.code === 200) {
+        okCount++
+        delete pending[ct]
+      } else {
+        ElMessage.error(`${title}提交失败：${res.msg || '未知错误'}`)
+      }
+    }
+    if (okCount > 0) {
+      ElMessage.success(`已提交 ${okCount} 项，等待管理员审核`)
+      await loadCerts()
+    }
+  } catch (e) {
+    ElMessage.error('网络错误，请稍后重试')
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -192,16 +254,14 @@ onMounted(() => { if (userStore.isTutor) loadCerts() })
 .cert-remark { font-size: 12px; color: #6b7280; }
 
 .cert-action { display: flex; align-items: center; gap: 16px; }
-
 .cert-preview .cert-image {
   width: 140px; height: 100px; border-radius: 6px;
   border: 1px solid #e5e7eb; cursor: zoom-in;
 }
 
-.cert-upload-slot {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-.upload-btn { position: relative;
+.cert-upload-slot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.upload-btn {
+  position: relative;
   width: 100px; height: 100px;
   border: 1px dashed #d9d9d9; border-radius: 6px; background: #fff;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -217,8 +277,18 @@ onMounted(() => { if (userStore.isTutor) loadCerts() })
 .upload-btn.disabled .upload-input { cursor: not-allowed; pointer-events: none; }
 .upload-btn-text { font-size: 12px; color: #9ca3af; }
 
+.submit-bar {
+  margin-top: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+}
+.submit-hint { font-size: 14px; color: #374151; }
+.text-warn { color: #ea580c; }
+
 @media (max-width: 768px) {
   .cert-row { flex-direction: column; align-items: stretch; }
   .cert-action { justify-content: flex-start; }
+  .submit-bar { flex-direction: column; gap: 12px; align-items: stretch; }
 }
 </style>
