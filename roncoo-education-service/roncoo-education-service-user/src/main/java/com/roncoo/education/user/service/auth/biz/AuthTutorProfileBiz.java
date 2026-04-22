@@ -174,6 +174,15 @@ public class AuthTutorProfileBiz extends BaseBiz {
     /**
      * 保存证书
      */
+    // 证书类型的默认名称（前端统一展示，这里兜底避免 certName 为空）
+    private static final java.util.Map<Integer, String> CERT_TYPE_DEFAULT_NAME = java.util.Map.of(
+            1, "身份证正面",
+            2, "身份证反面",
+            3, "学生证/毕业证",
+            4, "教师资格证",
+            5, "其他身份证件"
+    );
+
     public Result<String> certSave(AuthCertSaveReq req) {
         Long userId = ThreadContext.userId();
         Result<String> check = checkTutor(userId);
@@ -187,14 +196,34 @@ public class AuthTutorProfileBiz extends BaseBiz {
         if (req.getCertType() == null) {
             return Result.error("证书类型不能为空");
         }
-        if (!StringUtils.hasText(req.getCertName())) {
-            return Result.error("证书名称不能为空");
+
+        // certName 缺省时用固定类型名兜底
+        String certName = StringUtils.hasText(req.getCertName())
+                ? req.getCertName()
+                : CERT_TYPE_DEFAULT_NAME.getOrDefault(req.getCertType(), "认证证件");
+
+        // 5 个固定槽位的 certType（1~5），同一个教员同一个类型只保留一条记录 → upsert
+        java.util.List<TutorCertification> existing = tutorCertificationDao.listByTutorId(profile.getId());
+        TutorCertification same = existing.stream()
+                .filter(c -> req.getCertType().equals(c.getCertType()))
+                .findFirst()
+                .orElse(null);
+        if (same != null) {
+            TutorCertification update = new TutorCertification();
+            update.setId(same.getId());
+            update.setCertName(certName);
+            update.setCertUrl(req.getCertUrl());
+            update.setCertNo(req.getCertNo());
+            update.setAuditStatus(0); // 重新上传后重置为待审核
+            update.setAuditRemark(null);
+            tutorCertificationDao.updateById(update);
+            return Result.success("证书已更新，等待重新审核");
         }
 
         TutorCertification cert = new TutorCertification();
         cert.setTutorId(profile.getId());
         cert.setCertType(req.getCertType());
-        cert.setCertName(req.getCertName());
+        cert.setCertName(certName);
         cert.setCertUrl(req.getCertUrl());
         cert.setCertNo(req.getCertNo());
         cert.setAuditStatus(0); // 待审核

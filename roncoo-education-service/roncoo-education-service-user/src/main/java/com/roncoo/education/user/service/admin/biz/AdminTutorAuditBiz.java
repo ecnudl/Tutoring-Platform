@@ -145,6 +145,71 @@ public class AdminTutorAuditBiz extends BaseBiz {
     }
 
     /**
+     * 证件审核通过：将某一个证件置为通过，并重建 tutor_profile.is_verified
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> certApprove(Map<String, Object> req) {
+        Long certId = req.get("id") != null ? Long.parseLong(req.get("id").toString()) : null;
+        String remark = req.get("auditRemark") != null ? req.get("auditRemark").toString() : "";
+        if (certId == null) {
+            return Result.error("id不能为空");
+        }
+        TutorCertification cert = tutorCertificationDao.getById(certId);
+        if (cert == null) {
+            return Result.error("证件不存在");
+        }
+        TutorCertification update = new TutorCertification();
+        update.setId(certId);
+        update.setAuditStatus(1);
+        update.setAuditRemark(remark);
+        tutorCertificationDao.updateById(update);
+
+        refreshTutorVerified(cert.getTutorId());
+        return Result.success("证件已通过");
+    }
+
+    /**
+     * 证件审核驳回
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> certReject(Map<String, Object> req) {
+        Long certId = req.get("id") != null ? Long.parseLong(req.get("id").toString()) : null;
+        String remark = req.get("auditRemark") != null ? req.get("auditRemark").toString() : "";
+        if (certId == null) {
+            return Result.error("id不能为空");
+        }
+        if (!StringUtils.hasText(remark)) {
+            return Result.error("驳回原因不能为空");
+        }
+        TutorCertification cert = tutorCertificationDao.getById(certId);
+        if (cert == null) {
+            return Result.error("证件不存在");
+        }
+        TutorCertification update = new TutorCertification();
+        update.setId(certId);
+        update.setAuditStatus(2);
+        update.setAuditRemark(remark);
+        tutorCertificationDao.updateById(update);
+
+        refreshTutorVerified(cert.getTutorId());
+        return Result.success("证件已驳回");
+    }
+
+    /**
+     * 根据教员当前证件状态，重建 is_verified：
+     * 身份证正面(1) + 身份证反面(2) 两张都已审核通过(auditStatus=1)，才算证件已认证。
+     */
+    private void refreshTutorVerified(Long tutorId) {
+        List<TutorCertification> list = tutorCertificationDao.listByTutorId(tutorId);
+        boolean idFrontOk = list.stream().anyMatch(c -> Integer.valueOf(1).equals(c.getCertType()) && Integer.valueOf(1).equals(c.getAuditStatus()));
+        boolean idBackOk  = list.stream().anyMatch(c -> Integer.valueOf(2).equals(c.getCertType()) && Integer.valueOf(1).equals(c.getAuditStatus()));
+        TutorProfile update = new TutorProfile();
+        update.setId(tutorId);
+        update.setIsVerified(idFrontOk && idBackOk ? 1 : 0);
+        tutorProfileDao.updateById(update);
+    }
+
+    /**
      * 保存审核记录
      */
     private void saveAuditRecord(Long tutorId, Integer auditAction, String remark) {
