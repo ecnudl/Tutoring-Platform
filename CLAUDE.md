@@ -13,6 +13,19 @@
 - Nuxt 3 (SSR 模式) + Vue 3 + Element Plus + Pinia
 - 构建产物: `.output/server/index.mjs`，监听端口 3000
 
+## 运行架构
+
+所有后端服务都由 systemd 管理（`Restart=on-failure`、开机自启）：
+
+| 服务 | unit | 端口 | 说明 |
+|---|---|---|---|
+| Nuxt 前端 | `roncoo-web.service` | 3000 | 本项目 |
+| Gateway | `roncoo-gateway.service` | 7700 | Spring Cloud Gateway |
+| user-service | `roncoo-user.service` | 7720 | 用户/注册/短信 API |
+| system-service | `roncoo-system.service` | 7710 | 系统配置 API |
+
+依赖组件 (Docker 容器，`restart=unless-stopped`)：`tutor-nacos`、`tutor-mysql`、`tutor-redis`、`tutor-minio`。
+
 ## 工作流程
 
 每次修改源码后，必须按顺序完成以下三步：**提交 → 构建 → 重启**。
@@ -38,22 +51,34 @@ rt -p 591jiajiao exec --bg --name nuxt-build "cd /home/ubuntu/roncoo-education-w
 rt -p 591jiajiao logs rt_591jiajiao_bg_nuxt-build
 ```
 
-### 3. 重启服务
-
-找到旧进程并重启：
+### 3. 重启服务（systemd 管控）
 
 ```bash
-rt -p 591jiajiao exec "ps aux | grep 'index.mjs' | grep -v grep"
-rt -p 591jiajiao exec "kill <旧PID> && sleep 1 && cd /home/ubuntu/roncoo-education-web && nohup node .output/server/index.mjs > /home/ubuntu/logs/nuxt-web.log 2>&1 & echo 'started'"
+rt -p 591jiajiao exec "sudo systemctl restart roncoo-web"
+rt -p 591jiajiao exec "sudo systemctl status roncoo-web --no-pager"
 ```
 
-确认启动成功：
+或查看日志确认启动：
 
 ```bash
-rt -p 591jiajiao exec "cat /home/ubuntu/logs/nuxt-web.log"
+rt -p 591jiajiao exec "tail -20 /home/ubuntu/logs/nuxt-web.log"
 ```
 
 看到 `Listening on http://[::]:3000` 即表示成功，刷新网页查看效果。
+
+## 后端服务常用运维
+
+```bash
+# 查看全部 roncoo-* 单元状态
+rt -p 591jiajiao exec "sudo systemctl list-units 'roncoo-*' --no-pager"
+# 重启单个或全部
+rt -p 591jiajiao exec "sudo systemctl restart roncoo-user"
+rt -p 591jiajiao exec "sudo systemctl restart 'roncoo-*'"
+# 跟随日志
+rt -p 591jiajiao exec "tail -f /home/ubuntu/logs/user-service.log"
+```
+
+systemd unit 文件位于 `/etc/systemd/system/roncoo-{web,gateway,user,system}.service`。
 
 ## 项目结构（关键目录）
 
