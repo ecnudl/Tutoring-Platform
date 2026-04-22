@@ -1,107 +1,93 @@
 <template>
 <div>
-  <h2 class="page-title">资质证书</h2>
+  <h2 class="page-title">证件认证</h2>
 
-  <!-- 新增证书表单 -->
-  <el-card style="margin-bottom:20px">
-    <h4 style="margin-bottom:12px">添加证书</h4>
-    <el-form :model="certForm" label-width="80px">
-      <el-form-item label="类型">
-        <el-select v-model="certForm.certType" placeholder="证书类型" style="width:200px">
-          <el-option label="身份证" :value="1" />
-          <el-option label="学生证" :value="2" />
-          <el-option label="教师资格证" :value="3" />
-          <el-option label="学历证" :value="4" />
-          <el-option label="其他" :value="5" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="名称">
-        <el-input v-model="certForm.certName" placeholder="证书名称" style="width:200px" />
-      </el-form-item>
-      <el-form-item label="编号">
-        <el-input v-model="certForm.certNo" placeholder="证书编号(选填)" style="width:200px" />
-      </el-form-item>
-      <el-form-item label="证书照片">
-        <div>
-          <div v-if="certForm.certUrl" style="margin-bottom:8px">
-            <el-image :src="certForm.certUrl" style="width:200px;height:140px;border-radius:4px" fit="cover" :preview-src-list="[certForm.certUrl]" />
-            <el-button size="small" type="danger" style="margin-left:8px" @click="certForm.certUrl = ''">移除</el-button>
-          </div>
-          <div v-else>
-            <input type="file" ref="certFileInput" accept="image/*" style="display:none" @change="handleCertUpload" />
-            <el-button size="small" :loading="uploadingCert" @click="$refs.certFileInput.click()">上传证书照片</el-button>
-            <span style="font-size:12px;color:#999;margin-left:8px">支持 jpg/png，最大5MB</span>
+  <div class="cert-tip">
+    <el-icon :size="18" color="#f59e0b"><InfoFilled /></el-icon>
+    <span>
+      <strong>认证通过</strong>将获得 <span class="verified-chip">√ 证件已认证</span> 标识，大大提升<strong>家长信任度</strong>，
+      本站也将<strong>优先推荐</strong>。上传图片仅用于后台审核，<strong>严格保护隐私</strong>。
+    </span>
+  </div>
+
+  <el-card class="cert-card">
+    <div v-for="(slot, idx) in slots" :key="slot.certType" class="cert-row">
+      <div class="cert-label">
+        <div class="cert-label-title">{{ slot.title }}</div>
+        <div :class="['cert-label-hint', slot.required ? 'is-required' : '']">{{ slot.hint }}</div>
+        <div v-if="slotMap[slot.certType]" class="cert-status">
+          <el-tag size="small" :type="auditTagType(slotMap[slot.certType].auditStatus)">
+            {{ auditStatusLabel(slotMap[slot.certType].auditStatus) }}
+          </el-tag>
+          <span v-if="slotMap[slot.certType].auditRemark" class="cert-remark">
+            备注：{{ slotMap[slot.certType].auditRemark }}
+          </span>
+        </div>
+      </div>
+
+      <div class="cert-action">
+        <div v-if="slotMap[slot.certType]?.certUrl" class="cert-preview">
+          <el-image
+            :src="slotMap[slot.certType].certUrl"
+            :preview-src-list="[slotMap[slot.certType].certUrl]"
+            fit="cover"
+            class="cert-image"
+          />
+        </div>
+        <div class="cert-upload-slot" v-loading="uploading[idx]">
+          <input
+            type="file"
+            :ref="el => fileInputs[idx] = el"
+            accept="image/*"
+            style="display:none"
+            @change="e => handleUpload(e, slot)"
+          />
+          <button class="upload-btn" @click="fileInputs[idx]?.click()">
+            <el-icon :size="28" color="#ef4444"><Plus /></el-icon>
+          </button>
+          <div class="upload-btn-text">
+            {{ slotMap[slot.certType]?.certUrl ? '重新上传' : '上传' }}
           </div>
         </div>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" :loading="adding" @click="handleAdd">添加证书</el-button>
-      </el-form-item>
-    </el-form>
+      </div>
+    </div>
   </el-card>
-
-  <!-- 证书列表 -->
-  <el-table :data="certs" border stripe empty-text="暂无证书记录">
-    <el-table-column label="类型" width="120">
-      <template #default="{ row }">{{ certTypeLabel(row.certType) }}</template>
-    </el-table-column>
-    <el-table-column prop="certName" label="证书名称" />
-    <el-table-column prop="certNo" label="证书编号" />
-    <el-table-column label="证书照片" width="120">
-      <template #default="{ row }">
-        <el-image v-if="row.certUrl" :src="row.certUrl" style="width:60px;height:40px" fit="cover" :preview-src-list="[row.certUrl]" />
-        <span v-else style="color:#999">未上传</span>
-      </template>
-    </el-table-column>
-    <el-table-column label="操作" width="100">
-      <template #default="{ row }">
-        <el-popconfirm title="确定删除？" @confirm="handleDelete(row.id)">
-          <template #reference>
-            <el-button size="small" type="danger">删除</el-button>
-          </template>
-        </el-popconfirm>
-      </template>
-    </el-table-column>
-  </el-table>
 </div>
 </template>
+
 <script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ref, onMounted } from 'vue'
+import { Plus, InfoFilled } from '@element-plus/icons-vue'
 
 definePageMeta({
   layout: 'center',
   middleware: 'auth'
 })
-const { get, post, del } = useApi()
+
+const { get, post } = useApi()
 const config = useRuntimeConfig()
 
+const slots = [
+  { certType: 1, title: '身份证正面/护照', hint: '(必填)',                                     required: true  },
+  { certType: 2, title: '身份证反面',       hint: '(必填)',                                     required: true  },
+  { certType: 3, title: '学生证/毕业证',    hint: '(大学生必填，请上传带名字内容的那一页)',    required: false },
+  { certType: 4, title: '教师资格证',       hint: '(专业老师必填)',                             required: false },
+  { certType: 5, title: '其他身份证件',     hint: '(选填)',                                     required: false },
+]
+
 const certs = ref([])
-const certForm = ref({ certType: null, certName: '', certNo: '', certUrl: '' })
-const adding = ref(false)
-const uploadingCert = ref(false)
+const uploading = reactive([false, false, false, false, false])
+const fileInputs = reactive([])
 
-const certTypeLabel = (t) => ({ 1:'身份证', 2:'学生证', 3:'教师资格证', 4:'学历证', 5:'其他' }[t] || '未知')
+const slotMap = computed(() => {
+  const m = {}
+  for (const c of certs.value) m[c.certType] = c
+  return m
+})
 
-const handleCertUpload = async (e) => {
-  const file = e.target.files[0]
-  if (!file) return
-  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片不能超过5MB'); return }
-  uploadingCert.value = true
-  try {
-    const fd = new FormData()
-    fd.append('picFile', file)
-    const token = localStorage.getItem('token')
-    const res = await $fetch(`${config.public.apiBase}/system/auth/upload/pic`, {
-      method: 'POST', body: fd, headers: { token }
-    })
-    if (res.code === 200 && res.data) {
-      certForm.value.certUrl = res.data
-      ElMessage.success('照片上传成功')
-    } else { ElMessage.error(res.msg || '上传失败') }
-  } catch (err) { ElMessage.error('上传失败，请重试') }
-  finally { uploadingCert.value = false; e.target.value = '' }
-}
+const auditStatusLabel = (s) => ({ 0: '待审核', 1: '已通过', 2: '已驳回' }[s] ?? '未审核')
+const auditTagType = (s) => ({ 0: 'warning', 1: 'success', 2: 'danger' }[s] ?? 'info')
 
 const loadCerts = async () => {
   try {
@@ -110,35 +96,111 @@ const loadCerts = async () => {
   } catch (e) { console.error(e) }
 }
 
-const handleAdd = async () => {
-  if (!certForm.value.certType) { ElMessage.warning('请选择证书类型'); return }
-  if (!certForm.value.certName) { ElMessage.warning('请输入证书名称'); return }
-  adding.value = true
-  try {
-    const res = await post('/user/auth/tutor-profile/cert/save', certForm.value)
-    if (res.code === 200) {
-      ElMessage.success('添加成功')
-      certForm.value = { certType: null, certName: '', certNo: '', certUrl: '' }
-      await loadCerts()
-    } else { ElMessage.error(res.msg || '添加失败') }
-  } catch (e) { ElMessage.error('网络错误') }
-  finally { adding.value = false }
+const uploadImage = async (file) => {
+  const fd = new FormData()
+  fd.append('picFile', file)
+  const token = localStorage.getItem('token')
+  const res = await $fetch(`${config.public.apiBase}/system/auth/upload/pic`, {
+    method: 'POST', body: fd, headers: { token }
+  })
+  if (res.code === 200 && res.data) return res.data
+  throw new Error(res.msg || '上传失败')
 }
 
-const handleDelete = async (id) => {
-  try {
-    const res = await del('/user/auth/tutor-profile/cert/delete', { id })
-    if (res.code === 200) {
-      ElMessage.success('删除成功')
-      await loadCerts()
-    } else { ElMessage.error(res.msg || '删除失败') }
-  } catch (e) { ElMessage.error('网络错误') }
+const saveCert = async (slot, url) => {
+  return post('/user/auth/tutor-profile/cert/save', {
+    certType: slot.certType,
+    certName: slot.title,
+    certUrl: url,
+    certNo: ''
+  })
 }
 
-onMounted(() => { loadCerts() })
+const handleUpload = async (e, slot) => {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (!file) return
+
+  const isImg = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.type)
+  if (!isImg)               { ElMessage.error('只能上传图片格式'); return }
+  if (file.size > 10 * 1024 * 1024) { ElMessage.error('图片不能超过 10MB'); return }
+
+  const idx = slots.findIndex(s => s.certType === slot.certType)
+  uploading[idx] = true
+  try {
+    const url = await uploadImage(file)
+    const saveRes = await saveCert(slot, url)
+    if (saveRes.code === 200) {
+      ElMessage.success(saveRes.msg || '上传成功，等待审核')
+      await loadCerts()
+    } else {
+      ElMessage.error(saveRes.msg || '保存失败')
+    }
+  } catch (err) {
+    ElMessage.error(err?.message || '上传失败，请重试')
+  } finally {
+    uploading[idx] = false
+  }
+}
+
+onMounted(loadCerts)
 </script>
+
 <style scoped>
+.page-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #111827; }
+
+.cert-tip {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: #fff8e6; border: 1px solid #fde68a;
+  padding: 12px 14px; border-radius: 8px;
+  font-size: 14px; line-height: 1.7; color: #374151;
+  margin-bottom: 20px;
+}
+.cert-tip strong { color: #ea580c; }
+.verified-chip {
+  display: inline-block; padding: 1px 6px;
+  border: 1px solid #ea580c; color: #ea580c; background: #fff;
+  border-radius: 4px; font-weight: 600; margin: 0 2px;
+}
+
+.cert-card { padding: 8px 4px; }
+
+.cert-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 24px; padding: 20px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.cert-row:last-child { border-bottom: none; }
+
+.cert-label { flex: 1; min-width: 180px; }
+.cert-label-title { font-size: 16px; font-weight: 600; color: #111827; }
+.cert-label-hint  { font-size: 13px; color: #6b7280; margin-top: 4px; }
+.cert-label-hint.is-required { color: #dc2626; }
+
+.cert-status { margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cert-remark { font-size: 12px; color: #6b7280; }
+
+.cert-action { display: flex; align-items: center; gap: 16px; }
+
+.cert-preview .cert-image {
+  width: 140px; height: 100px; border-radius: 6px;
+  border: 1px solid #e5e7eb; cursor: zoom-in;
+}
+
+.cert-upload-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.upload-btn {
+  width: 100px; height: 100px;
+  border: 1px dashed #d9d9d9; border-radius: 6px; background: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+}
+.upload-btn:hover { border-color: #409eff; }
+.upload-btn-text { font-size: 12px; color: #9ca3af; }
+
 @media (max-width: 768px) {
-  .el-table { font-size: 13px; }
+  .cert-row { flex-direction: column; align-items: stretch; }
+  .cert-action { justify-content: flex-start; }
 }
 </style>
