@@ -89,6 +89,12 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="操作" width="160">
+            <template #default="{ row }">
+              <el-button size="small" type="success" :disabled="row.auditStatus === 1" @click="certApprove(row)">通过</el-button>
+              <el-button size="small" type="danger" :disabled="row.auditStatus === 2" @click="certReject(row)">驳回</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <div v-else style="margin-top:16px;color:#999;font-size:13px">暂无资质证书</div>
@@ -113,7 +119,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { post, get, put } from '@/api/index'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const keyword = ref('')
 const auditStatus = ref(1)
@@ -126,7 +132,7 @@ const detailVisible = ref(false)
 const detail = ref<any>(null)
 const detailCerts = ref<any[]>([])
 
-const certTypeLabel = (t: number) => ({ 1:'身份证', 2:'学生证', 3:'教师资格证', 4:'学历证', 5:'其他' }[t] || '未知')
+const certTypeLabel = (t: number) => ({ 1:'身份证正面', 2:'身份证反面', 3:'学生证/毕业证', 4:'教师资格证', 5:'其他身份证件' }[t] || '未知')
 
 const auditVisible = ref(false)
 const auditAction = ref('')
@@ -177,6 +183,32 @@ const handleAudit = (row: any, action: string) => {
   auditAction.value = action
   auditRemark.value = ''
   auditVisible.value = true
+}
+
+const certApprove = async (row) => {
+  try {
+    const res = await put('/user/admin/tutor-audit/cert/approve', { id: row.id, auditRemark: '' })
+    if (res.code === 200) {
+      ElMessage.success(res.msg || '已通过')
+      if (detail.value) { const cr = await get('/user/admin/tutor-audit/cert/list', { tutorId: detail.value.id }); if (cr.code === 200) detailCerts.value = cr.data || [] }
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (e) { ElMessage.error('网络错误') }
+}
+const certReject = async (row) => {
+  try {
+    const { value } = await ElMessageBox.prompt('请输入驳回原因', '驳回证件', { confirmButtonText: '确认驳回', cancelButtonText: '取消', inputPattern: /.+/, inputErrorMessage: '驳回原因不能为空' })
+    const res = await put('/user/admin/tutor-audit/cert/reject', { id: row.id, auditRemark: value })
+    if (res.code === 200) {
+      ElMessage.success(res.msg || '已驳回')
+      if (detail.value) { const cr = await get('/user/admin/tutor-audit/cert/list', { tutorId: detail.value.id }); if (cr.code === 200) detailCerts.value = cr.data || [] }
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (e) {
+    if (e !== 'cancel') ElMessage.error('操作失败')
+  }
 }
 
 const submitAudit = async () => {
