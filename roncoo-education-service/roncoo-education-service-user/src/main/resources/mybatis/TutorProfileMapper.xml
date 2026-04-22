@@ -46,6 +46,8 @@
         <result column="is_verified" jdbcType="TINYINT" property="isVerified"/>
         <result column="login_count" jdbcType="INTEGER" property="loginCount"/>
         <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="subjects" jdbcType="VARCHAR" property="subjects"/>
+        <result column="grades" jdbcType="VARCHAR" property="grades"/>
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
                type="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -118,6 +120,7 @@
         high_school, hometown_province, email, wechat, tags, city_id, district_id, address, latitude, longitude,
         teaching_method, price_min, price_max, salary_remark, free_trial,
         audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
+        subjects, grades,
         login_count, last_login_time
     </sql>
     <sql id="Blob_Column_List">
@@ -556,6 +559,12 @@
             <if test="record.tags != null">
                 tags = #{record.tags,jdbcType=VARCHAR},
             </if>
+            <if test="record.subjects != null">
+                subjects = #{record.subjects,jdbcType=VARCHAR},
+            </if>
+            <if test="record.grades != null">
+                grades = #{record.grades,jdbcType=VARCHAR},
+            </if>
             <if test="record.cityId != null">
                 city_id = #{record.cityId,jdbcType=BIGINT},
             </if>
@@ -785,6 +794,12 @@
             </if>
             <if test="tags != null">
                 tags = #{tags,jdbcType=VARCHAR},
+            </if>
+            <if test="subjects != null">
+                subjects = #{subjects,jdbcType=VARCHAR},
+            </if>
+            <if test="grades != null">
+                grades = #{grades,jdbcType=VARCHAR},
             </if>
             <if test="cityId != null">
                 city_id = #{cityId,jdbcType=BIGINT},
