@@ -17,8 +17,9 @@
         <!-- 左侧 -->
         <div class="detail-left">
           <el-avatar :size="120" :src="tutor.avatar || '/placeholder/avatar.png'" />
+          <div v-if="tutor.isVerified === 1" class="cert-verified-chip">证件已认证</div>
           <div class="badges">
-            <el-tag v-if="tutor.isVerified === 1" type="success" size="small">已认证</el-tag>
+            <el-tag type="primary" effect="plain" size="small">已认证</el-tag>
             <el-tag v-if="tutor.idVerified" type="success" size="small">身份已验</el-tag>
             <el-tag v-if="tutor.degreeVerified" type="success" size="small">学历已验</el-tag>
           </div>
@@ -209,5 +210,17 @@ onMounted(() => { loadTutor() })
   .detail-left { width: 100%; margin-bottom: 16px; }
   .detail-right { padding: 16px; }
   .el-descriptions { font-size: 13px; }
+}
+
+.cert-verified-chip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #34d399;
+  border-radius: 10px;
+  padding: 2px 10px;
+  display: inline-block;
+  white-space: nowrap;
 }
 </style>

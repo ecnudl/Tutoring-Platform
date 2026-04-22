@@ -103,6 +103,7 @@
         <div v-for="t in tutors" :key="t.id" class="tutor-card-h">
           <div class="tutor-avatar">
             <el-avatar :size="64" :src="t.avatar || '/placeholder/avatar.png'" />
+            <div v-if="t.isVerified === 1" class="cert-verified-chip">证件已认证</div>
           </div>
           <div class="tutor-body">
             <div class="tutor-top">
@@ -110,7 +111,7 @@
               <el-tag size="small" v-if="t.tutorType">{{ tutorTypeMap[t.tutorType] }}</el-tag>
               <el-tag size="small" type="info" v-if="t.gender === 1">男</el-tag>
               <el-tag size="small" type="danger" v-if="t.gender === 2">女</el-tag>
-              <el-tag size="small" type="success" v-if="t.isVerified === 1">已认证</el-tag>
+              <el-tag size="small" type="primary" effect="plain">已认证</el-tag>
             </div>
             <div class="tutor-detail">
               <span v-if="t.university">{{ t.university }}</span>
@@ -469,5 +470,16 @@ onMounted(() => {
   .filter-label { width: auto; margin-bottom: 4px; }
   .tutor-card-h { flex-direction: column; text-align: center; }
   .tutor-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+}
+
+.tutor-avatar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cert-verified-chip {
+  font-size: 11px;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #34d399;
+  border-radius: 10px;
+  padding: 1px 8px;
+  white-space: nowrap;
 }
 </style>
