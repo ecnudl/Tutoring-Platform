@@ -8,6 +8,7 @@
         <el-option label="待审核" :value="1" />
         <el-option label="已通过" :value="2" />
         <el-option label="已驳回" :value="3" />
+        <el-option label="已发布" :value="4" />
       </el-select>
       <el-input v-model="keyword" placeholder="姓名搜索" style="width:200px" clearable @keyup.enter="search" />
       <el-button type="primary" @click="search">搜索</el-button>
@@ -98,8 +99,8 @@ const saving = ref(false)
 
 const tutorTypeMap: Record<number, string> = { 1: '大学生', 2: '专职', 3: '在职教师', 4: '退休教师' }
 const degreeMap: Record<number, string> = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
-const auditLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已通过', 3: '已驳回' }[s] || '未知')
-const auditTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'danger' }[s] || 'info')
+const auditLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已通过', 3: '已驳回', 4: '已发布' }[s] || '未知')
+const auditTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'danger', 4: 'success' }[s] || 'info')
 
 const search = async () => {
   loading.value = true
