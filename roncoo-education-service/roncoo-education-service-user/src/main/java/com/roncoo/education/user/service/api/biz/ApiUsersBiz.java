@@ -691,10 +691,10 @@ public class ApiUsersBiz extends BaseBiz {
      */
     private String roleMismatchMsg(Integer actualType) {
         if (Integer.valueOf(1).equals(actualType)) {
-            return "该手机号是教员账号，请切换到"教员登录"";
+            return "该手机号是教员账号，请切换到教员登录页面";
         }
         if (Integer.valueOf(2).equals(actualType)) {
-            return "该手机号是家长账号，请切换到"家长登录"";
+            return "该手机号是家长账号，请切换到家长登录页面";
         }
         return "账号类型不匹配当前登录入口";
     }

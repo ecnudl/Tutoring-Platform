@@ -32,6 +32,8 @@ public class AdminTutorAuditBiz extends BaseBiz {
     private final TutorAuditRecordDao tutorAuditRecordDao;
     @NotNull
     private final TutorCertificationDao tutorCertificationDao;
+    @NotNull
+    private final com.roncoo.education.user.dao.UsersDao usersDao;
 
     /**
      * 待审核教员分页列表
@@ -193,6 +195,66 @@ public class AdminTutorAuditBiz extends BaseBiz {
 
         refreshTutorVerified(cert.getTutorId());
         return Result.success("证件已驳回");
+    }
+
+    /**
+     * 分页查询所有教员的证件（连带教员姓名、手机号），供 admin 证件审核页使用
+     */
+    public Result<?> certPage(Map<String, Object> req) {
+        int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
+        int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
+        Integer auditStatus = req.get("auditStatus") != null ? Integer.parseInt(req.get("auditStatus").toString()) : null;
+        Integer certType = req.get("certType") != null ? Integer.parseInt(req.get("certType").toString()) : null;
+
+        com.roncoo.education.user.dao.impl.mapper.entity.TutorCertificationExample example = new com.roncoo.education.user.dao.impl.mapper.entity.TutorCertificationExample();
+        com.roncoo.education.user.dao.impl.mapper.entity.TutorCertificationExample.Criteria c = example.createCriteria();
+        if (auditStatus != null) c.andAuditStatusEqualTo(auditStatus);
+        if (certType != null) c.andCertTypeEqualTo(certType);
+        example.setOrderByClause("audit_status asc, gmt_create desc");
+
+        Page<TutorCertification> page = ((com.roncoo.education.user.dao.TutorCertificationDao) tutorCertificationDao).page(pageCurrent, pageSize, example);
+
+        // 批量补齐教员姓名、手机号
+        java.util.List<Long> tutorIds = page.getList().stream().map(TutorCertification::getTutorId).distinct().collect(java.util.stream.Collectors.toList());
+        java.util.Map<Long, TutorProfile> tutorMap = new java.util.HashMap<>();
+        java.util.Map<Long, String> mobileMap = new java.util.HashMap<>();
+        if (!tutorIds.isEmpty()) {
+            java.util.List<TutorProfile> profiles = tutorProfileDao.listByIds(tutorIds);
+            for (TutorProfile p : profiles) tutorMap.put(p.getId(), p);
+            java.util.List<Long> userIds = profiles.stream().map(TutorProfile::getUserId).distinct().collect(java.util.stream.Collectors.toList());
+            if (!userIds.isEmpty()) {
+                java.util.List<com.roncoo.education.user.dao.impl.mapper.entity.Users> users = usersDao.listByIds(userIds);
+                java.util.Map<Long, String> userIdToMobile = new java.util.HashMap<>();
+                for (com.roncoo.education.user.dao.impl.mapper.entity.Users u : users) userIdToMobile.put(u.getId(), u.getMobile());
+                for (TutorProfile p : profiles) mobileMap.put(p.getId(), userIdToMobile.get(p.getUserId()));
+            }
+        }
+
+        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
+        for (TutorCertification cert : page.getList()) {
+            java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
+            row.put("id", cert.getId());
+            row.put("tutorId", cert.getTutorId());
+            row.put("certType", cert.getCertType());
+            row.put("certName", cert.getCertName());
+            row.put("certUrl", cert.getCertUrl());
+            row.put("certNo", cert.getCertNo());
+            row.put("auditStatus", cert.getAuditStatus());
+            row.put("auditRemark", cert.getAuditRemark());
+            row.put("gmtCreate", cert.getGmtCreate());
+            TutorProfile tp = tutorMap.get(cert.getTutorId());
+            row.put("tutorName", tp != null ? tp.getRealName() : null);
+            row.put("tutorMobile", mobileMap.get(cert.getTutorId()));
+            list.add(row);
+        }
+
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("list", list);
+        result.put("totalCount", page.getTotalCount());
+        result.put("totalPage", page.getTotalPage());
+        result.put("pageCurrent", page.getPageCurrent());
+        result.put("pageSize", page.getPageSize());
+        return Result.success(result);
     }
 
     /**
