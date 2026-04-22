@@ -327,6 +327,12 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("账号状态异常，请联系管理员");
         }
 
+        // 角色校验：教员登录入口不可用家长账号登录，反之亦然
+        if (req.getUserType() != null && user.getUserType() != null
+                && !req.getUserType().equals(user.getUserType())) {
+            return Result.error(roleMismatchMsg(user.getUserType()));
+        }
+
         // 密码校验（明文密码 + salt -> SHA1 比对）
         if (!DigestUtil.sha1Hex(user.getMobileSalt() + req.getPassword()).equals(user.getMobilePsw())) {
             UsersLog usersLog = new UsersLog();
@@ -379,6 +385,20 @@ public class ApiUsersBiz extends BaseBiz {
             log.warn("[SMS未启用] 跳过登录验证码校验，手机号：{}", mobile);
         }
         return loginByMobileOnly(mobile);
+    }
+
+    /**
+     * 短信登录（带角色校验）：expectedUserType 为空则不校验
+     */
+    public Result<UsersLoginResp> loginBySms(String mobile, String code, Integer expectedUserType) {
+        if (!StringUtils.hasText(mobile)) { return Result.error("手机号不能为空"); }
+        Users user = usersDao.getByMobile(mobile);
+        if (user == null) { return Result.error("该手机号未注册"); }
+        if (expectedUserType != null && user.getUserType() != null
+                && !expectedUserType.equals(user.getUserType())) {
+            return Result.error(roleMismatchMsg(user.getUserType()));
+        }
+        return loginBySms(mobile, code);
     }
 
     /**
@@ -663,5 +683,19 @@ public class ApiUsersBiz extends BaseBiz {
             record.setCity(ipInfo.getCity());
         }
         usersLogDao.save(record);
+    }
+
+
+    /**
+     * 按用户实际类型给出提示，引导用户去对应的登录入口
+     */
+    private String roleMismatchMsg(Integer actualType) {
+        if (Integer.valueOf(1).equals(actualType)) {
+            return "该手机号是教员账号，请切换到"教员登录"";
+        }
+        if (Integer.valueOf(2).equals(actualType)) {
+            return "该手机号是家长账号，请切换到"家长登录"";
+        }
+        return "账号类型不匹配当前登录入口";
     }
 }

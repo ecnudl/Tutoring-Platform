@@ -27,7 +27,7 @@ public class ApiAuthController {
     @ApiOperation(value = "短信验证码登录", notes = "校验短信验证码后免密登录")
     @PostMapping("/login/sms")
     public Result<UsersLoginResp> loginSms(@RequestBody Map<String, String> req) {
-        return biz.loginBySms(req.get("mobile"), req.get("code"));
+        Integer expectedType = null; try { if (req.get("userType") != null) expectedType = Integer.parseInt(String.valueOf(req.get("userType"))); } catch (Exception ignored) {} return biz.loginBySms(req.get("mobile"), req.get("code"), expectedType);
     }
 
     @ApiOperation(value = "找回密码", notes = "校验短信验证码后重置密码")

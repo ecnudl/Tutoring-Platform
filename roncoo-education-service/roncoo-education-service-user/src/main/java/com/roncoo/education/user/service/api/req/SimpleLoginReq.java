@@ -19,4 +19,7 @@ public class SimpleLoginReq implements Serializable {
 
     @ApiModelProperty(value = "密码（明文，开发环境用）", required = true)
     private String password;
+
+    @ApiModelProperty(value = "期望登录的用户类型：1=教员，2=家长；不传则不校验")
+    private Integer userType;
 }
