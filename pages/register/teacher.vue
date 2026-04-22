@@ -569,16 +569,28 @@ const handleSubmit = async () => {
     })
 
     // 3. 自动提交审核，让简历进入 admin"待审核"列表
+    let auditOk = true
+    let auditMsg = ''
     try {
-      await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/submit-audit`, {
+      const auditRes: any = await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/submit-audit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', token }
       })
+      if (auditRes && auditRes.code !== 200) {
+        auditOk = false
+        auditMsg = auditRes.msg || '审核提交未成功'
+      }
     } catch (e) {
-      console.warn('自动提交审核失败，用户可在个人中心手动提交', e)
+      auditOk = false
+      auditMsg = '审核提交未成功，可在个人中心手动提交'
+      console.warn('自动提交审核失败', e)
     }
 
-    ElMessage.success('注册成功！资料已提交审核，通过后即可接单。')
+    if (auditOk) {
+      ElMessage.success('注册成功！资料已提交审核，通过后即可接单。')
+    } else {
+      ElMessage.warning(`注册成功，但${auditMsg}，请登录后在个人中心手动提交审核。`)
+    }
     // 退出登录状态，引导用户重新登录
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('token')
