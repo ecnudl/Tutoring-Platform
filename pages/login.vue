@@ -123,7 +123,12 @@ const handlePasswordLogin = async () => {
 
   loading.value = true
   try {
-    const loginData = { mobile: passwordForm.value.mobile, password: passwordForm.value.password }
+    const expectedUserType = selectedRole.value === 'teacher' ? 1 : 2
+    const loginData = {
+      mobile: passwordForm.value.mobile,
+      password: passwordForm.value.password,
+      userType: expectedUserType
+    }
     const res = await post('/user/api/users/login/simple', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
@@ -148,7 +153,7 @@ const handleSmsLogin = async () => {
   if (!smsForm.value.code) { ElMessage.warning('请输入验证码'); return }
   loading.value = true
   try {
-    const loginData = { ...smsForm.value, userType: selectedRole.value === 'student' ? 1 : 2 }
+    const loginData = { ...smsForm.value, userType: selectedRole.value === 'teacher' ? 1 : 2 }
     const res = await post('/user/api/login/sms', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)

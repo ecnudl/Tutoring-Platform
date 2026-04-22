@@ -122,7 +122,7 @@ export const useUserStore = defineStore('user', {
     },
     async fetchNickname() {
       if (typeof window === 'undefined' || !this.token) return
-      if (this.nickname) return
+      // 不根据已有 nickname 提前返回：登录接口返回的是自动生成的随机昵称，需覆盖成"姓氏+角色"
       if (this.userType !== 1 && this.userType !== 2) return
 
       try {
