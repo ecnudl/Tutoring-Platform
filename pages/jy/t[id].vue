@@ -19,7 +19,7 @@
           <el-avatar :size="120" :src="tutor.avatar || '/placeholder/avatar.png'" />
           <div v-if="tutor.isVerified === 1" class="cert-verified-chip">证件已认证</div>
           <div class="badges">
-            <el-tag type="primary" effect="plain" size="small">已认证</el-tag>
+            
             <el-tag v-if="tutor.idVerified" type="success" size="small">身份已验</el-tag>
             <el-tag v-if="tutor.degreeVerified" type="success" size="small">学历已验</el-tag>
           </div>
