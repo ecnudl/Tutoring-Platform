@@ -17,7 +17,11 @@
         <!-- 左侧 -->
         <div class="detail-left">
           <el-avatar :size="120" :src="tutor.avatar || '/placeholder/avatar.png'" />
-          <div v-if="tutor.isVerified === 1" class="cert-verified-chip">证件已认证</div>
+          <div v-if="tutor.isVerified === 1" class="cert-verified-chip">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:4px">
+              <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>证件已认证
+          </div>
           <div class="badges">
             
             <el-tag v-if="tutor.idVerified" type="success" size="small">身份已验</el-tag>
@@ -213,14 +217,18 @@ onMounted(() => { loadTutor() })
 }
 
 .cert-verified-chip {
-  margin-top: 8px;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
   font-size: 12px;
-  color: #065f46;
-  background: #d1fae5;
-  border: 1px solid #34d399;
-  border-radius: 10px;
-  padding: 2px 10px;
-  display: inline-block;
+  font-weight: 600;
+  color: #047857;
+  letter-spacing: 0.3px;
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
 }
 </style>

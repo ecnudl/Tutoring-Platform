@@ -237,14 +237,19 @@
         <div v-if="tutors.length" class="tutor-grid">
           <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)" class="tutor-card">
             <div class="tutor-avatar-wrap">
-              <el-avatar :size="56" :src="t.avatar" />
+              <el-avatar :size="64" :src="t.avatar" />
               <span v-if="t.isVerified === 1" class="verified-badge" title="已认证">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="11" fill="#2563eb"/>
-                  <path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="11" fill="#2563eb" stroke="#fff" stroke-width="1.5"/>
+                  <path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
-              <div v-if="t.isVerified === 1" class="cert-verified-chip">证件已认证</div>
+            </div>
+            <div v-if="t.isVerified === 1" class="cert-verified-chip">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:4px">
+                <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              证件已认证
             </div>
             <div class="tutor-info">
               <div class="tutor-name">{{ t.realName || '教员' }}</div>
@@ -1176,33 +1181,39 @@ onMounted(async () => {
 .tutor-avatar-wrap {
   position: relative;
   display: inline-block;
+  line-height: 0;
 }
 .verified-badge {
   position: absolute;
   bottom: -2px;
-  right: -4px;
-  display: flex;
+  right: -2px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   border-radius: 50%;
-  padding: 1px;
+  padding: 0;
   line-height: 0;
-  box-shadow: 0 0 0 2px #fff;
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.18));
 }
 
-.tutor-info { text-align: center; margin-top: var(--space-md); width: 100%; }
-.verified-tag { margin-left: 6px; vertical-align: middle; }
-.tutor-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+.tutor-info { text-align: center; margin-top: 10px; width: 100%; }
+
 .cert-verified-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 3px 10px;
   font-size: 12px;
-  color: #065f46;
-  background: #d1fae5;
-  border: 1px solid #34d399;
-  border-radius: 10px;
-  padding: 1px 8px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #047857;
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
   white-space: nowrap;
-  margin-top: 4px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
 }
 .tutor-name { font-weight: var(--font-weight-semibold); margin-bottom: 2px; }
 .tutor-school { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 4px; }

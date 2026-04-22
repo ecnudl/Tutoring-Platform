@@ -103,7 +103,11 @@
         <div v-for="t in tutors" :key="t.id" class="tutor-card-h">
           <div class="tutor-avatar">
             <el-avatar :size="64" :src="t.avatar || '/placeholder/avatar.png'" />
-            <div v-if="t.isVerified === 1" class="cert-verified-chip">证件已认证</div>
+            <div v-if="t.isVerified === 1" class="cert-verified-chip">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:3px">
+                <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>证件已认证
+            </div>
           </div>
           <div class="tutor-body">
             <div class="tutor-top">
@@ -472,14 +476,19 @@ onMounted(() => {
   .tutor-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
 }
 
-.tutor-avatar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tutor-avatar { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cert-verified-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
   font-size: 11px;
-  color: #065f46;
-  background: #d1fae5;
-  border: 1px solid #34d399;
-  border-radius: 10px;
-  padding: 1px 8px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #047857;
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
 }
 </style>
