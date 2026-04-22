@@ -572,7 +572,7 @@ const handleSubmit = async () => {
     let auditOk = true
     let auditMsg = ''
     try {
-      const auditRes: any = await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/submit-audit`, {
+      const auditRes = await $fetch(`${config.public.apiBase}/user/auth/tutor-profile/submit-audit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', token }
       })
