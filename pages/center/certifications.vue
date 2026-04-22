@@ -45,16 +45,16 @@
           />
         </div>
         <div class="cert-upload-slot" v-loading="uploading[idx]">
-          <input
-            type="file"
-            :ref="el => fileInputs[idx] = el"
-            accept="image/*"
-            style="display:none"
-            @change="e => handleUpload(e, slot)"
-          />
-          <button class="upload-btn" :disabled="!userStore.isTutor" @click="fileInputs[idx]?.click()">
+          <label :class="['upload-btn', { disabled: !userStore.isTutor }]">
             <el-icon :size="28" color="#ef4444"><Plus /></el-icon>
-          </button>
+            <input
+              type="file"
+              accept="image/*"
+              :disabled="!userStore.isTutor"
+              class="upload-input"
+              @change="e => handleUpload(e, slot)"
+            />
+          </label>
           <div class="upload-btn-text">
             {{ slotMap[slot.certType]?.certUrl ? '重新上传' : '上传' }}
           </div>
@@ -90,7 +90,6 @@ const slots = [
 
 const certs = ref([])
 const uploading = reactive([false, false, false, false, false])
-const fileInputs = reactive([])
 
 const slotMap = computed(() => {
   const m = {}
@@ -202,13 +201,20 @@ onMounted(() => { if (userStore.isTutor) loadCerts() })
 .cert-upload-slot {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
-.upload-btn {
+.upload-btn { position: relative;
   width: 100px; height: 100px;
   border: 1px dashed #d9d9d9; border-radius: 6px; background: #fff;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: border-color 0.2s;
 }
-.upload-btn:hover { border-color: #409eff; }
+.upload-btn:hover:not(.disabled) { border-color: #409eff; }
+.upload-btn.disabled { cursor: not-allowed; opacity: 0.5; }
+.upload-input {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+}
+.upload-btn.disabled .upload-input { cursor: not-allowed; pointer-events: none; }
 .upload-btn-text { font-size: 12px; color: #9ca3af; }
 
 @media (max-width: 768px) {
