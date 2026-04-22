@@ -10,12 +10,27 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// 登录态失效的业务码：99=无token, 301=token过期, 302=token异常, 305=菜单过期
+const AUTH_EXPIRED_CODES = new Set([99, 301, 302, 305])
+
+function redirectToLogin() {
+  localStorage.removeItem('admin_token')
+  if (!location.pathname.endsWith('/login')) {
+    location.href = '/admin/login'
+  }
+}
+
 api.interceptors.response.use(
-  (res) => res.data,
+  (res) => {
+    const body = res.data
+    if (body && typeof body === 'object' && AUTH_EXPIRED_CODES.has(body.code)) {
+      redirectToLogin()
+    }
+    return body
+  },
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('admin_token')
-      window.location.href = '/login'
+      redirectToLogin()
     }
     return Promise.reject(err)
   }
