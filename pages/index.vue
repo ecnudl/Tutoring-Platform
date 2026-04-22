@@ -246,7 +246,10 @@
               </span>
             </div>
             <div class="tutor-info">
-              <div class="tutor-name">{{ t.realName || '教员' }}</div>
+              <div class="tutor-name">
+                {{ t.realName || '教员' }}
+                <el-tag v-if="t.isVerified === 1" type="success" size="small" effect="plain" class="verified-tag">已认证</el-tag>
+              </div>
               <div class="tutor-school">{{ t.university || '未填写' }}</div>
               <div class="tutor-price" v-if="t.priceMin">{{ t.priceMin }}-{{ t.priceMax }}元/时</div>
             </div>
@@ -1191,6 +1194,7 @@ onMounted(async () => {
 }
 
 .tutor-info { text-align: center; margin-top: var(--space-md); width: 100%; }
+.verified-tag { margin-left: 6px; vertical-align: middle; }
 .tutor-name { font-weight: var(--font-weight-semibold); margin-bottom: 2px; }
 .tutor-school { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 4px; }
 .tutor-price { font-weight: var(--font-weight-semibold); color: var(--color-accent-dark); }

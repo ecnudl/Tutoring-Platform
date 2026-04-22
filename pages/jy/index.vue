@@ -110,7 +110,7 @@
               <el-tag size="small" v-if="t.tutorType">{{ tutorTypeMap[t.tutorType] }}</el-tag>
               <el-tag size="small" type="info" v-if="t.gender === 1">男</el-tag>
               <el-tag size="small" type="danger" v-if="t.gender === 2">女</el-tag>
-              <el-tag size="small" type="success" v-if="t.verified">已认证</el-tag>
+              <el-tag size="small" type="success" v-if="t.isVerified === 1">已认证</el-tag>
             </div>
             <div class="tutor-detail">
               <span v-if="t.university">{{ t.university }}</span>
