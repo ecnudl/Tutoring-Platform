@@ -7,7 +7,7 @@
       <el-menu :default-active="$route.path" router :collapse="isCollapse" background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff">
         <el-menu-item index="/dashboard"><el-icon><House /></el-icon><span>首页</span></el-menu-item>
         <el-sub-menu index="tutor"><template #title><el-icon><User /></el-icon><span>教员管理</span></template>
-          <el-menu-item index="/tutor/audit">教员审核</el-menu-item><el-menu-item index="/tutor/list">教员列表</el-menu-item></el-sub-menu>
+          <el-menu-item index="/tutor/audit">教员审核</el-menu-item><el-menu-item index="/tutor/list">教员列表</el-menu-item><el-menu-item index="/cert/audit">证件审核</el-menu-item></el-sub-menu>
         <el-sub-menu index="requirement"><template #title><el-icon><Document /></el-icon><span>需求管理</span></template>
           <el-menu-item index="/requirement/audit">需求审核</el-menu-item><el-menu-item index="/requirement/list">需求列表</el-menu-item></el-sub-menu>
         <el-menu-item index="/reservation/list"><el-icon><Clock /></el-icon><span>预约管理</span></el-menu-item>
