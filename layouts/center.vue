@@ -26,7 +26,6 @@
           </div>
 
           <div class="nav-group" v-if="userStore.isTutor">
-            <NuxtLink to="/center/certifications">证件认证</NuxtLink>
             <NuxtLink to="/center/head-photo">形象照片</NuxtLink>
             <NuxtLink to="/center/photos">我的相册</NuxtLink>
           </div>
@@ -52,6 +51,7 @@
 
           <div class="nav-group">
             <NuxtLink to="/center/profile">基本资料</NuxtLink>
+            <NuxtLink to="/center/certifications">证件认证</NuxtLink>
             <a href="javascript:;" @click="openPwd">修改密码</a>
             <a href="javascript:;" @click="handleLogout">退出登录</a>
           </div>

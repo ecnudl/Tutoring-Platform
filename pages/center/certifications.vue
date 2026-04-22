@@ -2,6 +2,16 @@
 <div>
   <h2 class="page-title">证件认证</h2>
 
+  <el-alert
+    v-if="!userStore.isTutor"
+    type="info"
+    show-icon
+    :closable="false"
+    style="margin-bottom:16px"
+    title="证件认证仅对教员账号开放"
+    description="当前账号是家长/学员，没有教员资料。若你是教员，请用教员账号登录后再上传证件。"
+  />
+
   <div class="cert-tip">
     <el-icon :size="18" color="#f59e0b"><InfoFilled /></el-icon>
     <span>
@@ -42,7 +52,7 @@
             style="display:none"
             @change="e => handleUpload(e, slot)"
           />
-          <button class="upload-btn" @click="fileInputs[idx]?.click()">
+          <button class="upload-btn" :disabled="!userStore.isTutor" @click="fileInputs[idx]?.click()">
             <el-icon :size="28" color="#ef4444"><Plus /></el-icon>
           </button>
           <div class="upload-btn-text">
@@ -59,6 +69,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, InfoFilled } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
 
 definePageMeta({
   layout: 'center',
@@ -143,7 +155,7 @@ const handleUpload = async (e, slot) => {
   }
 }
 
-onMounted(loadCerts)
+onMounted(() => { if (userStore.isTutor) loadCerts() })
 </script>
 
 <style scoped>
