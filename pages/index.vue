@@ -1421,9 +1421,39 @@ onMounted(async () => {
 
   /* 分类速查 */
   .category-section { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
-  .category-row { flex-direction: column; }
-  .category-label { margin-bottom: var(--space-xs); }
-  .category-links-wrap { flex-direction: column; align-items: flex-start; }
+  .category-body { padding: 0 var(--space-md); }
+  .category-row { flex-direction: column; padding: var(--space-md) 0; }
+  .category-label { margin-bottom: var(--space-sm); width: auto; line-height: 1.4; }
+  .category-links-wrap { flex-direction: column; align-items: stretch; width: 100%; gap: var(--space-sm); }
+  .category-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-sm);
+    width: 100%;
+    min-width: 0;
+  }
+  .category-links a {
+    font-size: 13px;
+    line-height: 1.2;
+    padding: 7px 4px;
+    text-align: center;
+    background: var(--color-bg);
+    border-radius: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .category-links-wrap .category-links {
+    max-height: 72px;
+  }
+  .category-links-wrap .category-links.expanded {
+    max-height: 1000px;
+  }
+  .expand-btn {
+    align-self: flex-end;
+    font-size: var(--font-size-sm);
+  }
 
   /* 下方模块 */
   .section-box { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
