@@ -1401,9 +1401,16 @@ onMounted(async () => {
     padding: 4px 6px;
   }
 
-  /* 轮播图 */
-  .slide-item { height: 200px; }
-  .card-banner :deep(.el-carousel) { height: 200px !important; }
+  /* 轮播图：匹配 banner 3.2:1 纵横比，避免裁剪 */
+  .slide-item { height: 140px; background: #eaeff6; }
+  .slide-img { object-fit: contain; }
+  .card-banner :deep(.el-carousel) { height: 140px !important; }
+  .card-banner :deep(.el-carousel__container) { height: 140px !important; }
+  .card-banner :deep(.el-carousel__indicators) { bottom: 4px; }
+  .card-banner :deep(.el-carousel__indicator .el-carousel__button) {
+    width: 18px;
+    height: 2px;
+  }
 
   /* 三栏功能区 */
   .card-actions {
