@@ -1340,9 +1340,10 @@ onMounted(async () => {
 
 .links-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 4px 0;
+  gap: var(--space-xs) var(--space-md);
+  padding: 6px 0;
 }
 
 .links-label {
@@ -1356,6 +1357,7 @@ onMounted(async () => {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   transition: color var(--transition-fast);
+  white-space: nowrap;
 }
 
 .links-item:hover {
@@ -1460,5 +1462,22 @@ onMounted(async () => {
   .tutor-grid { grid-template-columns: repeat(2, 1fr); }
   .testimonial-grid { grid-template-columns: 1fr; }
   .order-right { gap: var(--space-sm); }
+
+  /* 友情链接 & 热门城市 */
+  .links-section { padding: var(--space-md) !important; }
+  .links-row {
+    gap: 6px 10px;
+    padding: 6px 0;
+  }
+  .links-label {
+    width: 100%;
+    margin-bottom: 2px;
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+  .links-item {
+    font-size: 13px;
+    padding: 3px 0;
+  }
 }
 </style>
