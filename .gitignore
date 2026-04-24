@@ -19,3 +19,4 @@ redis_data/
 nacos_data/
 minio_data/
 logs/
+._*
