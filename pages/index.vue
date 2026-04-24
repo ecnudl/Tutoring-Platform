@@ -772,12 +772,12 @@ onMounted(async () => {
 .action-entry {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 22px;
   padding: 10px 12px;
   border-radius: var(--radius-lg);
   transition: background var(--transition-fast);
   cursor: pointer;
-  max-width: 240px;
+  max-width: 260px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
