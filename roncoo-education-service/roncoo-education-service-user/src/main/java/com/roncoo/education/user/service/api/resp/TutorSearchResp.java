@@ -85,4 +85,7 @@ public class TutorSearchResp implements Serializable {
 
     @ApiModelProperty(value = "是否已认证(0:否,1:是)")
     private Integer isVerified;
+
+    @ApiModelProperty(value = "是否明星教员(0:否,1:是)")
+    private Integer isStar;
 }

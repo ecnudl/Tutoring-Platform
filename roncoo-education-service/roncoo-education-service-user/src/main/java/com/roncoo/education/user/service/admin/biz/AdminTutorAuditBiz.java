@@ -197,6 +197,29 @@ public class AdminTutorAuditBiz extends BaseBiz {
     }
 
     /**
+     * 设置或取消明星教员标记
+     */
+    public Result<String> setStar(Map<String, Object> req) {
+        Long id = req.get("id") != null ? Long.parseLong(req.get("id").toString()) : null;
+        Integer isStar = req.get("isStar") != null ? Integer.parseInt(req.get("isStar").toString()) : null;
+        if (id == null || isStar == null) {
+            return Result.error("参数错误");
+        }
+        if (isStar != 0 && isStar != 1) {
+            return Result.error("isStar 只能是 0 或 1");
+        }
+        TutorProfile profile = tutorProfileDao.getById(id);
+        if (profile == null) {
+            return Result.error("教员不存在");
+        }
+        TutorProfile update = new TutorProfile();
+        update.setId(id);
+        update.setIsStar(isStar);
+        tutorProfileDao.updateById(update);
+        return Result.success(isStar == 1 ? "已设为明星教员" : "已取消明星教员");
+    }
+
+    /**
      * 分页查询所有教员的证件（连带教员姓名、手机号），供 admin 证件审核页使用
      */
     public Result<?> certPage(Map<String, Object> req) {

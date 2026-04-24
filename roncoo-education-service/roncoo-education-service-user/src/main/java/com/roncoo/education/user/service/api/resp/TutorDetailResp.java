@@ -108,6 +108,12 @@ public class TutorDetailResp implements Serializable {
     @ApiModelProperty(value = "是否实名认证(0:否,1:是)")
     private Integer isVerified;
 
+    @ApiModelProperty(value = "登录次数")
+    private Integer loginCount;
+
+    @ApiModelProperty(value = "最近登录时间")
+    private java.time.LocalDateTime lastLoginTime;
+
     @ApiModelProperty(value = "可教科目名称列表")
     private List<String> subjectNames;
 

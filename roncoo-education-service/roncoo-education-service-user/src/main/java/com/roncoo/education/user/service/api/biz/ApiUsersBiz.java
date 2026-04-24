@@ -637,6 +637,19 @@ public class ApiUsersBiz extends BaseBiz {
         // 查询 userType
         Users dbUser = usersDao.getById(userId);
 
+        // 如果是教员角色，更新 login_count + last_login_time（用于首页排序与详情页展示）
+        if (LoginStatusEnum.SUCCESS.equals(loginStatusEnum) && dbUser != null
+                && UserTypeEnum.TUTOR.getCode().equals(dbUser.getUserType())) {
+            TutorProfile tp = tutorProfileDao.getByUserId(userId);
+            if (tp != null) {
+                TutorProfile update = new TutorProfile();
+                update.setId(tp.getId());
+                update.setLoginCount((tp.getLoginCount() == null ? 0 : tp.getLoginCount()) + 1);
+                update.setLastLoginTime(java.time.LocalDateTime.now());
+                tutorProfileDao.updateById(update);
+            }
+        }
+
         UsersLoginResp resp = new UsersLoginResp();
         resp.setMobile(mobile);
         resp.setToken(JwtUtil.create(userId, JwtUtil.DATE));

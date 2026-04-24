@@ -31,4 +31,6 @@ public class AdminTutorAuditController {
     public Result<String> certApprove(@RequestBody java.util.Map<String, Object> req) { return biz.certApprove(req); }
     @SysLog(value = "证件审核驳回") @ApiOperation(value = "证件审核驳回") @PutMapping("/cert/reject")
     public Result<String> certReject(@RequestBody java.util.Map<String, Object> req) { return biz.certReject(req); }
+    @SysLog(value = "设置/取消明星教员") @ApiOperation(value = "设置/取消明星教员") @PutMapping("/star")
+    public Result<String> setStar(@RequestBody java.util.Map<String, Object> req) { return biz.setStar(req); }
 }
