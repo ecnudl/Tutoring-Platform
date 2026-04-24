@@ -13,36 +13,58 @@
     </el-breadcrumb>
 
     <div v-loading="loading">
-      <div v-if="tutor" class="detail-layout">
-        <!-- 左侧 -->
-        <div class="detail-left">
-          <el-avatar :size="120" :src="tutor.avatar || '/placeholder/avatar.png'" />
-          <div v-if="tutor.isVerified === 1" class="cert-verified-chip">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:4px">
-              <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>证件已认证
+      <div v-if="tutor">
+        <!-- ========= 顶部 Hero 卡（参考 ttgood 风格） ========= -->
+        <div class="tutor-hero-card">
+          <div class="hero-avatar-wrap">
+            <img :src="tutor.avatar || '/placeholder/avatar.png'" alt="头像" class="hero-avatar-img" />
           </div>
-          <div class="badges">
-            
-            <el-tag v-if="tutor.idVerified" type="success" size="small">身份已验</el-tag>
-            <el-tag v-if="tutor.degreeVerified" type="success" size="small">学历已验</el-tag>
+          <div class="hero-identity">
+            <div class="hero-no-row">
+              <span class="hero-no-label">编号：</span>
+              <span class="hero-no-value">T{{ displayNo }}</span>
+            </div>
+            <div class="hero-name-row">
+              {{ getDisplayName(tutor) }}
+              <span v-if="tutor.gender === 1 || tutor.gender === 2" class="hero-gender">[{{ genderMap[tutor.gender] }}]</span>
+            </div>
+            <div v-if="tutor.isStar === 1" class="hero-star-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#f59e0b" xmlns="http://www.w3.org/2000/svg" style="margin-right:4px;vertical-align:-2px">
+                <path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.5L6 22l1.5-7.2L2 10l7.1-1.1L12 2z"/>
+              </svg>
+              明星教员
+            </div>
           </div>
-          <div class="display-no">编号：T{{ displayNo }}</div>
+          <div class="hero-stats">
+            <div class="stat-row">
+              <span class="stat-label">浏览次数：</span>
+              <span class="stat-value">{{ tutor.viewCount || 0 }}次</span>
+              <span v-if="tutor.teachingMethod === 3 || tutor.teachingMethod === 4" class="online-chip">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#f59e0b" stroke-width="2" xmlns="http://www.w3.org/2000/svg" style="margin-right:3px;vertical-align:-1px">
+                  <circle cx="12" cy="10" r="3"/><path d="M12 21s-7-7-7-11a7 7 0 1114 0c0 4-7 11-7 11z"/>
+                </svg>
+                可网络授课
+              </span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">登录次数：</span>
+              <span class="stat-value">{{ tutor.loginCount || 0 }}次</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">最近登录：</span>
+              <span class="stat-value">{{ formatLastLogin(tutor.lastLoginTime) }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">认证情况：</span>
+              <span v-if="tutor.isVerified === 1" class="cert-chip-inline">证件已认证</span>
+              <span v-else class="cert-chip-none">未认证</span>
+              <span v-if="tutor.isStar === 1" class="cert-chip-star">★</span>
+            </div>
+          </div>
         </div>
 
-        <!-- 右侧 -->
-        <div class="detail-right">
-          <h1 class="tutor-name-title">{{ tutor.surname || (tutor.realName ? tutor.realName.charAt(0) : '') }}老师</h1>
-          <el-descriptions :column="2" border style="margin-bottom:20px">
-            <el-descriptions-item label="编号">T{{ displayNo }}</el-descriptions-item>
-            <el-descriptions-item label="姓名">{{ tutor.surname || (tutor.realName ? tutor.realName.charAt(0) + '老师' : '-') }}</el-descriptions-item>
-            <el-descriptions-item label="性别">{{ genderMap[tutor.gender] || '未设置' }}</el-descriptions-item>
-            <el-descriptions-item label="学历">{{ degreeMap[tutor.degree] || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="院校">{{ tutor.university || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="专业">{{ tutor.major || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="所在区域" :span="2">{{ tutor.districtName || '-' }}</el-descriptions-item>
-          </el-descriptions>
-
+        <!-- ========= 正文详情 ========= -->
+        <div class="detail-body">
           <el-tabs v-model="activeTab">
             <el-tab-pane label="基本信息" name="basic">
               <el-descriptions :column="2" border>
@@ -138,6 +160,21 @@ const degreeMap = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博�
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
 const teachingMethodMap = { 1: '教师上门', 2: '学生上门', 3: '在线辅导', 4: '均可' }
 
+function getDisplayName(t) {
+  const name = (t.realName || '').trim()
+  if (!name) return '教员'
+  const surname = name.charAt(0)
+  const suffix = t.tutorType === 1 ? '教员' : '老师'
+  return surname + suffix
+}
+function formatLastLogin(dt) {
+  if (!dt) return '—'
+  const s = String(dt)
+  // 常见返回：2026-04-24 10:23:00
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  return m ? `${m[2]}-${m[3]}` : s
+}
+
 const loadTutor = async () => {
   loading.value = true
   try {
@@ -188,12 +225,109 @@ onMounted(() => { loadTutor() })
 }
 .el-breadcrumb { margin-bottom: 20px; }
 
-.detail-layout { display: flex; gap: 24px; }
-.detail-left { width: 160px; flex-shrink: 0; text-align: center; }
-.badges { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.display-no { margin-top: 8px; font-size: 13px; color: #999; }
+/* ========== Hero Card ========== */
+.tutor-hero-card {
+  display: grid;
+  grid-template-columns: 160px 1fr 1.1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 24px 28px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #f0e6d6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+}
+.hero-avatar-wrap {
+  width: 140px;
+  height: 140px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f5f5f5;
+  border: 1px solid #eee;
+}
+.hero-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hero-no-row {
+  font-size: 18px;
+  font-weight: 600;
+}
+.hero-no-label { color: #f97316; }
+.hero-no-value { color: #f97316; letter-spacing: 1px; }
+.hero-name-row {
+  font-size: 17px;
+  color: #333;
+  font-weight: 500;
+}
+.hero-gender {
+  color: #888;
+  font-size: 15px;
+  margin-left: 4px;
+}
+.hero-star-tag {
+  display: inline-flex;
+  align-items: center;
+  color: #f59e0b;
+  font-size: 15px;
+  font-weight: 600;
+  width: fit-content;
+}
+.hero-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 1px solid #f0e6d6;
+  padding-left: 28px;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  gap: 6px;
+}
+.stat-label { color: #888; }
+.stat-value { color: #333; }
+.online-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 12px;
+  color: #f59e0b;
+  font-size: 13px;
+  font-weight: 500;
+}
+.cert-chip-inline {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid #f97316;
+  color: #f97316;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 3px;
+  background: #fff;
+}
+.cert-chip-none {
+  color: #bbb;
+  font-size: 13px;
+}
+.cert-chip-star {
+  color: #f59e0b;
+  font-size: 15px;
+  margin-left: 4px;
+  font-weight: 700;
+}
 
-.detail-right { flex: 1; background: #fff; border-radius: 8px; padding: 24px; }
+.detail-body { background: #fff; border-radius: 8px; padding: 24px; }
 .tutor-name-title { font-size: 22px; margin-bottom: 16px; }
 
 .info-section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f5f5f5; }
@@ -210,9 +344,21 @@ onMounted(() => { loadTutor() })
 
 @media (max-width: 768px) {
   .tutor-detail-page { padding: 12px; }
-  .detail-layout { flex-direction: column; }
-  .detail-left { width: 100%; margin-bottom: 16px; }
-  .detail-right { padding: 16px; }
+  .tutor-hero-card {
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  .hero-avatar-wrap { width: 100px; height: 100px; }
+  .hero-stats {
+    grid-column: 1 / -1;
+    border-left: none;
+    border-top: 1px solid #f0e6d6;
+    padding-left: 0;
+    padding-top: 14px;
+    margin-top: 6px;
+  }
+  .detail-body { padding: 16px; }
   .el-descriptions { font-size: 13px; }
 }
 
