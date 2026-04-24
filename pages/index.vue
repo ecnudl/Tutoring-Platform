@@ -813,15 +813,16 @@ onMounted(async () => {
   background: var(--color-primary-light);
 }
 
-.action-entry span {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
-.hotline-number {
-  font-size: var(--font-size-xl);
+.action-entry span:not(.hotline-number) {
+  font-size: 19px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary) !important;
+  color: var(--color-text);
+  letter-spacing: 1px;
+}
+.action-entry .hotline-number {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
   letter-spacing: 0.5px;
 }
 
