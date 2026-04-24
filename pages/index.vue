@@ -234,25 +234,14 @@
         <div v-if="tutors.length" class="tutor-grid">
           <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)" class="tutor-card">
             <div class="tutor-avatar-wrap">
-              <el-avatar :size="64" :src="t.avatar" />
-              <span v-if="t.isVerified === 1" class="verified-badge" title="已认证">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="11" fill="#2563eb" stroke="#fff" stroke-width="1.5"/>
-                  <path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
+              <el-avatar :size="76" :src="t.avatar" />
             </div>
-            <div v-if="t.isVerified === 1" class="cert-verified-chip">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:4px">
-                <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              证件已认证
+            <div class="tutor-name-row">
+              <span class="tutor-name">{{ getTutorDisplayName(t) }}</span>
+              <span v-if="t.isStar === 1" class="tutor-star" title="明星教员">★</span>
+              <span v-if="t.isVerified === 1" class="tutor-cert-mark" title="证件已认证">√</span>
             </div>
-            <div class="tutor-info">
-              <div class="tutor-name">{{ t.realName || '教员' }}</div>
-              <div class="tutor-school">{{ t.university || '未填写' }}</div>
-              <div class="tutor-price" v-if="t.priceMin">{{ t.priceMin }}-{{ t.priceMax }}元/时</div>
-            </div>
+            <div class="tutor-school">{{ t.university || '未填写' }}</div>
           </NuxtLink>
         </div>
         <el-empty v-else description="暂无教员数据" />
@@ -333,6 +322,15 @@ const hotline = computed(() => config.value.siteHotline || '13795420591')
 
 const searchKeyword = ref('')
 const tutors = ref([])
+
+// 显示名：学生(tutor_type=1) → 姓+教员；其他(2在职/3专职/4海归) → 姓+老师
+function getTutorDisplayName(t) {
+  const name = (t.realName || '').trim()
+  if (!name) return '教员'
+  const surname = name.charAt(0)
+  const suffix = t.tutorType === 1 ? '教员' : '老师'
+  return surname + suffix
+}
 const activeNoticeTab = ref(0)
 
 const DEFAULT_ORDERS = [
@@ -472,7 +470,11 @@ onMounted(async () => {
   loadTestimonials()
 
   try {
-    const tRes = await post('/user/api/tutor/search', { pageCurrent: 1, pageSize: 8 })
+    const tRes = await post('/user/api/tutor/search', {
+      pageCurrent: 1,
+      pageSize: 18,
+      cityId: cityStore.cityId
+    })
     if (tRes.code === 200 && tRes.data) tutors.value = tRes.data.list || []
   } catch (e) {
     console.error(e)
@@ -1147,61 +1149,66 @@ onMounted(async () => {
 
 .tutor-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-lg);
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
 }
 
 .tutor-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  transition: border-color var(--transition-fast);
+  padding: 16px 10px 14px;
+  background: #f6f7f9;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: all var(--transition-fast);
+  text-decoration: none;
 }
-.tutor-card:hover { border-color: var(--color-primary); }
+.tutor-card:hover {
+  background: #fff;
+  border-color: var(--color-primary-light);
+  box-shadow: 0 4px 14px rgba(31, 78, 140, 0.08);
+}
 
 .tutor-avatar-wrap {
-  position: relative;
-  display: inline-block;
   line-height: 0;
+  margin-bottom: 10px;
 }
-.verified-badge {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  display: inline-flex;
+
+.tutor-name-row {
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  border-radius: 50%;
-  padding: 0;
-  line-height: 0;
-  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.18));
-}
-
-.tutor-info { text-align: center; margin-top: 10px; width: 100%; }
-
-.cert-verified-chip {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 12px;
-  padding: 3px 10px;
-  font-size: 12px;
+  gap: 3px;
+  font-size: 14px;
   font-weight: 600;
-  line-height: 1.6;
-  color: #047857;
-  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 1px solid #a7f3d0;
-  border-radius: 999px;
+  color: var(--color-text);
+  margin-bottom: 3px;
+  width: 100%;
   white-space: nowrap;
-  letter-spacing: 0.3px;
-  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
 }
-.tutor-name { font-weight: var(--font-weight-semibold); margin-bottom: 2px; }
-.tutor-school { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 4px; }
-.tutor-price { font-weight: var(--font-weight-semibold); color: var(--color-accent-dark); }
+.tutor-name { color: var(--color-text); }
+.tutor-star {
+  color: #f59e0b;
+  font-size: 14px;
+  line-height: 1;
+}
+.tutor-cert-mark {
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tutor-school {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
 
 /* ============================================
    最新订单
@@ -1450,7 +1457,8 @@ onMounted(async () => {
 
   /* 下方模块 */
   .section-box { margin: 0 var(--space-sm) var(--space-xl); border-radius: 8px; }
-  .tutor-grid { grid-template-columns: repeat(2, 1fr); }
+  .tutor-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tutor-card { padding: 12px 6px 10px; }
   .testimonial-grid { grid-template-columns: 1fr; }
   .order-right { gap: var(--space-sm); }
 
