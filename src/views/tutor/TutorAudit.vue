@@ -27,14 +27,26 @@
           <el-tag :type="auditTagType(row.auditStatus)" size="small">{{ auditLabel(row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="明星" width="90" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.isStar === 1" type="warning" size="small">★ 明星</el-tag>
+          <span v-else style="color:#bbb;font-size:12px">—</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="gmtCreate" label="创建时间" width="170" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="260" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click="viewDetail(row)">详情</el-button>
           <template v-if="row.auditStatus === 1">
             <el-button size="small" type="success" @click="handleAudit(row, 'approve')">通过</el-button>
             <el-button size="small" type="danger" @click="handleAudit(row, 'reject')">驳回</el-button>
           </template>
+          <el-button
+            v-if="row.auditStatus === 2 || row.auditStatus === 4"
+            size="small"
+            :type="row.isStar === 1 ? 'info' : 'warning'"
+            @click="toggleStar(row)"
+          >{{ row.isStar === 1 ? '取消明星' : '设为明星' }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -209,6 +221,19 @@ const certReject = async (row) => {
   } catch (e) {
     if (e !== 'cancel') ElMessage.error('操作失败')
   }
+}
+
+const toggleStar = async (row: any) => {
+  const next = row.isStar === 1 ? 0 : 1
+  try {
+    const res = await put('/user/admin/tutor-audit/star', { id: row.id, isStar: next })
+    if (res.code === 200) {
+      ElMessage.success(res.msg || (next === 1 ? '已设为明星教员' : '已取消明星'))
+      row.isStar = next
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (e) { ElMessage.error('网络错误') }
 }
 
 const submitAudit = async () => {
