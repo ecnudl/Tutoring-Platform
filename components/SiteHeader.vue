@@ -270,8 +270,8 @@ const handleLogout = () => {
 .brand-sub {
   font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
   font-size: 15px;
-  font-weight: 400;
-  color: var(--color-primary);
+  font-weight: 700;
+  color: var(--color-primary-dark);
   letter-spacing: 2px;
 }
 
