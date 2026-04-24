@@ -105,12 +105,14 @@
 
         <!-- ▸ 板块三：三栏功能区 -->
         <div class="card-actions">
-          <!-- 框1：热线 + 两个入口按钮 -->
+          <!-- 框1：4 行统一「图标+内容」入口 -->
           <div class="action-panel">
-            <div class="panel-hotline">
-              <span class="hotline-label">家教热线</span>
+            <a :href="'tel:' + hotline" class="action-entry">
+              <div class="entry-icon hotline-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
               <span class="hotline-number">{{ hotline }}</span>
-            </div>
+            </a>
             <NuxtLink to="/qjj" class="action-entry">
               <div class="entry-icon find-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -123,22 +125,17 @@
               </div>
               <span>我要做家教</span>
             </NuxtLink>
-
-            <div class="panel-search">
+            <div class="action-entry action-entry--search">
+              <div class="entry-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
               <el-input
                 v-model="searchKeyword"
-                placeholder="科目搜索，如「数学」「钢琴」"
+                placeholder="搜索科目"
                 size="default"
                 clearable
                 @keyup.enter="doSearch"
-              >
-                <template #prefix>
-                  <el-icon :size="14"><Search /></el-icon>
-                </template>
-                <template #append>
-                  <button type="button" class="ps-go" @click="doSearch">搜索</button>
-                </template>
-              </el-input>
+              />
             </div>
           </div>
 
@@ -771,43 +768,26 @@ onMounted(async () => {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* --- 框1：热线 + 两个入口按钮 --- */
-.panel-hotline {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: 0 20px var(--space-md);
-  margin-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.hotline-label {
-  font-size: var(--font-size-md);
-  color: var(--color-text);
-  font-weight: var(--font-weight-medium);
-}
-
-.hotline-number {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-  letter-spacing: 0.5px;
-}
-
+/* --- 框1：4 行统一 图标+内容 布局 --- */
 .action-entry {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  padding: 14px 20px;
+  gap: var(--space-md);
+  padding: 10px 12px;
   border-radius: var(--radius-lg);
   transition: background var(--transition-fast);
   cursor: pointer;
+  max-width: 240px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  text-decoration: none;
 }
 .action-entry:hover {
   background: var(--color-primary-lighter);
 }
 .action-entry + .action-entry {
-  margin-top: var(--space-md);
+  margin-top: var(--space-xs);
 }
 
 .entry-icon {
@@ -820,11 +800,17 @@ onMounted(async () => {
   color: #fff;
   flex-shrink: 0;
 }
+.hotline-icon {
+  background: var(--color-primary);
+}
 .find-icon {
   background: var(--color-primary);
 }
 .teach-icon {
   background: var(--color-accent);
+}
+.search-icon {
+  background: var(--color-primary-light);
 }
 
 .action-entry span {
@@ -832,40 +818,37 @@ onMounted(async () => {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
 }
-
-/* --- 框1：底部科目搜索 --- */
-.panel-search {
-  margin-top: var(--space-md);
-  padding: 0 4px;
+.hotline-number {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary) !important;
+  letter-spacing: 0.5px;
 }
-.panel-search :deep(.el-input__wrapper) {
-  border-radius: 6px;
+
+/* 搜索行：不需要 hover 高亮，输入框填满剩余宽度 */
+.action-entry--search {
+  cursor: default;
+}
+.action-entry--search:hover {
+  background: transparent;
+}
+.action-entry--search :deep(.el-input) {
+  flex: 1;
+  min-width: 0;
+}
+.action-entry--search :deep(.el-input__wrapper) {
+  height: 34px;
+  border-radius: 8px;
+  padding: 0 10px;
   box-shadow: inset 0 0 0 1px var(--color-border);
   transition: box-shadow var(--transition-fast);
 }
-.panel-search :deep(.el-input__wrapper.is-focus) {
+.action-entry--search :deep(.el-input__wrapper.is-focus) {
   box-shadow: inset 0 0 0 1px var(--color-primary);
 }
-.panel-search :deep(.el-input-group__append) {
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-.ps-go {
-  height: 30px;
-  padding: 0 16px;
-  background: var(--color-primary);
-  color: #fff;
-  border: none;
-  border-radius: 0 6px 6px 0;
+.action-entry--search :deep(.el-input__inner) {
   font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  letter-spacing: 1px;
 }
-.ps-go:hover { background: #0f2a4d; }
 
 /* --- 框2：二维码 --- */
 .contact-panel {
