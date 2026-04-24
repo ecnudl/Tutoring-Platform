@@ -470,14 +470,20 @@ onMounted(async () => {
   loadTestimonials()
 
   try {
-    const tRes = await post('/user/api/tutor/search', {
-      pageCurrent: 1,
-      pageSize: 18,
-      cityId: cityStore.cityId
-    })
-    if (tRes.code === 200 && tRes.data) tutors.value = tRes.data.list || []
+    // 先按当前城市筛选；若为空则退回不限城市，保证首页始终展示教员
+    const searchTutors = async (cityId) => {
+      const res = await post('/user/api/tutor/search', {
+        pageCurrent: 1,
+        pageSize: 18,
+        ...(cityId ? { cityId } : {})
+      })
+      return (res?.code === 200 && res.data) ? (res.data.list || []) : []
+    }
+    let list = await searchTutors(cityStore.cityId)
+    if (!list.length) list = await searchTutors(null)
+    tutors.value = list
   } catch (e) {
-    console.error(e)
+    console.error('[home] load tutors failed', e)
   }
 })
 </script>
