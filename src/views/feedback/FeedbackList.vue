@@ -1,30 +1,33 @@
 <template>
   <div class="page-container">
-    <h2 class="page-title">反馈管理</h2>
+    <h2 class="page-title">家教感言审核</h2>
+    <p class="page-tip">家教感言由教员/家长在用户中心提交，审核通过后展示在网站首页"家教感言"栏目。</p>
     <div class="filter-bar">
-      <el-select v-model="fbStatus" placeholder="状态" clearable style="width:140px" @change="search">
+      <el-select v-model="fbStatus" placeholder="审核状态" clearable style="width:160px" @change="search">
         <el-option label="全部" :value="null" />
-        <el-option label="待处理" :value="0" />
-        <el-option label="已回复" :value="1" />
-        <el-option label="已关闭" :value="2" />
+        <el-option label="待审核" :value="0" />
+        <el-option label="已通过" :value="1" />
+        <el-option label="已驳回" :value="2" />
       </el-select>
       <el-button type="primary" @click="search">搜索</el-button>
     </div>
     <el-table :data="list" border stripe empty-text="暂无数据" v-loading="loading">
       <el-table-column prop="userId" label="用户ID" width="180" />
-      <el-table-column prop="content" label="内容" show-overflow-tooltip />
-      <el-table-column prop="contact" label="联系方式" width="140" />
-      <el-table-column label="状态" width="80">
+      <el-table-column prop="content" label="感言内容" show-overflow-tooltip />
+      <el-table-column prop="contact" label="署名/联系" width="140" />
+      <el-table-column label="审核状态" width="100">
         <template #default="{ row }">
           <el-tag :type="fbTagType(row.fbStatus)" size="small">{{ fbLabel(row.fbStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="reply" label="回复" show-overflow-tooltip />
+      <el-table-column prop="reply" label="审核备注" show-overflow-tooltip />
       <el-table-column prop="gmtCreate" label="提交时间" width="170" />
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="240">
         <template #default="{ row }">
           <el-button size="small" @click="viewDetail(row)">查看</el-button>
-          <el-button size="small" type="primary" v-if="row.fbStatus===0" @click="handleReply(row)">回复</el-button>
+          <el-button size="small" type="success" v-if="row.fbStatus===0" @click="handleAudit(row, 'pass')">通过</el-button>
+          <el-button size="small" type="danger"  v-if="row.fbStatus===0" @click="handleAudit(row, 'reject')">驳回</el-button>
+          <el-button size="small" type="warning" v-if="row.fbStatus===1" @click="handleAudit(row, 'reject')">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -32,31 +35,33 @@
       <el-pagination layout="total,prev,pager,next" :total="total" :page-size="20" :current-page="page" @current-change="p => { page=p; search() }" />
     </div>
 
-    <el-dialog v-model="detailVisible" title="反馈详情" width="500px">
+    <el-dialog v-model="detailVisible" title="感言详情" width="500px">
       <el-descriptions :column="1" border v-if="detail">
         <el-descriptions-item label="用户ID">{{ detail.userId }}</el-descriptions-item>
         <el-descriptions-item label="内容">{{ detail.content }}</el-descriptions-item>
-        <el-descriptions-item label="联系方式">{{ detail.contact || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="署名/联系">{{ detail.contact || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="fbTagType(detail.fbStatus)">{{ fbLabel(detail.fbStatus) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="回复" v-if="detail.reply">{{ detail.reply }}</el-descriptions-item>
+        <el-descriptions-item label="审核备注" v-if="detail.reply">{{ detail.reply }}</el-descriptions-item>
         <el-descriptions-item label="提交时间">{{ detail.gmtCreate }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 
-    <el-dialog v-model="replyVisible" title="回复反馈" width="450px">
-      <el-form label-width="80px">
-        <el-form-item label="反馈内容">
-          <div style="color:#666">{{ replyRow?.content }}</div>
+    <el-dialog v-model="auditVisible" :title="auditAction==='pass'?'审核通过':'审核驳回'" width="450px">
+      <el-form label-width="90px">
+        <el-form-item label="感言内容">
+          <div style="color:#666">{{ auditRow?.content }}</div>
         </el-form-item>
-        <el-form-item label="回复">
-          <el-input v-model="replyText" type="textarea" :rows="3" placeholder="请输入回复内容" />
+        <el-form-item label="审核备注">
+          <el-input v-model="auditNote" type="textarea" :rows="3" :placeholder="auditAction==='pass' ? '可选：留下审核备注' : '请说明驳回原因（选填）'" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="replyVisible = false">取消</el-button>
-        <el-button type="primary" :loading="replying" @click="submitReply">提交回复</el-button>
+        <el-button @click="auditVisible = false">取消</el-button>
+        <el-button :type="auditAction==='pass'?'success':'danger'" :loading="auditing" @click="submitAudit">
+          {{ auditAction==='pass'?'确认通过':'确认驳回' }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -73,12 +78,13 @@ const page = ref(1)
 const loading = ref(false)
 const detailVisible = ref(false)
 const detail = ref<any>(null)
-const replyVisible = ref(false)
-const replyRow = ref<any>(null)
-const replyText = ref('')
-const replying = ref(false)
+const auditVisible = ref(false)
+const auditRow = ref<any>(null)
+const auditAction = ref<'pass'|'reject'>('pass')
+const auditNote = ref('')
+const auditing = ref(false)
 
-const fbLabel = (s: number) => ({ 0:'待处理',1:'已回复',2:'已关闭' }[s] || '未知')
+const fbLabel = (s: number) => ({ 0:'待审核',1:'已通过',2:'已驳回' }[s] || '未知')
 const fbTagType = (s: number) => ({ 0:'warning',1:'success',2:'info' }[s] || 'info')
 
 const search = async () => {
@@ -102,22 +108,32 @@ const viewDetail = async (row: any) => {
   } catch (e) { console.error(e) }
 }
 
-const handleReply = (row: any) => {
-  replyRow.value = row
-  replyText.value = ''
-  replyVisible.value = true
+const handleAudit = (row: any, action: 'pass'|'reject') => {
+  auditRow.value = row
+  auditAction.value = action
+  auditNote.value = ''
+  auditVisible.value = true
 }
 
-const submitReply = async () => {
-  if (!replyText.value) { ElMessage.warning('请输入回复内容'); return }
-  replying.value = true
+const submitAudit = async () => {
+  auditing.value = true
   try {
-    const res = await put('/user/admin/feedback/reply', { id: replyRow.value.id, reply: replyText.value })
-    if (res.code === 200) { ElMessage.success('回复成功'); replyVisible.value = false; await search() }
-    else ElMessage.error(res.msg || '操作失败')
+    const path = auditAction.value === 'pass' ? '/user/admin/feedback/audit-pass' : '/user/admin/feedback/audit-reject'
+    const res = await put(path, { id: auditRow.value.id, reply: auditNote.value })
+    if (res.code === 200) {
+      ElMessage.success(res.data || (auditAction.value === 'pass' ? '已通过' : '已驳回'))
+      auditVisible.value = false
+      await search()
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
   } catch (e) { ElMessage.error('网络错误') }
-  finally { replying.value = false }
+  finally { auditing.value = false }
 }
 
 onMounted(() => { search() })
 </script>
+<style scoped>
+.page-tip { color:#64748b;font-size:13px;margin:0 0 14px }
+.filter-bar { display:flex;gap:10px;margin-bottom:14px }
+</style>
