@@ -430,7 +430,7 @@ const loadTestimonials = async () => {
     if (res?.code === 200 && Array.isArray(res.data) && res.data.length) {
       testimonialsData.value = res.data.map(f => ({
         name: f.author || '热心用户',
-        role: '用户反馈',
+        role: f.role || '热心用户',
         content: f.content || ''
       }))
     }
