@@ -3,12 +3,10 @@ package com.roncoo.education.user.service.auth.biz;
 import com.roncoo.education.common.base.BaseBiz;
 import com.roncoo.education.common.base.ThreadContext;
 import com.roncoo.education.common.core.base.Result;
-import com.roncoo.education.common.core.enums.UserTypeEnum;
 import com.roncoo.education.user.dao.FeedbackDao;
 import com.roncoo.education.user.dao.UsersDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.Feedback;
 import com.roncoo.education.user.dao.impl.mapper.entity.FeedbackExample;
-import com.roncoo.education.user.dao.impl.mapper.entity.Users;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -34,22 +32,25 @@ public class AuthFeedbackBiz extends BaseBiz {
         return Result.success(feedbackDao.page(pageCurrent, pageSize, example));
     }
 
+    /**
+     * 提交家教感言。教员和家长（学员）都可发布；提交后状态为待审核 (fb_status=0)。
+     */
     public Result<String> submit(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
-        // 家教感言仅限教员发布
-        Users user = usersDao.getById(userId);
-        if (user == null || !UserTypeEnum.TUTOR.getCode().equals(user.getUserType())) {
-            return Result.error("家教感言仅限教员发布");
-        }
-        String content = req.get("content") != null ? req.get("content").toString() : "";
-        String contact = req.get("contact") != null ? req.get("contact").toString() : "";
-        if (!StringUtils.hasText(content)) return Result.error("反馈内容不能为空");
+        if (userId == null) return Result.error("请先登录");
+        if (usersDao.getById(userId) == null) return Result.error("用户不存在");
+
+        String content = req.get("content") != null ? req.get("content").toString().trim() : "";
+        String contact = req.get("contact") != null ? req.get("contact").toString().trim() : "";
+        if (!StringUtils.hasText(content)) return Result.error("感言内容不能为空");
+        if (content.length() > 500) return Result.error("感言内容过长，请控制在 500 字以内");
+
         Feedback fb = new Feedback();
         fb.setUserId(userId);
         fb.setContent(content);
         fb.setContact(contact);
-        fb.setFbStatus(0); // 待处理
+        fb.setFbStatus(0); // 0=待审核
         feedbackDao.save(fb);
-        return Result.success("提交成功，感谢您的反馈");
+        return Result.success("提交成功，审核通过后将展示在首页");
     }
 }

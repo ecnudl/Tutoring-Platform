@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -46,6 +47,10 @@ public class FeedbackDaoImpl extends AbstractBaseJdbc implements FeedbackDao {
         return this.feedbackMapper.selectByPrimaryKey(id);
     }
 
+    /**
+     * 分页查询。selectByExample 不加载 BLOB 列 (content/reply)，所以分页拿到主键后逐条按主键再 select，
+     * 保证 page 返回的 Feedback 含完整的 content/reply 字段。
+     */
     @Override
     public Page<Feedback> page(int pageCurrent, int pageSize, FeedbackExample example) {
         int count = this.feedbackMapper.countByExample(example);
@@ -54,7 +59,13 @@ public class FeedbackDaoImpl extends AbstractBaseJdbc implements FeedbackDao {
         int totalPage = PageUtil.countTotalPage(count, pageSize);
         example.setLimitStart(PageUtil.countOffset(pageCurrent, pageSize));
         example.setPageSize(pageSize);
-        return new Page<Feedback>(count, totalPage, pageCurrent, pageSize, this.feedbackMapper.selectByExample(example));
+        List<Feedback> shallow = this.feedbackMapper.selectByExample(example);
+        List<Feedback> full = new ArrayList<>(shallow.size());
+        for (Feedback f : shallow) {
+            Feedback withBlobs = this.feedbackMapper.selectByPrimaryKey(f.getId());
+            full.add(withBlobs != null ? withBlobs : f);
+        }
+        return new Page<Feedback>(count, totalPage, pageCurrent, pageSize, full);
     }
 
     @Override
