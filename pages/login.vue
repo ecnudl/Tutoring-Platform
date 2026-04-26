@@ -109,18 +109,6 @@ const handlePasswordLogin = async () => {
   if (!passwordForm.value.mobile) { ElMessage.warning('请输入用户名或手机号'); return }
   if (!passwordForm.value.password) { ElMessage.warning('请输入密码'); return }
 
-  if (passwordForm.value.mobile === 'admin' && passwordForm.value.password === 'admin123') {
-    userStore.saveLogin({
-      token: 'admin-token-' + Date.now(),
-      mobile: 'admin',
-      userType: 0,
-      isAdmin: true
-    })
-    ElMessage.success('管理员登录成功')
-    router.push(route.query.redirect || '/')
-    return
-  }
-
   loading.value = true
   try {
     const expectedUserType = selectedRole.value === 'teacher' ? 1 : 2
