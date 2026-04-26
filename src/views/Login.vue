@@ -7,7 +7,7 @@
         <el-form-item><el-input v-model="form.password" type="password" placeholder="密码" size="large" show-password /></el-form-item>
         <el-form-item><el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handleLogin">登录</el-button></el-form-item>
       </el-form>
-      <p style="text-align:center;color:#999;font-size:12px">默认账号: 18302045627 / admin123</p>
+      
     </el-card>
   </div>
 </template>
