@@ -454,9 +454,6 @@ public class ApiUsersBiz extends BaseBiz {
         String code = NumUtil.getVerCode();
         log.warn("手机号：{}，验证码：{}", req.getMobile(), code);
 
-        // TODO 正常应该是发送成功才放入缓存，这里方便没有短信通道的情况下，也能测试注册（上线需要删除该处）
-        cacheRedis.set(Constants.RedisPre.CODE + req.getMobile(), code, 5, TimeUnit.MINUTES);
-
         Sms sms = feignSysConfig.getSms();
         SmsFace smsFace = smsFaceMap.get(SmsPlatformEnum.byCode(sms.getSmsPlatform()).getMode());
         if (ObjectUtil.isEmpty(smsFace)) {
