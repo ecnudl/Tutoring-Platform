@@ -24,11 +24,15 @@ public class AdminTutorBiz extends BaseBiz {
         int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
         int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
         Integer auditStatus = req.get("auditStatus") != null ? Integer.parseInt(req.get("auditStatus").toString()) : null;
+        Integer statusId = req.get("statusId") != null ? Integer.parseInt(req.get("statusId").toString()) : null;
 
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
         if (auditStatus != null) {
             c.andAuditStatusEqualTo(auditStatus);
+        }
+        if (statusId != null) {
+            c.andStatusIdEqualTo(statusId);
         }
         if (req.get("keyword") != null && StringUtils.hasText(req.get("keyword").toString())) {
             c.andRealNameLike(PageUtil.like(req.get("keyword").toString()));
