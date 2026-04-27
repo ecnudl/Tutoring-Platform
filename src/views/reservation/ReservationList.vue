@@ -15,8 +15,10 @@
       <el-table-column prop="id" label="ID" width="180" />
       <el-table-column prop="studentUserId" label="学员ID" width="180" />
       <el-table-column prop="tutorUserId" label="教员ID" width="180" />
-      <el-table-column prop="scheduleTime" label="预约时间" />
-      <el-table-column prop="address" label="地点" />
+      <el-table-column prop="contactName" label="称谓" width="100" />
+      <el-table-column prop="contactMobile" label="手机" width="130" />
+      <el-table-column prop="contactWechat" label="微信" width="130" />
+      <el-table-column prop="remark" label="需求" show-overflow-tooltip />
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="statusType(row.resStatus)" size="small">{{ statusLabel(row.resStatus) }}</el-tag>
@@ -37,8 +39,10 @@
       <el-descriptions :column="1" border v-if="detail">
         <el-descriptions-item label="学员ID">{{ detail.studentUserId }}</el-descriptions-item>
         <el-descriptions-item label="教员ID">{{ detail.tutorUserId }}</el-descriptions-item>
-        <el-descriptions-item label="预约时间">{{ detail.scheduleTime }}</el-descriptions-item>
-        <el-descriptions-item label="地点">{{ detail.address || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="称谓">{{ detail.contactName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="联系手机">{{ detail.contactMobile || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="联系微信">{{ detail.contactWechat || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="需求">{{ detail.remark || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(detail.resStatus)">{{ statusLabel(detail.resStatus) }}</el-tag>
         </el-descriptions-item>
