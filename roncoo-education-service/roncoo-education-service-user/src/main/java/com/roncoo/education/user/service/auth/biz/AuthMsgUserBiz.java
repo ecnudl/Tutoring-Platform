@@ -19,6 +19,7 @@ import com.roncoo.education.user.service.auth.resp.AuthMsgResp;
 import com.roncoo.education.user.service.auth.resp.AuthMsgUserResp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -95,7 +96,8 @@ public class AuthMsgUserBiz extends BaseBiz {
         return Result.success((long) dao.countByExample(ex));
     }
 
-    /** 一键全部标记已读 */
+    /** 一键全部标记已读 (单事务, 局部失败整体回滚, 避免半已读半未读) */
+    @Transactional(rollbackFor = Exception.class)
     public Result<String> markAllRead() {
         Long uid = ThreadContext.userId();
         MsgUserExample ex = new MsgUserExample();
@@ -104,12 +106,14 @@ public class AuthMsgUserBiz extends BaseBiz {
                 .andStatusIdEqualTo(StatusIdEnum.YES.getCode())
                 .andIsReadEqualTo(ReadEnum.NO.getCode());
         List<MsgUser> unreads = dao.listByExample(ex);
+        int n = 0;
         for (MsgUser mu : unreads) {
             MsgUser u = new MsgUser();
             u.setId(mu.getId());
             u.setIsRead(ReadEnum.READ.getCode());
             dao.updateById(u);
+            n++;
         }
-        return Result.success("ok");
+        return Result.success("ok (" + n + ")");
     }
 }
