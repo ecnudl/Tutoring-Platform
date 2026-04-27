@@ -71,7 +71,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
 
 const userStore = useUserStore()
-const { get } = useApi()
+const { get, post } = useApi()
 const router = useRouter()
 
 const activeTab = ref('system')
@@ -153,6 +153,20 @@ async function loadSystem() {
         time: now, to: '/qjj'
       })
     }
+    // —— 真正的站内信（申请/审核状态变化）——
+    try {
+      const res = await post('/user/auth/msg/user/list', { pageCurrent: 1, pageSize: 30 })
+      if (res?.code === 200 && res.data?.list) {
+        for (const m of res.data.list) {
+          systemMessages.value.unshift({
+            tag: m.isRead ? '读' : '新',
+            tagClass: m.isRead ? 'tag-tip' : 'tag-ok',
+            text: (m.msgTitle ? (m.msgTitle + '：') : '') + (m.msgText || ''),
+            time: formatTime(m.gmtCreate)
+          })
+        }
+      }
+    } catch (e) { /* ignore msg errors */ }
   } catch (e) { /* ignore */ }
   finally { loadingSystem.value = false }
 }

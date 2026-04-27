@@ -100,7 +100,7 @@ const handleApply = async () => {
   try {
     const res = await post('/user/auth/application/apply', {
       requirementId: requirement.value.id,
-      message: '您好，我对这个需求很感兴趣，希望能为您提供教学服务'
+      applyMessage: '您好，我对这个需求很感兴趣，希望能为您提供教学服务'
     })
     if (res.code === 200) {
       ElMessage.success('申请已提交，请等待学员确认')
