@@ -148,7 +148,7 @@ const cityStore = useCityStore()
 const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
-const { get, post } = useApi()
+const { get } = useApi()
 
 const displayNo = route.params.id
 const tutor = ref(null)

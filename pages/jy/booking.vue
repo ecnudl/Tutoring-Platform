@@ -168,7 +168,7 @@ async function loadShortlist() {
       writeStorage(stored)
     }
   }
-  // hydrate each entry with tutor data
+  // hydrate each entry with tutor data; keep entries on transient fetch failure
   const out = []
   for (const entry of stored) {
     try {
@@ -176,12 +176,17 @@ async function loadShortlist() {
       const res = await get('/user/api/tutor/view', dn.toString().match(/^T/i) ? { displayNo: dn } : { id: entry.id })
       if (res?.code === 200 && res.data) {
         out.push({ ...res.data, addedAt: entry.addedAt, checked: true })
+      } else {
+        // 教员被删/审核驳回 -> 显式标记为不可选, 不提交
+        out.push({ id: entry.id, displayNo: entry.displayNo, realName: '(已下架教员)', addedAt: entry.addedAt, checked: false, _unavailable: true })
       }
-    } catch (_) {}
+    } catch (_) {
+      // 网络抖动 -> 保留占位, 不写回 storage 避免静默丢失
+      out.push({ id: entry.id, displayNo: entry.displayNo, realName: '(加载失败, 请刷新)', addedAt: entry.addedAt, checked: false, _loadError: true })
+    }
   }
   shortlist.value = out
-  // refresh storage with normalized records
-  writeStorage(out.map(t => ({ id: t.id, displayNo: t.displayNo, addedAt: t.addedAt })))
+  // 不重写 storage; 只有用户手动删除/成功提交才动 storage
 }
 
 const removeTutor = (id) => {
@@ -210,7 +215,7 @@ async function handleSubmit() {
   if (form.value.wechatSameAsMobile) form.value.contactWechat = form.value.contactMobile
 
   submitting.value = true
-  let okCount = 0
+  const okIds = []
   const errors = []
   try {
     for (const t of checked) {
@@ -222,7 +227,7 @@ async function handleSubmit() {
           contactWechat: form.value.contactWechat,
           remark: form.value.need
         })
-        if (res?.code === 200) okCount++
+        if (res?.code === 200) okIds.push(String(t.id))
         else errors.push(`${t.realName || t.displayNo}: ${res?.msg || '失败'}`)
       } catch (e) {
         errors.push(`${t.realName || t.displayNo}: ${e?.response?.data?.msg || '网络错误'}`)
@@ -230,17 +235,15 @@ async function handleSubmit() {
     }
   } finally { submitting.value = false }
 
-  if (okCount > 0) {
-    // remove the successfully booked from shortlist
-    const okIds = checked.slice(0, okCount).map(t => String(t.id))
+  if (okIds.length > 0) {
     shortlist.value = shortlist.value.filter(t => !okIds.includes(String(t.id)))
     writeStorage(shortlist.value.map(t => ({ id: t.id, displayNo: t.displayNo, addedAt: t.addedAt })))
 
     const msg = errors.length
-      ? `成功提交 ${okCount} 条，${errors.length} 条失败：<br>${errors.join('<br>')}`
-      : `提交成功，客服将在 <span style="color:#e67e22">24小时</span> 内致电给您确认详情，请保持电话畅通！`
+      ? `成功提交 ${okIds.length} 条，以下失败：\n${errors.join('\n')}`
+      : '提交成功，客服将在 24 小时内致电给您确认详情，请保持电话畅通！'
     try {
-      await ElMessageBox.alert(msg, '提交结果', { dangerouslyUseHTMLString: true, confirmButtonText: '知道了' })
+      await ElMessageBox.alert(msg, '提交结果', { confirmButtonText: '知道了' })
     } catch (_) {}
     if (errors.length === 0) {
       activeTab.value = 'history'
