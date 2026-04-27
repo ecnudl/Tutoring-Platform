@@ -108,11 +108,18 @@ public class AuthReservationBiz extends BaseBiz {
                 : (req.get("message") != null ? req.get("message").toString() : "");
         Long subjectId = req.get("subjectId") != null ? Long.parseLong(req.get("subjectId").toString()) : null;
 
+        String contactName = req.get("contactName") != null ? req.get("contactName").toString() : null;
+        String contactMobile = req.get("contactMobile") != null ? req.get("contactMobile").toString() : null;
+        String contactWechat = req.get("contactWechat") != null ? req.get("contactWechat").toString() : null;
+
         TutorReservation reservation = new TutorReservation();
         reservation.setStudentUserId(userId);
         reservation.setTutorUserId(tutorUserId);
         reservation.setTutorId(tutorProfile.getId());
         reservation.setSubjectId(subjectId);
+        reservation.setContactName(contactName);
+        reservation.setContactMobile(contactMobile);
+        reservation.setContactWechat(contactWechat);
         reservation.setScheduleTime(scheduleTime);
         reservation.setAddress(address);
         reservation.setRemark(remark);

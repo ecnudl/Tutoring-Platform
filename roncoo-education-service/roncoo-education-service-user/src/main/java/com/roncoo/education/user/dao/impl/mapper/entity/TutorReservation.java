@@ -12,6 +12,9 @@ public class TutorReservation implements Serializable {
     private Long tutorUserId;
     private Long tutorId;
     private Long subjectId;
+    private String contactName;
+    private String contactMobile;
+    private String contactWechat;
     private String scheduleTime;
     private String address;
     private String remark;
@@ -35,6 +38,12 @@ public class TutorReservation implements Serializable {
     public void setTutorId(Long tutorId) { this.tutorId = tutorId; }
     public Long getSubjectId() { return subjectId; }
     public void setSubjectId(Long subjectId) { this.subjectId = subjectId; }
+    public String getContactName() { return contactName; }
+    public void setContactName(String contactName) { this.contactName = contactName == null ? null : contactName.trim(); }
+    public String getContactMobile() { return contactMobile; }
+    public void setContactMobile(String contactMobile) { this.contactMobile = contactMobile == null ? null : contactMobile.trim(); }
+    public String getContactWechat() { return contactWechat; }
+    public void setContactWechat(String contactWechat) { this.contactWechat = contactWechat == null ? null : contactWechat.trim(); }
     public String getScheduleTime() { return scheduleTime; }
     public void setScheduleTime(String scheduleTime) { this.scheduleTime = scheduleTime == null ? null : scheduleTime.trim(); }
     public String getAddress() { return address; }

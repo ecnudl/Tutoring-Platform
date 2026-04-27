@@ -10,6 +10,9 @@
         <result column="tutor_user_id" jdbcType="BIGINT" property="tutorUserId"/>
         <result column="tutor_id" jdbcType="BIGINT" property="tutorId"/>
         <result column="subject_id" jdbcType="BIGINT" property="subjectId"/>
+        <result column="contact_name" jdbcType="VARCHAR" property="contactName"/>
+        <result column="contact_mobile" jdbcType="VARCHAR" property="contactMobile"/>
+        <result column="contact_wechat" jdbcType="VARCHAR" property="contactWechat"/>
         <result column="schedule_time" jdbcType="VARCHAR" property="scheduleTime"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="res_status" jdbcType="TINYINT" property="resStatus"/>
@@ -53,7 +56,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, student_user_id, tutor_user_id, tutor_id, subject_id, schedule_time, address, res_status, cancel_reason</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, student_user_id, tutor_user_id, tutor_id, subject_id, contact_name, contact_mobile, contact_wechat, schedule_time, address, res_status, cancel_reason</sql>
     <sql id="Blob_Column_List">remark</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_reservation
@@ -83,6 +86,9 @@
             <if test="tutorUserId != null">tutor_user_id,</if>
             <if test="tutorId != null">tutor_id,</if>
             <if test="subjectId != null">subject_id,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="contactMobile != null">contact_mobile,</if>
+            <if test="contactWechat != null">contact_wechat,</if>
             <if test="scheduleTime != null">schedule_time,</if>
             <if test="address != null">address,</if>
             <if test="resStatus != null">res_status,</if>
@@ -97,6 +103,9 @@
             <if test="tutorUserId != null">#{tutorUserId,jdbcType=BIGINT},</if>
             <if test="tutorId != null">#{tutorId,jdbcType=BIGINT},</if>
             <if test="subjectId != null">#{subjectId,jdbcType=BIGINT},</if>
+            <if test="contactName != null">#{contactName,jdbcType=VARCHAR},</if>
+            <if test="contactMobile != null">#{contactMobile,jdbcType=VARCHAR},</if>
+            <if test="contactWechat != null">#{contactWechat,jdbcType=VARCHAR},</if>
             <if test="scheduleTime != null">#{scheduleTime,jdbcType=VARCHAR},</if>
             <if test="address != null">#{address,jdbcType=VARCHAR},</if>
             <if test="resStatus != null">#{resStatus,jdbcType=TINYINT},</if>
@@ -129,6 +138,9 @@
             <if test="tutorUserId != null">tutor_user_id = #{tutorUserId,jdbcType=BIGINT},</if>
             <if test="tutorId != null">tutor_id = #{tutorId,jdbcType=BIGINT},</if>
             <if test="subjectId != null">subject_id = #{subjectId,jdbcType=BIGINT},</if>
+            <if test="contactName != null">contact_name = #{contactName,jdbcType=VARCHAR},</if>
+            <if test="contactMobile != null">contact_mobile = #{contactMobile,jdbcType=VARCHAR},</if>
+            <if test="contactWechat != null">contact_wechat = #{contactWechat,jdbcType=VARCHAR},</if>
             <if test="scheduleTime != null">schedule_time = #{scheduleTime,jdbcType=VARCHAR},</if>
             <if test="address != null">address = #{address,jdbcType=VARCHAR},</if>
             <if test="resStatus != null">res_status = #{resStatus,jdbcType=TINYINT},</if>

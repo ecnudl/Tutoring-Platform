@@ -74,16 +74,42 @@ public class AuthMsgUserBiz extends BaseBiz {
         if (!record.getUserId().equals(ThreadContext.userId())) {
             return Result.error("没权限读该信息");
         }
-
         if (ReadEnum.NO.getCode().equals(record.getIsRead())) {
             record.setIsRead(ReadEnum.READ.getCode());
             dao.updateById(record);
         }
-
         Msg msg = msgDao.getById(record.getMsgId());
         if (msg == null) {
             return Result.error("查询msg有误");
         }
         return Result.success(BeanUtil.copyProperties(msg, AuthMsgResp.class));
+    }
+
+    /** 当前用户未读站内信数 (用于角标) */
+    public Result<Long> unreadCount() {
+        MsgUserExample ex = new MsgUserExample();
+        ex.createCriteria()
+                .andUserIdEqualTo(ThreadContext.userId())
+                .andStatusIdEqualTo(StatusIdEnum.YES.getCode())
+                .andIsReadEqualTo(ReadEnum.NO.getCode());
+        return Result.success((long) dao.countByExample(ex));
+    }
+
+    /** 一键全部标记已读 */
+    public Result<String> markAllRead() {
+        Long uid = ThreadContext.userId();
+        MsgUserExample ex = new MsgUserExample();
+        ex.createCriteria()
+                .andUserIdEqualTo(uid)
+                .andStatusIdEqualTo(StatusIdEnum.YES.getCode())
+                .andIsReadEqualTo(ReadEnum.NO.getCode());
+        List<MsgUser> unreads = dao.listByExample(ex);
+        for (MsgUser mu : unreads) {
+            MsgUser u = new MsgUser();
+            u.setId(mu.getId());
+            u.setIsRead(ReadEnum.READ.getCode());
+            dao.updateById(u);
+        }
+        return Result.success("ok");
     }
 }
