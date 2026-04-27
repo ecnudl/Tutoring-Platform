@@ -22,11 +22,9 @@ import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
 
-/**
- * AUTH-站内信用户记录表
- *
- * @author wujing
- */
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class AuthMsgUserBiz extends BaseBiz {
@@ -36,13 +34,6 @@ public class AuthMsgUserBiz extends BaseBiz {
     @NotNull
     private final MsgDao msgDao;
 
-    /**
-     * 站内信分页列表接口
-     *
-     * @param req
-     * @return
-     * @author wuyun
-     */
     public Result<Page<AuthMsgUserResp>> list(AuthMsgUserPageReq req) {
         MsgUserExample example = new MsgUserExample();
         MsgUserExample.Criteria c = example.createCriteria();
@@ -51,16 +42,27 @@ public class AuthMsgUserBiz extends BaseBiz {
         if (req.getIsRead() != null) {
             c.andIsReadEqualTo(req.getIsRead());
         }
-        example.setOrderByClause(" sort asc, id desc ");
+        example.setOrderByClause("id desc");
         Page<MsgUser> page = dao.page(req.getPageCurrent(), req.getPageSize(), example);
-        return Result.success(PageUtil.transform(page, AuthMsgUserResp.class));
+
+        List<AuthMsgUserResp> items = new ArrayList<>();
+        if (page.getList() != null) {
+            for (MsgUser mu : page.getList()) {
+                AuthMsgUserResp resp = BeanUtil.copyProperties(mu, AuthMsgUserResp.class);
+                Msg msg = msgDao.getById(mu.getMsgId());
+                if (msg != null) {
+                    resp.setMsgTitle(msg.getMsgTitle());
+                    resp.setMsgText(msg.getMsgText());
+                    resp.setMsgType(msg.getMsgType());
+                }
+                items.add(resp);
+            }
+        }
+        Page<AuthMsgUserResp> out = new Page<>(page.getTotalCount(), page.getTotalPage(),
+                page.getPageCurrent(), page.getPageSize(), items);
+        return Result.success(out);
     }
 
-    /**
-     * 用户查看站内信内容
-     *
-     * @author wuyun
-     */
     public Result<AuthMsgResp> readMsg(AuthMsgUserGetReq req) {
         if (req.getId() == null) {
             return Result.error("id不能为空");
@@ -73,18 +75,15 @@ public class AuthMsgUserBiz extends BaseBiz {
             return Result.error("没权限读该信息");
         }
 
-        // 未阅读，则刷新阅读状态
         if (ReadEnum.NO.getCode().equals(record.getIsRead())) {
             record.setIsRead(ReadEnum.READ.getCode());
             dao.updateById(record);
         }
 
-        // 返回消息实体
         Msg msg = msgDao.getById(record.getMsgId());
         if (msg == null) {
             return Result.error("查询msg有误");
         }
         return Result.success(BeanUtil.copyProperties(msg, AuthMsgResp.class));
     }
-
 }

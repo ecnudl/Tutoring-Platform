@@ -8,6 +8,8 @@ import com.roncoo.education.common.core.base.Result;
 import com.roncoo.education.common.core.enums.ApplicationStatusEnum;
 import com.roncoo.education.common.core.enums.RequirementStatusEnum;
 import com.roncoo.education.common.core.enums.UserTypeEnum;
+import com.roncoo.education.user.dao.MsgDao;
+import com.roncoo.education.user.dao.MsgUserDao;
 import com.roncoo.education.user.dao.TutorApplicationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
 import com.roncoo.education.user.dao.TutorRequirementDao;
@@ -37,12 +39,13 @@ public class AuthApplicationBiz extends BaseBiz {
     private final UsersDao usersDao;
     @NotNull
     private final VipMembershipDao vipMembershipDao;
+    @NotNull
+    private final MsgDao msgDao;
+    @NotNull
+    private final MsgUserDao msgUserDao;
 
     private static final int DAILY_APPLY_LIMIT = 5;
 
-    /**
-     * 教员：我的申请列表
-     */
     public Result<?> page(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
         Users user = usersDao.getById(userId);
@@ -57,9 +60,6 @@ public class AuthApplicationBiz extends BaseBiz {
         return Result.success(tutorApplicationDao.page(pageCurrent, pageSize, example));
     }
 
-    /**
-     * 学员：查看我的需求收到的申请
-     */
     public Result<?> received(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
         Users user = usersDao.getById(userId);
@@ -77,9 +77,6 @@ public class AuthApplicationBiz extends BaseBiz {
         return Result.success(tutorApplicationDao.listByRequirementId(requirementId));
     }
 
-    /**
-     * 教员：申请需求
-     */
     @Transactional(rollbackFor = Exception.class)
     public Result<String> apply(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
@@ -110,7 +107,6 @@ public class AuthApplicationBiz extends BaseBiz {
         if (existing != null) {
             return Result.error("您已申请过该需求，不能重复申请");
         }
-        // VIP权益：非VIP教员每日申请上限5次
         if (!isVipUser(userId)) {
             LocalDateTime todayStart = LocalDate.now().atStartOfDay();
             List<TutorApplication> todayApps = tutorApplicationDao.listByUserId(userId);
@@ -128,37 +124,34 @@ public class AuthApplicationBiz extends BaseBiz {
         application.setApplyMessage(applyMessage);
         application.setAppStatus(ApplicationStatusEnum.APPLIED.getCode());
         tutorApplicationDao.save(application);
+
+        // 通知需求发布者：有新申请
+        String tutorName = profile.getRealName() != null ? profile.getRealName() : "教员";
+        String reqTitle = requirement.getTitle() != null ? requirement.getTitle() : "您的需求";
+        sendMsg(requirement.getUserId(),
+                "新的家教申请",
+                tutorName + " 已申请您的需求《" + reqTitle + "》，可在「我发布的需求 → 收到的申请」中查看。");
         return Result.success("申请成功");
     }
 
-    /**
-     * 学员：将申请标为入围
-     */
     public Result<String> shortlist(Long id) {
-        return updateAppStatus(id, ApplicationStatusEnum.APPLIED, ApplicationStatusEnum.SHORTLISTED, "入围成功");
+        return updateAppStatus(id, ApplicationStatusEnum.APPLIED, ApplicationStatusEnum.SHORTLISTED, "入围成功", "您的申请已被入围");
     }
 
-    /**
-     * 学员：接受申请
-     */
     public Result<String> accept(Long id) {
-        return updateAppStatus(id, null, ApplicationStatusEnum.ACCEPTED, "已录用");
+        return updateAppStatus(id, null, ApplicationStatusEnum.ACCEPTED, "已录用", "您的申请已被录用！请尽快与学员联系");
     }
 
-    /**
-     * 学员：拒绝申请
-     */
     public Result<String> reject(Long id) {
-        return updateAppStatus(id, null, ApplicationStatusEnum.REJECTED, "已拒绝");
+        return updateAppStatus(id, null, ApplicationStatusEnum.REJECTED, "已拒绝", "您的申请未被采纳");
     }
 
-    private Result<String> updateAppStatus(Long id, ApplicationStatusEnum requiredFrom, ApplicationStatusEnum target, String successMsg) {
+    private Result<String> updateAppStatus(Long id, ApplicationStatusEnum requiredFrom, ApplicationStatusEnum target, String successMsg, String tutorNotifyText) {
         Long userId = ThreadContext.userId();
         TutorApplication app = tutorApplicationDao.getById(id);
         if (app == null) {
             return Result.error("申请不存在");
         }
-        // 验证当前用户是需求发布者
         TutorRequirement req = tutorRequirementDao.getById(app.getRequirementId());
         if (req == null || !req.getUserId().equals(userId)) {
             return Result.error("无权操作此申请");
@@ -166,7 +159,6 @@ public class AuthApplicationBiz extends BaseBiz {
         if (requiredFrom != null && !requiredFrom.getCode().equals(app.getAppStatus())) {
             return Result.error("当前状态不允许此操作");
         }
-        // 已录用或已拒绝不可再操作
         if (ApplicationStatusEnum.ACCEPTED.getCode().equals(app.getAppStatus()) || ApplicationStatusEnum.REJECTED.getCode().equals(app.getAppStatus())) {
             return Result.error("该申请已最终处理，不可修改");
         }
@@ -174,12 +166,23 @@ public class AuthApplicationBiz extends BaseBiz {
         update.setId(id);
         update.setAppStatus(target.getCode());
         tutorApplicationDao.updateById(update);
+
+        // 录用 -> 需求转为「已匹配」
+        if (target == ApplicationStatusEnum.ACCEPTED
+                && RequirementStatusEnum.PUBLISHED.getCode().equals(req.getReqStatus())) {
+            TutorRequirement reqUpdate = new TutorRequirement();
+            reqUpdate.setId(req.getId());
+            reqUpdate.setReqStatus(RequirementStatusEnum.MATCHED.getCode());
+            tutorRequirementDao.updateById(reqUpdate);
+        }
+
+        // 通知教员：申请状态变化
+        String reqTitle = req.getTitle() != null ? req.getTitle() : "需求";
+        sendMsg(app.getUserId(), "申请状态更新", tutorNotifyText + "（需求《" + reqTitle + "》）。");
+
         return Result.success(successMsg);
     }
 
-    /**
-     * 教员：取消申请
-     */
     public Result<String> cancel(Long id) {
         Long userId = ThreadContext.userId();
         TutorApplication application = tutorApplicationDao.getById(id);
@@ -193,9 +196,25 @@ public class AuthApplicationBiz extends BaseBiz {
         return Result.success("取消成功");
     }
 
-    /**
-     * 检查用户是否为生效中的VIP
-     */
+    /** 写一条站内信指向某用户. msg_type=1 (系统通知). 失败不影响主流程. */
+    private void sendMsg(Long userId, String title, String content) {
+        try {
+            Msg msg = new Msg();
+            msg.setMsgType(1);
+            msg.setMsgTitle(title);
+            msg.setMsgText(content);
+            msgDao.save(msg);
+
+            MsgUser mu = new MsgUser();
+            mu.setMsgId(msg.getId());
+            mu.setUserId(userId);
+            mu.setIsRead(0);
+            msgUserDao.save(mu);
+        } catch (Exception ignored) {
+            // 通知失败不阻塞业务
+        }
+    }
+
     private boolean isVipUser(Long userId) {
         VipMembership vip = vipMembershipDao.getByUserId(userId);
         if (vip == null) {

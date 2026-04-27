@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -46,6 +47,9 @@ public class TutorApplicationDaoImpl extends AbstractBaseJdbc implements TutorAp
         return this.tutorApplicationMapper.selectByPrimaryKey(id);
     }
 
+    /**
+     * 分页. selectByExample 不加载 BLOB (apply_message), 用主键再 select 一次拿全字段.
+     */
     @Override
     public Page<TutorApplication> page(int pageCurrent, int pageSize, TutorApplicationExample example) {
         int count = this.tutorApplicationMapper.countByExample(example);
@@ -54,23 +58,21 @@ public class TutorApplicationDaoImpl extends AbstractBaseJdbc implements TutorAp
         int totalPage = PageUtil.countTotalPage(count, pageSize);
         example.setLimitStart(PageUtil.countOffset(pageCurrent, pageSize));
         example.setPageSize(pageSize);
-        return new Page<TutorApplication>(count, totalPage, pageCurrent, pageSize, this.tutorApplicationMapper.selectByExample(example));
+        return new Page<TutorApplication>(count, totalPage, pageCurrent, pageSize, hydrate(this.tutorApplicationMapper.selectByExample(example)));
     }
 
     @Override
     public List<TutorApplication> listByRequirementId(Long requirementId) {
         TutorApplicationExample example = new TutorApplicationExample();
-        TutorApplicationExample.Criteria criteria = example.createCriteria();
-        criteria.andRequirementIdEqualTo(requirementId);
-        return this.tutorApplicationMapper.selectByExample(example);
+        example.createCriteria().andRequirementIdEqualTo(requirementId);
+        return hydrate(this.tutorApplicationMapper.selectByExample(example));
     }
 
     @Override
     public List<TutorApplication> listByUserId(Long userId) {
         TutorApplicationExample example = new TutorApplicationExample();
-        TutorApplicationExample.Criteria criteria = example.createCriteria();
-        criteria.andUserIdEqualTo(userId);
-        return this.tutorApplicationMapper.selectByExample(example);
+        example.createCriteria().andUserIdEqualTo(userId);
+        return hydrate(this.tutorApplicationMapper.selectByExample(example));
     }
 
     @Override
@@ -79,10 +81,21 @@ public class TutorApplicationDaoImpl extends AbstractBaseJdbc implements TutorAp
         TutorApplicationExample.Criteria criteria = example.createCriteria();
         criteria.andRequirementIdEqualTo(requirementId);
         criteria.andTutorIdEqualTo(tutorId);
-        List<TutorApplication> list = this.tutorApplicationMapper.selectByExample(example);
+        List<TutorApplication> list = hydrate(this.tutorApplicationMapper.selectByExample(example));
         if (list.isEmpty()) {
             return null;
         }
         return list.get(0);
+    }
+
+    /** 用主键回查一次, 让 BLOB 列 (apply_message) 也带上. */
+    private List<TutorApplication> hydrate(List<TutorApplication> shallow) {
+        if (shallow == null || shallow.isEmpty()) return shallow;
+        List<TutorApplication> full = new ArrayList<>(shallow.size());
+        for (TutorApplication a : shallow) {
+            TutorApplication withBlobs = this.tutorApplicationMapper.selectByPrimaryKey(a.getId());
+            full.add(withBlobs != null ? withBlobs : a);
+        }
+        return full;
     }
 }

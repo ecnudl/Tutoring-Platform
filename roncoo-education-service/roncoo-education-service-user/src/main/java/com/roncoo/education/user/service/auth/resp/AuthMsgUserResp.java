@@ -56,6 +56,9 @@ public class AuthMsgUserResp implements Serializable {
     @ApiModelProperty(value = "短信标题")
     private String msgTitle;
 
+    @ApiModelProperty(value = "短信内容")
+    private String msgText;
+
     @ApiModelProperty(value = "是否阅读(1是;0否)")
     private Integer isRead;
 
