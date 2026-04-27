@@ -57,7 +57,8 @@ public class ApiTutorBiz extends BaseBiz {
     public Result<Page<TutorSearchResp>> search(TutorSearchReq req) {
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
-        // 展示审核通过及已发布的教员（兼容历史数据）
+        // 展示审核通过及已发布的教员（兼容历史数据）, 且后台未禁用 (status_id=1)
+        c.andStatusIdEqualTo(1);
         c.andAuditStatusIn(java.util.Arrays.asList(
                 TutorAuditStatusEnum.APPROVED.getCode(),
                 TutorAuditStatusEnum.PUBLISHED.getCode()));
@@ -140,13 +141,13 @@ public class ApiTutorBiz extends BaseBiz {
     /**
      * 首页推荐教员列表
      */
-    @Cacheable
     public Result<List<TutorListResp>> recommend(Long cityId, Integer limit) {
         if (limit == null || limit <= 0) {
             limit = 18;
         }
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
+        c.andStatusIdEqualTo(1);
         c.andAuditStatusEqualTo(TutorAuditStatusEnum.PUBLISHED.getCode());
         if (cityId != null) {
             c.andCityIdEqualTo(cityId);
