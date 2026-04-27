@@ -89,7 +89,7 @@
               <div class="info-section">
                 <h3>可教授科目</h3>
                 <div v-if="tutor.subjects">
-                  <el-tag v-for="sub in tutor.subjects.split(',')" :key="sub" style="margin:2px 4px">{{ sub }}</el-tag>
+                  <el-tag v-for="sub in (Array.isArray(tutor.subjects) ? tutor.subjects : String(tutor.subjects || '').split(',').filter(Boolean))" :key="sub" style="margin:2px 4px">{{ sub }}</el-tag>
                 </div>
                 <p v-else class="info-text">暂无</p>
               </div>
@@ -148,7 +148,7 @@ const cityStore = useCityStore()
 const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
-const { get } = useApi()
+const { get, post } = useApi()
 
 const displayNo = route.params.id
 const tutor = ref(null)
@@ -188,25 +188,31 @@ const loadTutor = async () => {
   finally { loading.value = false }
 }
 
-const handleBooking = async () => {
+const handleBooking = () => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录后再预约')
-    router.push('/login')
+    router.push('/login?redirect=' + encodeURIComponent(route.fullPath))
+    return
+  }
+  if (!tutor.value || !tutor.value.id) {
+    ElMessage.error('教员信息未加载完成，请稍后重试')
+    return
+  }
+  if (!userStore.isStudent) {
+    ElMessage.warning('仅家长/学员可发起预约（当前账号为教员或未设置类型）')
     return
   }
   try {
-    const res = await post('/user/auth/reservation/create', {
-      tutorId: tutor.value.id,
-      message: '我对您的教学经历很感兴趣，希望能预约试讲'
-    })
-    if (res.code === 200) {
-      ElMessage.success('预约请求已发送，工作人员将尽快与您联系')
-    } else {
-      ElMessage.error(res.msg || '预约失败')
+    const KEY = 'pending_booking_tutors'
+    const raw = localStorage.getItem(KEY)
+    const list = raw ? JSON.parse(raw) : []
+    const id = String(tutor.value.id)
+    if (!list.find(x => String(x.id) === id)) {
+      list.push({ id, displayNo: tutor.value.displayNo, addedAt: new Date().toISOString() })
+      localStorage.setItem(KEY, JSON.stringify(list))
     }
-  } catch (e) {
-    ElMessage.error('预约失败，请稍后重试')
-  }
+  } catch (_) {}
+  router.push('/jy/booking')
 }
 
 onMounted(() => { loadTutor() })

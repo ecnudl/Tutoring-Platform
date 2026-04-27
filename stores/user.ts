@@ -77,7 +77,8 @@ export const useUserStore = defineStore('user', {
     userType: parseInt(initValue('userType', '0')) || 0,
     mobile: initValue('mobile'),
     isAdmin: initValue('isAdmin') === 'true',
-    nickname: initValue('nickname')
+    nickname: initValue('nickname'),
+    unreadCount: 0
   }),
   getters: {
     isLoggedIn: (s) => !!s.token,
@@ -178,5 +179,20 @@ export const useUserStore = defineStore('user', {
         localStorage.removeItem('nickname')
       }
     }
-  }
+  ,
+    async fetchUnreadCount() {
+      if (typeof window === 'undefined' || !this.token) {
+        this.unreadCount = 0
+        return
+      }
+      try {
+        const { get } = useApi()
+        const res = await get('/user/auth/msg/user/unread-count')
+        if (res?.code === 200) this.unreadCount = Number(res.data) || 0
+      } catch (_) { /* ignore */ }
+    },
+    resetUnread() {
+      this.unreadCount = 0
+    }
+}
 })

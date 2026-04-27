@@ -191,7 +191,15 @@ const goExternal = (url) => {
   window.location.href = url
 }
 
-onMounted(() => { loadSystem(); loadNotices() })
+onMounted(async () => {
+  await loadSystem()
+  await loadNotices()
+  // 进入消息中心 = 全部已读, 同步刷新角标
+  try {
+    await post('/user/auth/msg/user/mark-all-read', {})
+    userStore.fetchUnreadCount?.()
+  } catch (_) { /* ignore */ }
+})
 </script>
 
 <style scoped>

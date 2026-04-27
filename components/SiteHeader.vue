@@ -52,14 +52,18 @@
           <NuxtLink to="/jy" class="nav-cell">教员库</NuxtLink>
           <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
           <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
-          <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
+          <el-badge :value="userStore.unreadCount" :hidden="!userStore.isLoggedIn || !userStore.unreadCount" :max="99">
+            <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
+          </el-badge>
         </div>
         <div class="nav-right-row">
           <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
           <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
-            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
+            <el-badge :value="userStore.unreadCount" :hidden="!userStore.unreadCount" :max="99">
+              <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
+            </el-badge>
             <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
           </template>
           <template v-else>
@@ -73,7 +77,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 import { Location, ArrowDown, Phone } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
@@ -86,10 +90,18 @@ const router = useRouter()
 const runtimeConfig = useRuntimeConfig()
 const brandDomains = runtimeConfig.public.brandDomains || ['www.591jiajiao.com', 'www.591jiajiao.cn']
 
+const route = useRoute()
+let unreadTimer = null
 onMounted(() => {
   if (userStore.isLoggedIn) {
     userStore.fetchNickname()
+    userStore.fetchUnreadCount()
+    unreadTimer = setInterval(() => userStore.fetchUnreadCount(), 60000)
   }
+})
+onBeforeUnmount(() => { if (unreadTimer) clearInterval(unreadTimer) })
+watch(() => route.fullPath, () => {
+  if (userStore.isLoggedIn) userStore.fetchUnreadCount()
 })
 
 const cities = CITY_LIST
