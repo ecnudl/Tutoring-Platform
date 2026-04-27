@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -46,6 +47,7 @@ public class TutorReservationDaoImpl extends AbstractBaseJdbc implements TutorRe
         return this.tutorReservationMapper.selectByPrimaryKey(id);
     }
 
+    /** 分页. selectByExample 不加载 BLOB (remark), 用主键回查一次拿全字段 */
     @Override
     public Page<TutorReservation> page(int pageCurrent, int pageSize, TutorReservationExample example) {
         int count = this.tutorReservationMapper.countByExample(example);
@@ -54,22 +56,31 @@ public class TutorReservationDaoImpl extends AbstractBaseJdbc implements TutorRe
         int totalPage = PageUtil.countTotalPage(count, pageSize);
         example.setLimitStart(PageUtil.countOffset(pageCurrent, pageSize));
         example.setPageSize(pageSize);
-        return new Page<TutorReservation>(count, totalPage, pageCurrent, pageSize, this.tutorReservationMapper.selectByExample(example));
+        return new Page<TutorReservation>(count, totalPage, pageCurrent, pageSize,
+                hydrate(this.tutorReservationMapper.selectByExample(example)));
     }
 
     @Override
     public List<TutorReservation> listByStudentUserId(Long studentUserId) {
         TutorReservationExample example = new TutorReservationExample();
-        TutorReservationExample.Criteria criteria = example.createCriteria();
-        criteria.andStudentUserIdEqualTo(studentUserId);
-        return this.tutorReservationMapper.selectByExample(example);
+        example.createCriteria().andStudentUserIdEqualTo(studentUserId);
+        return hydrate(this.tutorReservationMapper.selectByExample(example));
     }
 
     @Override
     public List<TutorReservation> listByTutorUserId(Long tutorUserId) {
         TutorReservationExample example = new TutorReservationExample();
-        TutorReservationExample.Criteria criteria = example.createCriteria();
-        criteria.andTutorUserIdEqualTo(tutorUserId);
-        return this.tutorReservationMapper.selectByExample(example);
+        example.createCriteria().andTutorUserIdEqualTo(tutorUserId);
+        return hydrate(this.tutorReservationMapper.selectByExample(example));
+    }
+
+    private List<TutorReservation> hydrate(List<TutorReservation> shallow) {
+        if (shallow == null || shallow.isEmpty()) return shallow;
+        List<TutorReservation> full = new ArrayList<>(shallow.size());
+        for (TutorReservation r : shallow) {
+            TutorReservation withBlobs = this.tutorReservationMapper.selectByPrimaryKey(r.getId());
+            full.add(withBlobs != null ? withBlobs : r);
+        }
+        return full;
     }
 }
