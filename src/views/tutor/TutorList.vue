@@ -10,6 +10,11 @@
         <el-option label="已驳回" :value="3" />
         <el-option label="已发布" :value="4" />
       </el-select>
+      <el-select v-model="statusFilter" placeholder="启用状态" clearable style="width:140px" @change="search">
+        <el-option label="全部" :value="null" />
+        <el-option label="已启用" :value="1" />
+        <el-option label="已禁用" :value="0" />
+      </el-select>
       <el-input v-model="keyword" placeholder="姓名搜索" style="width:200px" clearable @keyup.enter="search" />
       <el-button type="primary" @click="search">搜索</el-button>
     </div>
@@ -28,11 +33,20 @@
           <el-tag :type="auditTagType(row.auditStatus)" size="small">{{ auditLabel(row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="启用状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.statusId === 1 ? 'success' : 'danger'" size="small">
+            {{ row.statusId === 1 ? '已启用' : '已禁用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="gmtCreate" label="创建时间" width="170" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="280" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click="viewDetail(row)">详情</el-button>
           <el-button size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
+          <el-button v-if="row.statusId === 1" size="small" type="warning" @click="quickToggle(row, 0)">禁用</el-button>
+          <el-button v-else size="small" type="success" @click="quickToggle(row, 1)">启用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -40,7 +54,6 @@
       <el-pagination layout="total,prev,pager,next" :total="total" :page-size="20" :current-page="page" @current-change="p => { page=p; search() }" />
     </div>
 
-    <!-- 详情弹窗 -->
     <el-dialog v-model="detailVisible" title="教员详情" width="600px">
       <el-descriptions :column="2" border v-if="detail">
         <el-descriptions-item label="姓名">{{ detail.realName }}</el-descriptions-item>
@@ -55,11 +68,15 @@
         <el-descriptions-item label="审核状态">
           <el-tag :type="auditTagType(detail.auditStatus)">{{ auditLabel(detail.auditStatus) }}</el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="启用状态">
+          <el-tag :type="detail.statusId === 1 ? 'success' : 'danger'">
+            {{ detail.statusId === 1 ? '已启用' : '已禁用' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="排序权重">{{ detail.sort || 0 }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 
-    <!-- 编辑弹窗 -->
     <el-dialog v-model="editVisible" title="编辑教员" width="400px">
       <el-form label-width="80px">
         <el-form-item label="排序权重">
@@ -82,10 +99,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { post, get, put } from '@/api/index'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const keyword = ref('')
 const auditStatus = ref<number | null>(null)
+const statusFilter = ref<number | null>(null)
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -107,7 +125,9 @@ const search = async () => {
   try {
     const res = await post('/user/admin/tutor/page', {
       pageCurrent: page.value, pageSize: 20,
-      auditStatus: auditStatus.value, keyword: keyword.value || undefined
+      auditStatus: auditStatus.value,
+      statusId: statusFilter.value,
+      keyword: keyword.value || undefined
     })
     if (res.code === 200 && res.data) {
       list.value = res.data.list || []
@@ -137,6 +157,22 @@ const submitEdit = async () => {
     else ElMessage.error(res.msg || '操作失败')
   } catch (e) { ElMessage.error('网络错误') }
   finally { saving.value = false }
+}
+
+const quickToggle = async (row: any, target: 0 | 1) => {
+  const action = target === 1 ? '启用' : '禁用'
+  try {
+    await ElMessageBox.confirm(`确认${action}教员「${row.realName}」？` + (target === 0 ? '禁用后将不在前台教员列表中展示。' : ''), `${action}确认`, {
+      confirmButtonText: action,
+      cancelButtonText: '取消',
+      type: target === 1 ? 'success' : 'warning'
+    })
+  } catch { return }
+  try {
+    const res = await put('/user/admin/tutor/edit', { id: row.id, sort: row.sort || 0, statusId: target })
+    if (res.code === 200) { ElMessage.success(`${action}成功`); await search() }
+    else ElMessage.error(res.msg || '操作失败')
+  } catch (e) { ElMessage.error('网络错误') }
 }
 
 onMounted(() => { search() })
