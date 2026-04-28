@@ -56,7 +56,7 @@
           </el-tab-pane>
         </el-tabs>
         <div class="login-footer">
-          <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+          <NuxtLink to="/forgot-password">找回密码</NuxtLink>
           <NuxtLink :to="selectedRole === 'student' ? '/register/student' : '/register/teacher'">我要注册</NuxtLink>
         </div>
       </div>

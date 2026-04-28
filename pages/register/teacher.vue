@@ -94,7 +94,7 @@
           <div class="bottom-tip">
             已有账号？<NuxtLink to="/login?type=teacher">教员登录</NuxtLink>
             <span class="sep">|</span>
-            <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+            <NuxtLink to="/forgot-password">找回密码</NuxtLink>
           </div>
         </el-form>
       </div>

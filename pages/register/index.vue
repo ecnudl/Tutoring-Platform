@@ -3,7 +3,7 @@
     <div class="container register-page">
       <div class="register-body">
         <h2 class="register-title">欢迎注册</h2>
-        <p class="register-subtitle">如果您已经注册过，可以直接 <NuxtLink to="/login/find-password">找回密码</NuxtLink></p>
+        <p class="register-subtitle">如果您已经注册过，可以直接 <NuxtLink to="/forgot-password">找回密码</NuxtLink></p>
         <div class="register-cards">
           <NuxtLink to="/register/student" class="reg-card">
             <div class="reg-icon">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;</div>
@@ -11,7 +11,7 @@
             <p>我是学员/家长</p>
             <div class="reg-links">
               <NuxtLink to="/login?type=student">学员/家长登录</NuxtLink>
-              <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+              <NuxtLink to="/forgot-password">找回密码</NuxtLink>
             </div>
           </NuxtLink>
           <NuxtLink to="/register/teacher" class="reg-card">
@@ -20,7 +20,7 @@
             <p>我是老师</p>
             <div class="reg-links">
               <NuxtLink to="/login?type=teacher">教员登录</NuxtLink>
-              <NuxtLink to="/login/find-password">找回密码</NuxtLink>
+              <NuxtLink to="/forgot-password">找回密码</NuxtLink>
             </div>
           </NuxtLink>
         </div>
