@@ -25,4 +25,10 @@ public class AdminRequirementAuditController {
     public Result<String> approve(@RequestBody java.util.Map<String, Object> req) { return biz.approve(req); }
     @SysLog(value = "审核拒绝") @ApiOperation(value = "审核拒绝") @PutMapping("/reject")
     public Result<String> reject(@RequestBody java.util.Map<String, Object> req) { return biz.reject(req); }
+
+    @SysLog(value = "标为已接单") @ApiOperation(value = "标为已接单(admin 离线匹配后)") @PutMapping("/match")
+    public Result<String> match(@RequestBody java.util.Map<String, Object> req) { return biz.match(req); }
+
+    @ApiOperation(value = "待审核数量统计") @GetMapping("/pending-count")
+    public Result<Long> pendingCount() { return biz.pendingCount(); }
 }

@@ -25,7 +25,10 @@
         <result column="application_count" jdbcType="INTEGER" property="applicationCount"/>
         <result column="contact_wechat" jdbcType="VARCHAR" property="contactWechat"/>
         <result column="teaching_method" jdbcType="TINYINT" property="teachingMethod"/>
-        <result column="display_no" jdbcType="VARCHAR" property="displayNo"/>    </resultMap>
+        <result column="display_no" jdbcType="VARCHAR" property="displayNo"/>        <result column="matched_at" jdbcType="TIMESTAMP" property="matchedAt"/>
+      <result column="matched_tutor_remark" jdbcType="VARCHAR" property="matchedTutorRemark"/>
+      <result column="target_tutor_user_id" jdbcType="BIGINT" property="targetTutorUserId"/>
+  </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
         <result column="schedule" jdbcType="LONGVARCHAR" property="schedule"/>
         <result column="requirement_detail" jdbcType="LONGVARCHAR" property="requirementDetail"/>
@@ -66,7 +69,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id</sql>
     <sql id="Blob_Column_List">schedule, requirement_detail</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_requirement
@@ -113,7 +116,10 @@
             <if test="requirementDetail != null">requirement_detail,</if>
             <if test="contactWechat != null">contact_wechat,</if>
             <if test="teachingMethod != null">teaching_method,</if>
-            <if test="displayNo != null">display_no,</if>        </trim>
+            <if test="displayNo != null">display_no,</if>              <if test="matchedAt != null">matched_at,</if>
+          <if test="matchedTutorRemark != null">matched_tutor_remark,</if>
+          <if test="targetTutorUserId != null">target_tutor_user_id,</if>
+    </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
             <if test="gmtCreate != null">#{gmtCreate,jdbcType=TIMESTAMP},</if>
@@ -140,7 +146,10 @@
             <if test="requirementDetail != null">#{requirementDetail,jdbcType=LONGVARCHAR},</if>
             <if test="contactWechat != null">#{contactWechat,jdbcType=VARCHAR},</if>
             <if test="teachingMethod != null">#{teachingMethod,jdbcType=TINYINT},</if>
-            <if test="displayNo != null">#{displayNo,jdbcType=VARCHAR},</if>        </trim>
+            <if test="displayNo != null">#{displayNo,jdbcType=VARCHAR},</if>              <if test="matchedAt != null">#{matchedAt,jdbcType=TIMESTAMP},</if>
+          <if test="matchedTutorRemark != null">#{matchedTutorRemark,jdbcType=VARCHAR},</if>
+          <if test="targetTutorUserId != null">#{targetTutorUserId,jdbcType=BIGINT},</if>
+    </trim>
     </insert>
     <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultType="java.lang.Integer">select count(*) from tutor_requirement <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
     <update id="updateByExampleSelective" parameterType="map">
@@ -196,7 +205,10 @@
             <if test="requirementDetail != null">requirement_detail = #{requirementDetail,jdbcType=LONGVARCHAR},</if>
             <if test="contactWechat != null">contact_wechat = #{contactWechat,jdbcType=VARCHAR},</if>
             <if test="teachingMethod != null">teaching_method = #{teachingMethod,jdbcType=TINYINT},</if>
-            <if test="displayNo != null">display_no = #{displayNo,jdbcType=VARCHAR},</if>        </set>
+            <if test="displayNo != null">display_no = #{displayNo,jdbcType=VARCHAR},</if>              <if test="matchedAt != null">matched_at = #{matchedAt,jdbcType=TIMESTAMP},</if>
+          <if test="matchedTutorRemark != null">matched_tutor_remark = #{matchedTutorRemark,jdbcType=VARCHAR},</if>
+          <if test="targetTutorUserId != null">target_tutor_user_id = #{targetTutorUserId,jdbcType=BIGINT},</if>
+    </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">

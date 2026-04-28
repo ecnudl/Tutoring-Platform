@@ -16,7 +16,9 @@
         <result column="schedule_time" jdbcType="VARCHAR" property="scheduleTime"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="res_status" jdbcType="TINYINT" property="resStatus"/>
-        <result column="cancel_reason" jdbcType="VARCHAR" property="cancelReason"/>    </resultMap>
+        <result column="cancel_reason" jdbcType="VARCHAR" property="cancelReason"/>        <result column="matched_at" jdbcType="TIMESTAMP" property="matchedAt"/>
+      <result column="requirement_id" jdbcType="BIGINT" property="requirementId"/>
+  </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation">
         <result column="remark" jdbcType="LONGVARCHAR" property="remark"/>
     </resultMap>
@@ -56,7 +58,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, student_user_id, tutor_user_id, tutor_id, subject_id, contact_name, contact_mobile, contact_wechat, schedule_time, address, res_status, cancel_reason</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, student_user_id, tutor_user_id, tutor_id, subject_id, contact_name, contact_mobile, contact_wechat, schedule_time, address, res_status, cancel_reason, matched_at, requirement_id</sql>
     <sql id="Blob_Column_List">remark</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_reservation
@@ -93,7 +95,9 @@
             <if test="address != null">address,</if>
             <if test="resStatus != null">res_status,</if>
             <if test="cancelReason != null">cancel_reason,</if>
-            <if test="remark != null">remark,</if>        </trim>
+            <if test="remark != null">remark,</if>              <if test="matchedAt != null">matched_at,</if>
+          <if test="requirementId != null">requirement_id,</if>
+    </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
             <if test="gmtCreate != null">#{gmtCreate,jdbcType=TIMESTAMP},</if>
@@ -110,7 +114,9 @@
             <if test="address != null">#{address,jdbcType=VARCHAR},</if>
             <if test="resStatus != null">#{resStatus,jdbcType=TINYINT},</if>
             <if test="cancelReason != null">#{cancelReason,jdbcType=VARCHAR},</if>
-            <if test="remark != null">#{remark,jdbcType=LONGVARCHAR},</if>        </trim>
+            <if test="remark != null">#{remark,jdbcType=LONGVARCHAR},</if>              <if test="matchedAt != null">#{matchedAt,jdbcType=TIMESTAMP},</if>
+          <if test="requirementId != null">#{requirementId,jdbcType=BIGINT},</if>
+    </trim>
     </insert>
     <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample" resultType="java.lang.Integer">select count(*) from tutor_reservation <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
     <update id="updateByExampleSelective" parameterType="map">
@@ -145,7 +151,9 @@
             <if test="address != null">address = #{address,jdbcType=VARCHAR},</if>
             <if test="resStatus != null">res_status = #{resStatus,jdbcType=TINYINT},</if>
             <if test="cancelReason != null">cancel_reason = #{cancelReason,jdbcType=VARCHAR},</if>
-            <if test="remark != null">remark = #{remark,jdbcType=LONGVARCHAR},</if>        </set>
+            <if test="remark != null">remark = #{remark,jdbcType=LONGVARCHAR},</if>              <if test="matchedAt != null">matched_at = #{matchedAt,jdbcType=TIMESTAMP},</if>
+          <if test="requirementId != null">requirement_id = #{requirementId,jdbcType=BIGINT},</if>
+    </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation">

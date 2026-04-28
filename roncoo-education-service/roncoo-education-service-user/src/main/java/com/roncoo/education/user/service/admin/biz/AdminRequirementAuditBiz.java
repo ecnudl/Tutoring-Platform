@@ -127,4 +127,30 @@ public class AdminRequirementAuditBiz extends BaseBiz {
         }
         tutorRequirementAuditDao.save(record);
     }
+
+    /** 标为已接单 (admin 离线撮合成功后) */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> match(Map<String, Object> req) {
+        Long id = Long.parseLong(req.get("id").toString());
+        String tutorRemark = req.get("matchedTutorRemark") != null ? req.get("matchedTutorRemark").toString() : "";
+        TutorRequirement requirement = tutorRequirementDao.getById(id);
+        if (requirement == null) return Result.error("需求不存在");
+        if (!RequirementStatusEnum.PUBLISHED.getCode().equals(requirement.getReqStatus())) {
+            return Result.error("仅已发布的需求可标为已接单");
+        }
+        TutorRequirement update = new TutorRequirement();
+        update.setId(id);
+        update.setReqStatus(RequirementStatusEnum.MATCHED.getCode());
+        update.setMatchedAt(java.time.LocalDateTime.now());
+        if (StringUtils.hasText(tutorRemark)) update.setMatchedTutorRemark(tutorRemark);
+        tutorRequirementDao.updateById(update);
+        saveAuditRecord(id, 3, "已接单: " + tutorRemark);
+        return Result.success("已标记为已接单, 学员库该需求显示已接单");
+    }
+
+    public Result<Long> pendingCount() {
+        TutorRequirementExample ex = new TutorRequirementExample();
+        ex.createCriteria().andReqStatusEqualTo(RequirementStatusEnum.PENDING.getCode());
+        return Result.success((long) tutorRequirementDao.page(1, 1, ex).getTotalCount());
+    }
 }

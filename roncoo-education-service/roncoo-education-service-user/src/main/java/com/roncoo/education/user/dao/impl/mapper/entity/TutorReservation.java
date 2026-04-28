@@ -20,6 +20,8 @@ public class TutorReservation implements Serializable {
     private String remark;
     private Integer resStatus;
     private String cancelReason;
+    private java.time.LocalDateTime matchedAt;
+    private Long requirementId;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -54,6 +56,11 @@ public class TutorReservation implements Serializable {
     public void setResStatus(Integer resStatus) { this.resStatus = resStatus; }
     public String getCancelReason() { return cancelReason; }
     public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason == null ? null : cancelReason.trim(); }
+    public java.time.LocalDateTime getMatchedAt() { return matchedAt; }
+    public void setMatchedAt(java.time.LocalDateTime matchedAt) { this.matchedAt = matchedAt; }
+    public Long getRequirementId() { return requirementId; }
+    public void setRequirementId(Long requirementId) { this.requirementId = requirementId; }
+
 
     @Override
     public String toString() {

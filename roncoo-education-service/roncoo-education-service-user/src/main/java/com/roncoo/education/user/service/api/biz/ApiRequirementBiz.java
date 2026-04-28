@@ -41,7 +41,9 @@ public class ApiRequirementBiz extends BaseBiz {
     public Result<Page<RequirementSearchResp>> search(RequirementSearchReq req) {
         TutorRequirementExample example = new TutorRequirementExample();
         TutorRequirementExample.Criteria c = example.createCriteria();
-        c.andReqStatusEqualTo(RequirementStatusEnum.PUBLISHED.getCode());
+        c.andReqStatusIn(java.util.Arrays.asList(
+                RequirementStatusEnum.PUBLISHED.getCode(),
+                RequirementStatusEnum.MATCHED.getCode()));
         if (req.getCityId() != null) {
             c.andCityIdEqualTo(req.getCityId());
         }
@@ -67,7 +69,9 @@ public class ApiRequirementBiz extends BaseBiz {
         if (requirement == null) {
             return Result.error("需求不存在");
         }
-        if (!RequirementStatusEnum.PUBLISHED.getCode().equals(requirement.getReqStatus())) {
+        Integer st = requirement.getReqStatus();
+        if (!RequirementStatusEnum.PUBLISHED.getCode().equals(st)
+                && !RequirementStatusEnum.MATCHED.getCode().equals(st)) {
             return Result.error("该需求暂不可查看");
         }
         // 增加浏览次数
@@ -93,7 +97,9 @@ public class ApiRequirementBiz extends BaseBiz {
         }
         TutorRequirementExample example = new TutorRequirementExample();
         TutorRequirementExample.Criteria c = example.createCriteria();
-        c.andReqStatusEqualTo(RequirementStatusEnum.PUBLISHED.getCode());
+        c.andReqStatusIn(java.util.Arrays.asList(
+                RequirementStatusEnum.PUBLISHED.getCode(),
+                RequirementStatusEnum.MATCHED.getCode()));
         if (cityId != null) {
             c.andCityIdEqualTo(cityId);
         }

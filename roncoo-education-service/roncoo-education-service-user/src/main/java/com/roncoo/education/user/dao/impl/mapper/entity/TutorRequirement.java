@@ -27,6 +27,9 @@ public class TutorRequirement implements Serializable {
     private String contactMobile;
     private Integer reqStatus;
     private String auditRemark;
+    private java.time.LocalDateTime matchedAt;
+    private String matchedTutorRemark;
+    private Long targetTutorUserId;
     private Integer viewCount;
     private Integer applicationCount;
     private String contactWechat;
@@ -93,4 +96,11 @@ public class TutorRequirement implements Serializable {
     public String toString() {
         return "TutorRequirement [id=" + id + ", userId=" + userId + ", title=" + title + ", reqStatus=" + reqStatus + "]";
     }
+
+    public java.time.LocalDateTime getMatchedAt() { return matchedAt; }
+    public void setMatchedAt(java.time.LocalDateTime matchedAt) { this.matchedAt = matchedAt; }
+    public String getMatchedTutorRemark() { return matchedTutorRemark; }
+    public void setMatchedTutorRemark(String matchedTutorRemark) { this.matchedTutorRemark = matchedTutorRemark == null ? null : matchedTutorRemark.trim(); }
+    public Long getTargetTutorUserId() { return targetTutorUserId; }
+    public void setTargetTutorUserId(Long targetTutorUserId) { this.targetTutorUserId = targetTutorUserId; }
 }
