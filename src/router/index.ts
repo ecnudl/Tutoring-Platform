@@ -19,6 +19,7 @@ const routes = [
     { path: 'dict/grade', component: () => import('@/views/dict/GradeList.vue') },
     { path: 'dict/tag', component: () => import('@/views/dict/TagList.vue') },
     { path: 'content/banner', component: () => import('@/views/content/BannerList.vue') },
+    { path: 'content/tutor-group-qr', component: () => import('@/views/content/TutorGroupQr.vue') },
     { path: 'content/article', component: () => import('@/views/content/ArticleList.vue') },
     { path: 'content/announcement', component: () => import('@/views/content/AnnouncementList.vue') },
     { path: 'content/faq', component: () => import('@/views/content/FaqList.vue') },
