@@ -80,6 +80,13 @@ public class AdminSysConfigController {
         return biz.delete(id);
     }
 
+    @ApiOperation(value = "按 key 写入配置(不存在则新建)", notes = "POST { configKey, configValue, configName? }")
+    @SysLog(value = "按 key 写入配置")
+    @PostMapping(value = "/save-by-key")
+    public Result<String> saveByKey(@RequestBody java.util.Map<String, String> req) {
+        return biz.saveByKey(req.get("configKey"), req.get("configValue"), req.get("configName"));
+    }
+
     @ApiOperation(value = "视频云初始化设置", notes = "视频云初始化设置")
     @SysLog(value = "视频云初始化设置")
     @GetMapping(value = "/video/init")

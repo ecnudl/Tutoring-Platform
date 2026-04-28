@@ -25,6 +25,8 @@ import com.roncoo.education.system.service.admin.resp.AdminSysConfigListResp;
 import com.roncoo.education.system.service.admin.resp.AdminSysConfigPageResp;
 import com.roncoo.education.system.service.admin.resp.AdminSysConfigViewResp;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import com.roncoo.education.common.tools.IdWorker;
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
@@ -166,4 +168,31 @@ public class AdminSysConfigBiz extends BaseBiz {
         VideoConfig videoConfig = BeanUtil.objToBean(configMap, VideoConfig.class);
         return Result.success(VodUtil.getCallbackUrl(videoConfig));
     }
+
+    /** 按 key 新建/更新一条 sys_config; 同时清掉 system 缓存让 /system/api/site/config 立即拿到新值 */
+    @CacheEvict(cacheNames = "system", allEntries = true)
+    public Result<String> saveByKey(String key, String value, String name) {
+        if (key == null || key.isEmpty()) return Result.error("configKey 不能为空");
+        SysConfigExample example = new SysConfigExample();
+        example.createCriteria().andConfigKeyEqualTo(key);
+        java.util.List<SysConfig> existing = dao.listByExample(example);
+        if (existing != null && !existing.isEmpty()) {
+            SysConfig row = existing.get(0);
+            row.setConfigValue(value == null ? "" : value);
+            if (name != null && !name.isEmpty()) row.setConfigName(name);
+            dao.updateById(row);
+        } else {
+            SysConfig row = new SysConfig();
+            row.setId(IdWorker.getId());
+            row.setConfigKey(key);
+            row.setConfigValue(value == null ? "" : value);
+            row.setConfigName(name == null ? key : name);
+            row.setConfigType(1);
+            row.setContentType(1);
+            row.setSort(0);
+            dao.save(row);
+        }
+        return Result.success("保存成功");
+    }
+
 }
