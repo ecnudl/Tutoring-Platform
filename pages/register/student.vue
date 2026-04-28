@@ -14,14 +14,7 @@
           <el-form-item label="手机号">
             <el-input v-model="form.mobile" placeholder="请输入手机号" size="large" />
           </el-form-item>
-          <el-form-item label="短信验证码">
-            <div class="code-row">
-              <el-input v-model="form.code" placeholder="请输入短信验证码" size="large" style="flex:1" />
-              <el-button size="large" :disabled="countdown > 0" @click="sendCode">
-                {{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}
-              </el-button>
-            </div>
-          </el-form-item>
+
           <el-form-item label="您的尊称">
             <el-input v-model="form.realName" placeholder="请输入您的尊称：例如 张女士" size="large" />
           </el-form-item>
@@ -30,6 +23,19 @@
           </el-form-item>
           <el-form-item label="确认密码">
             <el-input v-model="form.confirmPassword" type="password" placeholder="请重复密码" size="large" show-password />
+          </el-form-item>
+          <el-form-item label="安全问题（用于忘记密码后找回，请妥善保管）">
+            <el-select v-model="form.securityQuestion" placeholder="请选择一个安全问题" size="large" style="width:100%">
+              <el-option label="您母亲的姓名是？" value="您母亲的姓名是？" />
+              <el-option label="您父亲的姓名是？" value="您父亲的姓名是？" />
+              <el-option label="您毕业的小学名字是？" value="您毕业的小学名字是？" />
+              <el-option label="您出生的城市是？" value="您出生的城市是？" />
+              <el-option label="您家中宠物的名字是？" value="您家中宠物的名字是？" />
+              <el-option label="您最好朋友的姓名是？" value="您最好朋友的姓名是？" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="安全答案">
+            <el-input v-model="form.securityAnswer" placeholder="请填写答案（不区分大小写，请记牢）" size="large" />
           </el-form-item>
           <el-form-item>
             <div class="agreement-check" :class="{ 'agreement-check--error': showAgreementError && !form.agreed }">
@@ -69,43 +75,17 @@ const showAgreementError = ref(false)
 
 const form = ref({
   mobile: '',
-  code: '',
   realName: '',
   password: '',
   confirmPassword: '',
+  securityQuestion: '',
+  securityAnswer: '',
   agreed: false
 })
-
-const countdown = ref(0)
-
-const sendCode = async () => {
-  if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  try {
-    const res = await post('/user/api/sms/send', { mobile: form.value.mobile })
-    if (res.code === 200) {
-      ElMessage.success('验证码已发送')
-      countdown.value = 60
-      const timer = setInterval(() => {
-        if (--countdown.value <= 0) clearInterval(timer)
-      }, 1000)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e) {
-    ElMessage.error('发送失败，请稍后重试')
-  }
-}
 
 const handleSubmit = async () => {
   if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
     ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  if (!form.value.code) {
-    ElMessage.warning('请输入短信验证码')
     return
   }
   if (!form.value.realName) {
@@ -120,6 +100,10 @@ const handleSubmit = async () => {
     ElMessage.warning('两次密码不一致')
     return
   }
+  if (!form.value.securityQuestion || !form.value.securityAnswer) {
+    ElMessage.warning('请选择安全问题并填写答案（用于忘记密码后找回）')
+    return
+  }
   if (!form.value.agreed) {
     showAgreementError.value = true
     ElMessage.warning('请先阅读并同意用户协议、免责声明和隐私保护政策')
@@ -131,9 +115,10 @@ const handleSubmit = async () => {
     const res = await post('/user/api/users/register/simple', {
       mobile: form.value.mobile,
       password: form.value.password,
-      code: form.value.code,
       userType: 2,
-      realName: form.value.realName
+      realName: form.value.realName,
+      securityQuestion: form.value.securityQuestion,
+      securityAnswer: form.value.securityAnswer
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')

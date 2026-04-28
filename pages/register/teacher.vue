@@ -55,14 +55,7 @@
             <el-input v-model="step1.mobile" placeholder="请输入11位手机号" maxlength="11" />
           </el-form-item>
 
-          <el-form-item label="短信验证码" prop="code" required>
-            <div class="code-row">
-              <el-input v-model="step1.code" placeholder="请输入短信验证码" maxlength="6" style="flex:1" />
-              <el-button :disabled="countdown > 0" @click="sendCode">
-                {{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}
-              </el-button>
-            </div>
-          </el-form-item>
+
 
           <el-form-item label="设置密码" prop="password" required>
             <el-input v-model="step1.password" type="password" placeholder="6-20 位，字母+数字" show-password />
@@ -70,6 +63,21 @@
 
           <el-form-item label="确认密码" prop="confirmPassword" required>
             <el-input v-model="step1.confirmPassword" type="password" placeholder="再次输入密码" show-password />
+          </el-form-item>
+
+          <el-form-item label="安全问题" prop="securityQuestion" required>
+            <el-select v-model="step1.securityQuestion" placeholder="请选择一个问题（用于忘记密码后找回）" style="width:100%">
+              <el-option label="您母亲的姓名是？" value="您母亲的姓名是？" />
+              <el-option label="您父亲的姓名是？" value="您父亲的姓名是？" />
+              <el-option label="您毕业的小学名字是？" value="您毕业的小学名字是？" />
+              <el-option label="您出生的城市是？" value="您出生的城市是？" />
+              <el-option label="您家中宠物的名字是？" value="您家中宠物的名字是？" />
+              <el-option label="您最好朋友的姓名是？" value="您最好朋友的姓名是？" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="安全答案" prop="securityAnswer" required>
+            <el-input v-model="step1.securityAnswer" placeholder="不区分大小写，请记牢；忘记密码时需要回答" />
           </el-form-item>
 
           <div class="agreement-box" :class="{ error: agreementError }">
@@ -326,7 +334,6 @@ const config = useRuntimeConfig()
 
 const currentStep = ref(1)
 const submitting = ref(false)
-const countdown = ref(0)
 const agreementError = ref(false)
 
 const step1Ref = ref(null)
@@ -340,9 +347,10 @@ const universityList = computed(() => universities.value)
 const step1 = reactive({
   cityId: cityStore.cityId,
   mobile: '',
-  code: '',
   password: '',
   confirmPassword: '',
+  securityQuestion: '',
+  securityAnswer: '',
   agreed: false
 })
 
@@ -352,7 +360,6 @@ const step1Rules = {
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
   ],
-  code: [{ required: true, message: '请输入短信验证码', trigger: 'blur' }],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '密码长度 6-20 位', trigger: 'blur' }
@@ -360,7 +367,9 @@ const step1Rules = {
   confirmPassword: [
     { required: true, message: '请再次输入密码', trigger: 'blur' },
     { validator: (_, v, cb) => v === step1.password ? cb() : cb(new Error('两次密码不一致')), trigger: 'blur' }
-  ]
+  ],
+  securityQuestion: [{ required: true, message: '请选择安全问题', trigger: 'change' }],
+  securityAnswer: [{ required: true, message: '请填写安全答案', trigger: 'blur' }]
 }
 
 const onCityChange = (newId) => {
@@ -369,22 +378,6 @@ const onCityChange = (newId) => {
   if (!target) return
   // 跳转到目标城市子站的注册页
   navigateToCity(target, '/register/teacher')
-}
-
-const sendCode = async () => {
-  if (!step1.mobile || !/^1[3-9]\d{9}$/.test(step1.mobile)) {
-    ElMessage.warning('请输入正确的手机号'); return
-  }
-  try {
-    const res = await post('/user/api/sms/send', { mobile: step1.mobile })
-    if (res.code === 200) {
-      ElMessage.success('验证码已发送')
-      countdown.value = 60
-      const timer = setInterval(() => { if (--countdown.value <= 0) clearInterval(timer) }, 1000)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e) { ElMessage.error('发送失败，请稍后重试') }
 }
 
 const goStep2 = async () => {
@@ -512,9 +505,10 @@ const handleSubmit = async () => {
     const regRes = await post('/user/api/users/register/simple', {
       mobile: step1.mobile,
       password: step1.password,
-      code: step1.code,
       userType: 1,
-      realName: step2.realName
+      realName: step2.realName,
+      securityQuestion: step1.securityQuestion,
+      securityAnswer: step1.securityAnswer
     })
     if (regRes.code !== 200) {
       ElMessage.error(regRes.msg || '注册失败')
