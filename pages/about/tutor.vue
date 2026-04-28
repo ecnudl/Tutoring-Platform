@@ -2,7 +2,7 @@
 <div class="bt-page">
   <Head>
     <Title>为什么选择591家教网 · 期待您来做老师</Title>
-    <Meta name="description" content="591家教网邀您加入教员队伍 — 不收中介费、信息透明、隐私保护。" />
+    <Meta name="description" content="591家教网邀您加入教员队伍 — 透明分发、规则清晰、不抽成课时费。" />
   </Head>
 
   <!-- ============ 面包屑 ============ -->
@@ -92,7 +92,7 @@
       <div class="bt-cta-words">
         <p class="kicker">下一步</p>
         <h3 class="bt-cta-h">填写资料 · 上传证件 · 等待审核 · 开始接单</h3>
-        <p class="bt-cta-fine">不收教员中介费，课时费由学员直接结算。</p>
+        <p class="bt-cta-fine">课时费由家长直接结算给您（不经平台）；中介费一次性结清，长期无负担。</p>
       </div>
       <NuxtLink to="/register/teacher" class="bt-cta-btn">
         <span>现在就注册教员</span>
@@ -114,7 +114,7 @@ const reasons = [
   { title: '订单透明公开',         desc: '已发布的家教需求所有合规教员都能完整看到，机会均等。' },
   { title: '信息真实可靠',         desc: '每一位学员/家长信息逐条核实，确保您接到真实有效的需求。' },
   { title: '诚信服务 · 反馈通道',  desc: '提供诚信优质服务，纠纷与建议有专人响应，可投诉可申诉。' },
-  { title: '不收教员中介费',       desc: '教员在平台接单平台不抽成，课时费由学员直接结算给您。' },
+  { title: '透明中介费 · 不抽成', desc: '中介费一次性收取(等同首次课时费), 上 1 次课减半, 2 次起不退; 课时费 100% 归您。' },
   { title: '隐私保护 · 严格脱敏',  desc: '注册资料采取保密措施，对外展示均经脱敏处理，绝不外泄。' }
 ]
 </script>

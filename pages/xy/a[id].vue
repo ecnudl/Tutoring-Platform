@@ -184,7 +184,7 @@
           </h4>
           <ol class="tips-list">
             <li><strong>双向核验</strong> — 学员信息逐单核实，避免假单浪费您的时间。</li>
-            <li><strong>不收教员中介费</strong> — 课时费由学员直接结算给您，平台不抽成。</li>
+            <li><strong>课时费 100% 归您</strong> — 由家长直接支付给您，不经平台；中介费一次性，规则公开。</li>
             <li><strong>分发更公平</strong> — 客服按学员需求与教员条件做匹配，不是先到先得。</li>
           </ol>
         </div>

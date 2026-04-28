@@ -348,7 +348,7 @@ const DEFAULT_TESTIMONIALS = [
   { name: '张女士', role: '学生家长', content: '老师非常耐心，孩子数学从70分提到了95分，非常感谢平台推荐的教员！' },
   { name: '李同学', role: '大学生教员', content: '平台派单很快，家长也很好沟通，一个月接了5个学生，课时费准时结算。' },
   { name: '王先生', role: '学生家长', content: '给孩子找了一位复旦的英语家教，口语提升很明显，试讲免费这个政策很好。' },
-  { name: '陈老师', role: '专职教员', content: '在平台上教了两年了，学生资源稳定，平台不收中介费，比之前的机构好很多。' },
+  { name: '陈老师', role: '专职教员', content: '在平台上教了两年了，学生资源稳定，匹配规则清晰、纠纷处理及时，比之前的机构好很多。' },
 ]
 const testimonialsData = ref([])
 const testimonials = computed(() => testimonialsData.value.length ? testimonialsData.value : DEFAULT_TESTIMONIALS)

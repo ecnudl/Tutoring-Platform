@@ -10,7 +10,7 @@
     <el-form label-width="80px">
       <el-form-item label="内容">
         <el-input v-model="form.content" type="textarea" :rows="4" maxlength="500" show-word-limit
-                  :placeholder="userStore.isTutor ? '例如：在平台上教了两年了，学生资源稳定，平台不收中介费…' : '例如：老师非常耐心，孩子数学从70分提到了95分…'" />
+                  :placeholder="userStore.isTutor ? '例如：学生资源稳定，纠纷处理及时，匹配靠谱…' : '例如：老师非常耐心，孩子数学从70分提到了95分…'" />
       </el-form-item>
       <el-form-item label="署名">
         <el-input v-model="form.contact" maxlength="50" :placeholder="userStore.isTutor ? '您希望展示的称呼，如：陈老师（选填）' : '您希望展示的称呼，如：张女士（选填）'" />
