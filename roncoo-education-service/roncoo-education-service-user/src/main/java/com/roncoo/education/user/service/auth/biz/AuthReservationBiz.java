@@ -120,8 +120,17 @@ public class AuthReservationBiz extends BaseBiz {
         requirement.setContactName(contactName);
         requirement.setContactMobile(contactMobile);
         requirement.setContactWechat(contactWechat);
+        // 城市/区域跟着教员走 — 否则学员库 cityId 过滤会把它过滤掉
+        requirement.setCityId(tutorProfile.getCityId());
+        requirement.setDistrictId(tutorProfile.getDistrictId());
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         tutorRequirementDao.save(requirement);
+        // 落库后回填 display_no (公开详情页按 A + 6 位数字 查找)
+        TutorRequirement upDisplay = new TutorRequirement();
+        upDisplay.setId(requirement.getId());
+        upDisplay.setDisplayNo("A" + (100000 + requirement.getId() % 900000));
+        tutorRequirementDao.updateById(upDisplay);
+        requirement.setDisplayNo(upDisplay.getDisplayNo());
 
         // 2) 再建 reservation, 关联到 requirement.id
         TutorReservation reservation = new TutorReservation();

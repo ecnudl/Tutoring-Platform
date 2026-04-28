@@ -27,6 +27,9 @@ public class RequirementSearchResp implements Serializable {
     @ApiModelProperty(value = "主键")
     private Long id;
 
+    @io.swagger.annotations.ApiModelProperty(value = "展示编号 A...")
+    private String displayNo;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime gmtCreate;
