@@ -98,7 +98,7 @@
             </div>
           </div>
           <div class="req-action">
-            <NuxtLink :to="'/xy/a' + (r.displayNo || r.id)">
+            <NuxtLink :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)">
               <el-button type="primary" size="small">详情</el-button>
             </NuxtLink>
           </div>
