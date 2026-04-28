@@ -6,7 +6,9 @@
         <el-option label="全部" :value="null" />
         <el-option label="待审核" :value="1" />
         <el-option label="已发布" :value="2" />
+        <el-option label="已接单" :value="3" />
         <el-option label="已驳回" :value="6" />
+        <el-option label="已关闭(过期)" :value="5" />
       </el-select>
       <el-input v-model="keyword" placeholder="标题搜索" style="width:200px" clearable @keyup.enter="search" />
       <el-button type="primary" @click="search">搜索</el-button>
@@ -28,6 +30,7 @@
             <el-button size="small" type="success" @click="handleAudit(row, 'approve')">通过</el-button>
             <el-button size="small" type="danger" @click="handleAudit(row, 'reject')">驳回</el-button>
           </template>
+          <el-button v-if="row.reqStatus === 2" size="small" type="warning" @click="handleMatch(row)">标为已接单</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,7 +73,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { post, get, put } from '@/api/index'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const keyword = ref('')
 const reqStatus = ref(1)
@@ -87,8 +90,8 @@ const auditRemark = ref('')
 const auditRow = ref<any>(null)
 const submitting = ref(false)
 
-const statusLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已发布', 5: '已关闭', 6: '已驳回' }[s] || '未知')
-const statusTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 5: 'info', 6: 'danger' }[s] || 'info')
+const statusLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已发布', 3: '已接单', 5: '已关闭', 6: '已驳回' }[s] || '未知')
+const statusTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'warning', 5: 'info', 6: 'danger' }[s] || 'info')
 
 const search = async () => {
   loading.value = true
@@ -130,4 +133,21 @@ const submitAudit = async () => {
 }
 
 onMounted(() => { search() })
+
+const handleMatch = async (row: any) => {
+  let remark = ''
+  try {
+    const r = await ElMessageBox.prompt(
+      '标为「已接单」？这会让需求在学员库显示已接单, 并在 1 周后自动清理。\n\n备注（接单教员姓名/电话, 便于以后查账）：',
+      '标为已接单',
+      { confirmButtonText: '确认', cancelButtonText: '取消', inputType: 'textarea', inputPlaceholder: '可选, 例如：李教员（13xxxx1234）' }
+    )
+    remark = r.value || ''
+  } catch { return }
+  try {
+    const res = await put('/user/admin/requirement-audit/match', { id: row.id, matchedTutorRemark: remark })
+    if (res.code === 200) { ElMessage.success(res.data); await search() }
+    else ElMessage.error(res.msg || '操作失败')
+  } catch { ElMessage.error('网络错误') }
+}
 </script>
