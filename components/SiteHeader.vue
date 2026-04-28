@@ -58,7 +58,7 @@
         </div>
         <div class="nav-right-row">
           <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
-          <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
+          <NuxtLink to="/about/tutor" class="nav-cell">做老师</NuxtLink>
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
             <el-badge :value="userStore.unreadCount" :hidden="!userStore.unreadCount" :max="99">

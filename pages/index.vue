@@ -67,7 +67,7 @@
             </div>
             <div class="nav-right-row">
               <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
-              <NuxtLink to="/register/teacher" class="nav-cell">做老师</NuxtLink>
+              <NuxtLink to="/about/tutor" class="nav-cell">做老师</NuxtLink>
               <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
               <template v-if="userStore.isLoggedIn">
                 <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
@@ -119,7 +119,7 @@
               </div>
               <span>我要找家教</span>
             </NuxtLink>
-            <NuxtLink to="/register/teacher" class="action-entry">
+            <NuxtLink to="/about/tutor" class="action-entry">
               <div class="entry-icon teach-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
