@@ -50,6 +50,12 @@
           </div>
 
           <div class="nav-group">
+            <a href="javascript:;" @click="handleTutorGroup" class="nav-tutor-group">
+              <span class="nav-tg-dot"></span>接单群
+            </a>
+          </div>
+
+          <div class="nav-group">
             <NuxtLink to="/center/profile">基本资料</NuxtLink>
             <NuxtLink to="/center/certifications">证件认证</NuxtLink>
             <a href="javascript:;" @click="openPwd">修改密码</a>
@@ -161,6 +167,14 @@ const handleLogout = () => {
   ElMessage.success('已退出登录')
   router.push('/login')
 }
+
+const handleTutorGroup = () => {
+  if (userStore.isTutor) {
+    router.push('/center/tutor-group')
+  } else {
+    ElMessage.warning('您不是教员，无法进入')
+  }
+}
 </script>
 
 <style scoped>
@@ -243,5 +257,20 @@ const handleLogout = () => {
   .nav-head { font-size: 18px; padding-bottom: 10px; margin-bottom: 10px; }
   .nav-group { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 0; }
   .nav-group a { padding: 4px 0; font-size: 13px; }
+}
+
+.nav-tutor-group {
+  position: relative;
+  font-weight: 600;
+  color: var(--color-primary) !important;
+}
+.nav-tg-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  margin-right: 8px;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+  vertical-align: middle;
 }
 </style>
