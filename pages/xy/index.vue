@@ -83,7 +83,7 @@
           <div class="req-body">
             <div class="req-title-row">
               <span class="req-title">{{ r.title || r.subjectName || '家教需求' }}</span>
-              <el-tag size="small" type="success">招募中</el-tag>
+              <el-tag size="small" :type="r.reqStatus === 3 ? 'warning' : 'success'">{{ r.reqStatus === 3 ? '已接单' : '招募中' }}</el-tag>
             </div>
             <div class="req-no">订单编号：A{{ r.displayNo || r.id }}</div>
             <div class="req-info">

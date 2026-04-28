@@ -19,9 +19,8 @@
 
           <div class="nav-group">
             <NuxtLink to="/center/messages">我的消息</NuxtLink>
-            <NuxtLink to="/center/applications" v-if="userStore.isTutor">申请记录</NuxtLink>
-            <NuxtLink to="/center/received-applications" v-else>收到的申请</NuxtLink>
-            <NuxtLink to="/center/reservations">我的预约</NuxtLink>
+            <NuxtLink to="/center/received-applications" v-if="!userStore.isTutor">收到的申请</NuxtLink>
+            <NuxtLink to="/center/reservations" v-if="!userStore.isTutor">我的预约</NuxtLink>
             <NuxtLink to="/center/orders">我的订单</NuxtLink>
           </div>
 

@@ -40,9 +40,20 @@
         </el-descriptions>
 
         <div class="action-bar">
-          <el-button type="primary" size="large" @click="handleApply">申请该需求</el-button>
+          <el-button v-if="req.reqStatus === 3" type="warning" size="large" disabled>已接单</el-button>
+          <el-button v-else type="primary" size="large" @click="showCs = true">联系客服接单</el-button>
           <el-button size="large" @click="$router.back()">返回列表</el-button>
         </div>
+
+        <el-dialog v-model="showCs" title="联系客服接单" width="380px" align-center>
+          <p style="line-height:1.9;font-size:14px;color:#334155;margin:0 0 8px">看到合适的需求，请联系客服报名。客服核验后会与您联系并安排匹配。</p>
+          <ul style="margin:8px 0;padding-left:18px;line-height:2;font-size:14px">
+            <li>客服微信：<strong style="color:#1F4E8C">{{ csWechat || '591jiajiao' }}</strong></li>
+            <li>客服电话：<strong style="color:#1F4E8C">{{ csHotline || '13795420591' }}</strong></li>
+          </ul>
+          <p style="font-size:12px;color:#94a3b8;margin:6px 0 0">为保障您和学员的权益，平台不在站内放学员联系方式，请走客服侧匹配。</p>
+          <template #footer><el-button type="primary" @click="showCs = false">知道了</el-button></template>
+        </el-dialog>
       </el-card>
 
       <div v-else-if="!loading" style="text-align:center;padding:60px;color:#999">
@@ -55,10 +66,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
 import { useUserStore } from '~/stores/user'
+import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const cityStore = useCityStore()
 const userStore = useUserStore()
@@ -87,30 +99,11 @@ const loadReq = async () => {
   finally { loading.value = false }
 }
 
-const handleApply = async () => {
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录后再申请')
-    router.push('/login')
-    return
-  }
-  if (!userStore.isTutor) {
-    ElMessage.warning('仅教员可以申请需求')
-    return
-  }
-  try {
-    const res = await post('/user/auth/application/apply', {
-      requirementId: requirement.value.id,
-      applyMessage: '您好，我对这个需求很感兴趣，希望能为您提供教学服务'
-    })
-    if (res.code === 200) {
-      ElMessage.success('申请已提交，请等待学员确认')
-    } else {
-      ElMessage.error(res.msg || '申请失败')
-    }
-  } catch (e) {
-    ElMessage.error('申请失败，请稍后重试')
-  }
-}
+const showCs = ref(false)
+const { config, load: loadSiteConfig } = useSiteConfig()
+const csWechat = computed(() => config.value.siteCsWechat)
+const csHotline = computed(() => config.value.siteHotline)
+loadSiteConfig()
 
 onMounted(() => { loadReq() })
 </script>
