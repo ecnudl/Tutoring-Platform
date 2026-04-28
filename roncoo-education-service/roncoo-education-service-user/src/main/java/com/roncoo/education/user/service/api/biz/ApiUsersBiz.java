@@ -282,6 +282,15 @@ public class ApiUsersBiz extends BaseBiz {
         // 注册（直接明文密码，内部会SHA1加盐哈希存储）
         Users user = register(req.getMobile(), req.getPassword(), 1, null, null, req.getUserType());
 
+        // 安全问题(可选): 如果填了, 存到 users 表, 用于找回密码
+        if (StringUtils.hasText(req.getSecurityQuestion()) && StringUtils.hasText(req.getSecurityAnswer())) {
+            Users update = new Users();
+            update.setId(user.getId());
+            update.setSecurityQuestion(req.getSecurityQuestion().trim());
+            update.setSecurityAnswerHash(DigestUtil.sha1Hex(user.getMobileSalt() + req.getSecurityAnswer().trim().toLowerCase()));
+            usersDao.updateById(update);
+        }
+
         // 保存真实姓名/尊称到档案
         if (StringUtils.hasText(req.getRealName())) {
             if (UserTypeEnum.TUTOR.getCode().equals(req.getUserType())) {
@@ -444,6 +453,47 @@ public class ApiUsersBiz extends BaseBiz {
         }
         return resetPasswordByMobile(mobile, newPassword);
     }
+
+    /**
+     * 找回密码(无短信路线): 先返回该手机号设置的安全问题
+     */
+    public Result<String> getSecurityQuestion(String mobile) {
+        if (!StringUtils.hasText(mobile)) return Result.error("手机号不能为空");
+        Users user = usersDao.getByMobile(mobile);
+        if (user == null) return Result.error("该手机号未注册");
+        if (!StringUtils.hasText(user.getSecurityQuestion())) {
+            return Result.error("您注册时未设置安全问题，请联系客服重置密码");
+        }
+        return Result.success(user.getSecurityQuestion());
+    }
+
+    /**
+     * 找回密码(无短信路线): 答对安全问题即可重置
+     * 注意: 失败计数 + 锁定走 Redis, 防暴力枚举
+     */
+    public Result<String> resetPasswordByQuestion(String mobile, String answer, String newPassword) {
+        if (!StringUtils.hasText(mobile)) return Result.error("手机号不能为空");
+        if (!StringUtils.hasText(answer)) return Result.error("请填写安全答案");
+        if (!StringUtils.hasText(newPassword)) return Result.error("请填写新密码");
+        Users user = usersDao.getByMobile(mobile);
+        if (user == null) return Result.error("该手机号未注册");
+        if (!StringUtils.hasText(user.getSecurityQuestion()) || !StringUtils.hasText(user.getSecurityAnswerHash())) {
+            return Result.error("您未设置安全问题，请联系客服重置密码");
+        }
+        // 失败次数限制 (Redis): 5 次失败锁 30 分钟
+        String failKey = "secq_fail:" + mobile;
+        String failStr = cacheRedis.get(failKey);
+        int fails = failStr != null ? Integer.parseInt(failStr) : 0;
+        if (fails >= 5) return Result.error("尝试次数过多，请 30 分钟后再试或联系客服");
+        String inputHash = DigestUtil.sha1Hex(user.getMobileSalt() + answer.trim().toLowerCase());
+        if (!inputHash.equalsIgnoreCase(user.getSecurityAnswerHash())) {
+            cacheRedis.set(failKey, String.valueOf(fails + 1), 30, java.util.concurrent.TimeUnit.MINUTES);
+            return Result.error("安全答案不正确，剩余 " + (5 - fails - 1) + " 次");
+        }
+        cacheRedis.delete(failKey);
+        return resetPasswordByMobile(mobile, newPassword);
+    }
+
 
     public Result<String> sendCode(SendCodeReq req) {
         // 验证码发送次数校验

@@ -18,6 +18,8 @@ public class Users implements Serializable {
     private String mobileSalt;
 
     private String mobilePsw;
+    private String securityQuestion;
+    private String securityAnswerHash;
 
     private String nickname;
 
@@ -100,6 +102,11 @@ public class Users implements Serializable {
     public void setMobilePsw(String mobilePsw) {
         this.mobilePsw = mobilePsw == null ? null : mobilePsw.trim();
     }
+    public String getSecurityQuestion() { return securityQuestion; }
+    public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion == null ? null : securityQuestion.trim(); }
+    public String getSecurityAnswerHash() { return securityAnswerHash; }
+    public void setSecurityAnswerHash(String securityAnswerHash) { this.securityAnswerHash = securityAnswerHash == null ? null : securityAnswerHash.trim(); }
+
 
     public String getNickname() {
         return nickname;

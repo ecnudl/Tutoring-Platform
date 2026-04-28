@@ -28,4 +28,10 @@ public class SimpleRegisterReq implements Serializable {
 
     @ApiModelProperty(value = "真实姓名/尊称")
     private String realName;
+
+    @ApiModelProperty(value = "安全问题(找回密码用)")
+    private String securityQuestion;
+
+    @ApiModelProperty(value = "安全答案(明文,存储时SHA1+salt哈希)")
+    private String securityAnswer;
 }

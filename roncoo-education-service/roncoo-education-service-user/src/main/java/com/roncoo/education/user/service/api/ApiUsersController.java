@@ -84,6 +84,18 @@ public class ApiUsersController {
         return biz.loginSimple(req);
     }
 
+    @ApiOperation(value = "找回密码-取安全问题", notes = "POST { mobile } 返回该手机号设置的安全问题")
+    @PostMapping(value = "/password/security-question")
+    public Result<String> getSecurityQuestion(@RequestBody java.util.Map<String, String> req) {
+        return biz.getSecurityQuestion(req.get("mobile"));
+    }
+
+    @ApiOperation(value = "找回密码-答安全问题重置", notes = "POST { mobile, answer, password }")
+    @PostMapping(value = "/password/reset-by-question")
+    public Result<String> resetPasswordByQuestion(@RequestBody java.util.Map<String, String> req) {
+        return biz.resetPasswordByQuestion(req.get("mobile"), req.get("answer"), req.get("password"));
+    }
+
     @ApiOperation(value = "微信登录，获取授权地址", notes = "返回微信登录授权地址")
     @PostMapping(value = "/wx/login")
     public Result<String> wxLogin(@RequestBody WxLoginReq req) {

@@ -9,6 +9,8 @@
     <result column="mobile" jdbcType="VARCHAR" property="mobile" />
     <result column="mobile_salt" jdbcType="VARCHAR" property="mobileSalt" />
     <result column="mobile_psw" jdbcType="VARCHAR" property="mobilePsw" />
+    <result column="security_question" jdbcType="VARCHAR" property="securityQuestion" />
+    <result column="security_answer_hash" jdbcType="VARCHAR" property="securityAnswerHash" />
     <result column="nickname" jdbcType="VARCHAR" property="nickname" />
     <result column="user_sex" jdbcType="TINYINT" property="userSex" />
       <result column="user_age" jdbcType="DATE" property="userAge"/>
@@ -81,7 +83,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, gmt_create, gmt_modified, status_id, mobile, mobile_salt, mobile_psw, nickname,
+    id, gmt_create, gmt_modified, status_id, mobile, mobile_salt, mobile_psw, security_question, security_answer_hash, nickname,
     user_sex, user_age, user_head, remark, union_id, open_id, city, province, country,
     register_source, user_type
   </sql>
@@ -160,6 +162,12 @@
       <if test="mobilePsw != null">
         mobile_psw,
       </if>
+      <if test="securityQuestion != null">
+        security_question,
+      </if>
+      <if test="securityAnswerHash != null">
+        security_answer_hash,
+      </if>
       <if test="nickname != null">
         nickname,
       </if>
@@ -218,6 +226,12 @@
       </if>
       <if test="mobilePsw != null">
         #{mobilePsw,jdbcType=VARCHAR},
+      </if>
+      <if test="securityQuestion != null">
+        #{securityQuestion,jdbcType=VARCHAR},
+      </if>
+      <if test="securityAnswerHash != null">
+        #{securityAnswerHash,jdbcType=VARCHAR},
       </if>
       <if test="nickname != null">
         #{nickname,jdbcType=VARCHAR},
@@ -286,6 +300,12 @@
       </if>
       <if test="record.mobilePsw != null">
         mobile_psw = #{record.mobilePsw,jdbcType=VARCHAR},
+      </if>
+      <if test="record.securityQuestion != null">
+        security_question = #{record.securityQuestion,jdbcType=VARCHAR},
+      </if>
+      <if test="record.securityAnswerHash != null">
+        security_answer_hash = #{record.securityAnswerHash,jdbcType=VARCHAR},
       </if>
       <if test="record.nickname != null">
         nickname = #{record.nickname,jdbcType=VARCHAR},
@@ -373,6 +393,12 @@
       </if>
       <if test="mobilePsw != null">
         mobile_psw = #{mobilePsw,jdbcType=VARCHAR},
+      </if>
+      <if test="securityQuestion != null">
+        security_question = #{securityQuestion,jdbcType=VARCHAR},
+      </if>
+      <if test="securityAnswerHash != null">
+        security_answer_hash = #{securityAnswerHash,jdbcType=VARCHAR},
       </if>
       <if test="nickname != null">
         nickname = #{nickname,jdbcType=VARCHAR},
