@@ -420,7 +420,13 @@ onMounted(() => {
   border-color: var(--color-primary);
 }
 
-.tutor-avatar { flex-shrink: 0; }
+/* 头像列固定 64×64, 防止 chip 撑列宽导致头像水平偏移 */
+.tutor-avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
 .tutor-body { flex: 1; }
 
 .tutor-top {
@@ -476,8 +482,12 @@ onMounted(() => {
   .tutor-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
 }
 
-.tutor-avatar { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* 证件认证 chip — 绝对定位锚到头像下方居中, 不参与 flex 列宽计算 */
 .cert-verified-chip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   padding: 2px 9px;
@@ -490,5 +500,6 @@ onMounted(() => {
   border-radius: 999px;
   white-space: nowrap;
   box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
+  z-index: 1;
 }
 </style>

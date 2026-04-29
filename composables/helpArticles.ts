@@ -214,7 +214,7 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
     title: '做家教收费标准',
     configKey: 'helpTutorPricingHtml',
     category: 'tutor',
-    lead: '以下为 <strong>各年级各类别教员</strong> 的课时费参考，实际由教员与家长协商。',
+    lead: '本页包含 <strong>课时费参考</strong> + <strong>中介费规则</strong>。课时费由教员自定，中介费按下方规则一次性收取。',
     priceTable: {
       headers: ['教员类型', '小学', '初中', '高中', '大学/成人'],
       rows: [
@@ -226,12 +226,22 @@ export const HELP_ARTICLES: Record<string, HelpArticle> = {
     },
     sections: [
       {
+        title: '中介费规则 (与 /zf 一致)',
+        list: [
+          '<strong>家长侧</strong>: 一次性 100 元中介费, 撮合时由教员代收。',
+          '<strong>教员侧</strong>: 中介费 = 首次上课课时费金额 (如 2 小时 350 元 → 中介费 350 元), <strong>首单收益归平台</strong>; 续单课时费 100% 归教员, 平台不再收取。',
+          '<strong>仅上 1 次课</strong>: 中介费<strong>减半退还</strong>。',
+          '<strong>上 2 次及以上</strong>: 中介费<strong>不退</strong>。',
+          '<strong>售后</strong>: 家长对教员不满意, 可联系客服免费推荐其他教员, 直到满意为止 (家长侧不再额外付中介费)。'
+        ]
+      },
+      {
         title: '定价参考要点',
         list: [
-          '文化课参考以上表格；艺术类（钢琴、美术、书法）通常高于文化课 20%-50%。',
-          '海归外教、小语种（日语、法语、德语）按大学/成人栏目参考。',
+          '文化课参考上方表格; 艺术类 (钢琴/美术/书法) 通常高于文化课 20%-50%。',
+          '海归外教、小语种 (日语/法语/德语) 按大学/成人栏目参考。',
           '在线辅导一般为面授的 8-9 折。',
-          '试讲 30 分钟免费，是当前行业惯例；有经验后定价不需迁就。',
+          '试讲 30 分钟免费, 是当前行业惯例; 有经验后定价不需迁就。',
           '好评达到 10 条以上、成单 20 次以上的教员可以适当上浮。'
         ]
       }
