@@ -38,80 +38,115 @@ public class ApiRequirementBiz extends BaseBiz {
 
     /**
      * 需求搜索（分页+多条件）
-     * 排序: PUBLISHED 在前, MATCHED 在后
-     * 过滤: MATCHED 状态停留 24h 后从列表中消失 (Java post-filter)
+     * 设计:
+     *   SQL 只做 status / 排序 / 一次性拉全部
+     *   Java 后过滤所有 filter, 实现 NULL = 通配符 + online 跨城市:
+     *     - cityId / district / subject / tutorType / teachingMethod 任一字段 NULL => 视为通配, 该 filter 命中
+     *     - teachingMethod=3 (在线) 跳过 cityId/district (位置无关)
+     *     - MATCHED 且 matched_at > 24h 前不再展示
+     *   再 Java 切片做分页. 量级 <几百行, 性能可接受.
      */
     public Result<Page<RequirementSearchResp>> search(RequirementSearchReq req) {
-        // 在线辅导订单 (teaching_method=3) 是位置无关的, 任何城市/区域 filter 都应展示.
-        //
-        // 三种情况:
-        //  A) 用户指定了 teachingMethod=3 → 单 criteria, 跳过 cityId/district (online 不分城市)
-        //  B) 用户指定了 teachingMethod∈{1,2,4} → 单 criteria, 正常按城市过滤
-        //  C) 用户没指定 teachingMethod 但有 city 或 district → OR (线下匹配位置 ∪ 全部 online)
-        //  D) 用户都没指定 → 单 criteria, 全部 PUBLISHED + 24h MATCHED
         TutorRequirementExample example = new TutorRequirementExample();
-        java.util.List<Integer> visibleStatuses = java.util.Arrays.asList(
+        TutorRequirementExample.Criteria c = example.createCriteria();
+        c.andReqStatusIn(java.util.Arrays.asList(
                 RequirementStatusEnum.PUBLISHED.getCode(),
-                RequirementStatusEnum.MATCHED.getCode());
-        boolean hasLocation = req.getCityId() != null || StringUtils.hasText(req.getDistrict());
+                RequirementStatusEnum.MATCHED.getCode()));
 
-        if (req.getTeachingMethod() != null) {
-            // A or B
-            TutorRequirementExample.Criteria c = example.createCriteria();
-            c.andReqStatusIn(visibleStatuses);
-            c.andTeachingMethodEqualTo(req.getTeachingMethod());
-            applySearchFilters(c, req, /*applyLocation=*/req.getTeachingMethod() != 3);
-        } else if (hasLocation) {
-            // C: 分支 A 线下匹配位置, 分支 B 全部 online
-            TutorRequirementExample.Criteria a = example.createCriteria();
-            a.andReqStatusIn(visibleStatuses);
-            a.andTeachingMethodNotEqualTo(3);
-            applySearchFilters(a, req, /*applyLocation=*/true);
-
-            TutorRequirementExample.Criteria b = example.or();
-            b.andReqStatusIn(visibleStatuses);
-            b.andTeachingMethodEqualTo(3);
-            applySearchFilters(b, req, /*applyLocation=*/false);
-        } else {
-            // D
-            TutorRequirementExample.Criteria c = example.createCriteria();
-            c.andReqStatusIn(visibleStatuses);
-            applySearchFilters(c, req, /*applyLocation=*/false);
-        }
-
-        // 已匹配的沉底, 同状态内按 id desc
+        // SQL 排序: MATCHED 沉底, 同状态 id desc
         example.setOrderByClause(
                 "CASE WHEN req_status = " + RequirementStatusEnum.MATCHED.getCode()
                         + " THEN 1 ELSE 0 END ASC, id DESC");
-        Page<TutorRequirement> page = tutorRequirementDao.page(req.getPageCurrent(), req.getPageSize(), example);
+        // 一次性拉全部 (PUBLISHED + MATCHED). 当前规模可接受.
+        Page<TutorRequirement> rawPage = tutorRequirementDao.page(1, 5000, example);
+        java.util.List<TutorRequirement> all = rawPage.getList() != null ? rawPage.getList() : java.util.Collections.emptyList();
 
-        // 过滤: MATCHED 且 matched_at < 24h 前的去掉
-        applyMatchedCutoff(page);
-        return Result.success(PageUtil.transform(page, RequirementSearchResp.class));
+        // Java 后过滤
+        LocalDateTime matchedCutoff = LocalDateTime.now().minusHours(24);
+        java.util.List<TutorRequirement> filtered = all.stream()
+                .filter(r -> notExpiredMatched(r, matchedCutoff))
+                .filter(r -> matchTeachingMethod(r, req))
+                .filter(r -> matchCity(r, req))
+                .filter(r -> matchDistrict(r, req))
+                .filter(r -> matchSubject(r, req))
+                .filter(r -> matchTutorType(r, req))
+                .filter(r -> matchKeyword(r, req))
+                .filter(r -> matchGrade(r, req))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Java 切片分页
+        int pageCurrent = req.getPageCurrent() <= 0 ? 1 : req.getPageCurrent();
+        int pageSize = req.getPageSize() <= 0 ? 20 : req.getPageSize();
+        int from = Math.min((pageCurrent - 1) * pageSize, filtered.size());
+        int to = Math.min(from + pageSize, filtered.size());
+
+        Page<TutorRequirement> outPage = new Page<>();
+        outPage.setList(filtered.subList(from, to));
+        outPage.setTotalCount(filtered.size());
+        outPage.setPageCurrent(pageCurrent);
+        outPage.setPageSize(pageSize);
+        // totalPage
+        outPage.setTotalPage((int) Math.ceil(filtered.size() / (double) pageSize));
+        return Result.success(PageUtil.transform(outPage, RequirementSearchResp.class));
     }
 
-    /**
-     * 把 search 请求里非位置类的过滤 (科目 / 教员类型 / 关键字 / 年级) 拼到指定 criteria 上.
-     * applyLocation = true 时也会拼 cityId / district (位置类).
-     */
-    private void applySearchFilters(TutorRequirementExample.Criteria c,
-                                    RequirementSearchReq req, boolean applyLocation) {
-        if (applyLocation) {
-            if (req.getCityId() != null) c.andCityIdEqualTo(req.getCityId());
-            if (StringUtils.hasText(req.getDistrict())) {
-                c.andDistrictNamesLike(PageUtil.like(req.getDistrict()));
-            }
-        }
-        if (req.getGradeId() != null) c.andGradeIdEqualTo(req.getGradeId());
-        if (StringUtils.hasText(req.getKeyword())) c.andTitleLike(PageUtil.like(req.getKeyword()));
-        if (StringUtils.hasText(req.getSubject())) {
-            c.andSubjectIdsLike(PageUtil.like(req.getSubject()));
-        }
-        if (StringUtils.hasText(req.getTutorType())) {
-            c.andTutorTypePrefLike(PageUtil.like(req.getTutorType()));
-        }
+    /** MATCHED 状态停留 24h 后从列表消失 */
+    private static boolean notExpiredMatched(TutorRequirement r, LocalDateTime cutoff) {
+        if (!RequirementStatusEnum.MATCHED.getCode().equals(r.getReqStatus())) return true;
+        return r.getMatchedAt() != null && r.getMatchedAt().isAfter(cutoff);
     }
 
+    /** teachingMethod 严格匹配 (用户主动选才过滤) */
+    private static boolean matchTeachingMethod(TutorRequirement r, RequirementSearchReq req) {
+        if (req.getTeachingMethod() == null) return true;
+        return req.getTeachingMethod().equals(r.getTeachingMethod());
+    }
+
+    /** city 通配规则: filter NULL → 命中; 订单 city NULL → 命中 (admin 没填); 订单是在线辅导 → 命中跨城市 */
+    private static boolean matchCity(TutorRequirement r, RequirementSearchReq req) {
+        if (req.getCityId() == null) return true;
+        if (Integer.valueOf(3).equals(r.getTeachingMethod())) return true;
+        if (r.getCityId() == null) return true;
+        return req.getCityId().equals(r.getCityId());
+    }
+
+    /** district 通配规则: 同 city, 加上 LIKE 包含语义 */
+    private static boolean matchDistrict(TutorRequirement r, RequirementSearchReq req) {
+        if (!StringUtils.hasText(req.getDistrict())) return true;
+        if (Integer.valueOf(3).equals(r.getTeachingMethod())) return true;
+        if (!StringUtils.hasText(r.getDistrictNames())) return true;
+        return r.getDistrictNames().contains(req.getDistrict());
+    }
+
+    /** subject 通配规则: filter 空命中, 订单 subject_ids 空命中, 否则 contains */
+    private static boolean matchSubject(TutorRequirement r, RequirementSearchReq req) {
+        if (!StringUtils.hasText(req.getSubject())) return true;
+        if (!StringUtils.hasText(r.getSubjectIds())) return true;
+        return r.getSubjectIds().contains(req.getSubject());
+    }
+
+    /** tutorType 同上 */
+    private static boolean matchTutorType(TutorRequirement r, RequirementSearchReq req) {
+        if (!StringUtils.hasText(req.getTutorType())) return true;
+        if (!StringUtils.hasText(r.getTutorTypePref())) return true;
+        return r.getTutorTypePref().contains(req.getTutorType());
+    }
+
+    /** keyword 命中 title (空字段视为命中) */
+    private static boolean matchKeyword(TutorRequirement r, RequirementSearchReq req) {
+        if (!StringUtils.hasText(req.getKeyword())) return true;
+        if (!StringUtils.hasText(r.getTitle())) return true;
+        return r.getTitle().contains(req.getKeyword());
+    }
+
+    /** grade 严格匹配 (空字段视为命中) */
+    private static boolean matchGrade(TutorRequirement r, RequirementSearchReq req) {
+        if (req.getGradeId() == null) return true;
+        if (r.getGradeId() == null) return true;
+        return req.getGradeId().equals(r.getGradeId());
+    }
+
+    /** 兼容老接口: latest / related 仍走 Example 简版查询, 这两边复用此过滤. */
     private static void applyMatchedCutoff(Page<TutorRequirement> page) {
         if (page == null || page.getList() == null) return;
         LocalDateTime cutoff = LocalDateTime.now().minusHours(24);
