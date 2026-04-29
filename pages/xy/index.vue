@@ -83,12 +83,12 @@
           <!-- 未接单: NuxtLink, 整行可点 -->
           <NuxtLink
             v-if="r.reqStatus !== 3"
-            :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)"
+            :to="'/xy/s' + (r.displayNo ? r.displayNo.replace(/^S/i, '') : r.id)"
             class="req-row"
           >
             <div class="rc-c1">
               <div class="rc-title">{{ buildCardTitle(r) }}</div>
-              <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
+              <div class="rc-no">{{ r.displayNo || ('S' + r.id) }}</div>
             </div>
             <div class="rc-c2">
               <template v-if="Number(r.teachingMethod) === 3">
@@ -116,7 +116,7 @@
           <div v-else class="req-row is-matched">
             <div class="rc-c1">
               <div class="rc-title">{{ buildCardTitle(r) }}</div>
-              <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
+              <div class="rc-no">{{ r.displayNo || ('S' + r.id) }}</div>
             </div>
             <div class="rc-c2">
               <template v-if="Number(r.teachingMethod) === 3">

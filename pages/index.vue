@@ -257,7 +257,7 @@
           <NuxtLink
             v-for="order in latestOrders"
             :key="order.id"
-            :to="order.isMatched ? '/xy' : ('/xy/a' + (order.displayNo ? order.displayNo.replace(/^A/i, '') : order.id))"
+            :to="order.isMatched ? '/xy' : ('/xy/s' + (order.displayNo ? order.displayNo.replace(/^S/i, '') : order.id))"
             class="order-item"
             :class="{ 'is-matched': order.isMatched }"
           >
@@ -414,9 +414,9 @@ const loadLatestOrders = async () => {
     const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
     if (res?.code === 200 && Array.isArray(res.data)) {
       latestOrdersData.value = res.data.map((r) => {
-        // 标题: 优先 admin 标题; 否则取 subjectIds CSV 第一项; 兜底 "暂无科目要求"
-        const subjectFirst = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean)[0] : ''
-        const title = r.title || subjectFirst || '暂无科目要求'
+        // 标题: 只用 subjectIds CSV 拼接 (用 "、"); 不显示 admin 标题; 兜底 "暂无科目要求"
+        const subjects = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean).join('、') : ''
+        const title = subjects || '暂无科目要求'
         // 区域: 在线 → 网络授课; 否则 districtNames 第一项 / address / 区域待确认
         let area
         if (Number(r.teachingMethod) === 3) {

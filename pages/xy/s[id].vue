@@ -1,8 +1,8 @@
 <template>
 <div class="xa-page">
   <Head>
-    <Title>A{{ displayNoNum }} 学员需求 - 591家教网</Title>
-    <Meta name="description" :content="`A${displayNoNum}学员需求详情，区域 / 年级 / 科目 / 预算 / 上课要求。`" />
+    <Title>S{{ displayNoNum }} 学员需求 - 591家教网</Title>
+    <Meta name="description" :content="`S${displayNoNum}学员需求详情，区域 / 年级 / 科目 / 预算 / 上课要求。`" />
   </Head>
 
   <!-- 面包屑 -->
@@ -11,7 +11,7 @@
     <span class="sep">›</span>
     <NuxtLink to="/xy">学员库</NuxtLink>
     <span class="sep">›</span>
-    <span class="cur">A{{ displayNoNum }}</span>
+    <span class="cur">S{{ displayNoNum }}</span>
   </div>
 
   <div v-loading="loading">
@@ -25,7 +25,7 @@
             <path d="M20 33 L29 42 L45 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <p class="state-eyebrow">需求 A{{ displayNoNum }}</p>
+        <p class="state-eyebrow">需求 S{{ displayNoNum }}</p>
         <h2 class="state-title">该需求已接单</h2>
         <p class="state-desc">感谢您的关注。客服已为这位学员安排了合适的教员，本订单不再公开接受新申请。</p>
         <p class="state-tip">还可以为您匹配类似订单 — 在学员库继续挑选，或直接联系客服。</p>
@@ -46,7 +46,7 @@
             <circle cx="32" cy="48" r="2.5" fill="currentColor"/>
           </svg>
         </div>
-        <p class="state-eyebrow">需求 A{{ displayNoNum }}</p>
+        <p class="state-eyebrow">需求 S{{ displayNoNum }}</p>
         <h2 class="state-title">未找到该需求</h2>
         <p class="state-desc">需求可能已下架、已关闭或暂未通过审核。请返回学员库挑选其他订单。</p>
         <div class="state-actions">
@@ -75,7 +75,7 @@
           <div class="xa-meta-row">
             <div class="xa-no-stamp">
               <span class="lbl">订单</span>
-              <span class="num">A<em>{{ displayNoNum }}</em></span>
+              <span class="num">S<em>{{ displayNoNum }}</em></span>
             </div>
             <div class="xa-meta-side">
               <span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> {{ req.viewCount || 0 }}</span>
@@ -92,7 +92,7 @@
             <span class="bullet"></span>学员信息
           </h3>
           <dl class="xa-dl">
-            <div class="xa-row"><dt>订单编号</dt><dd class="mono">A{{ displayNoNum }}</dd></div>
+            <div class="xa-row"><dt>订单编号</dt><dd class="mono">S{{ displayNoNum }}</dd></div>
             <div class="xa-row"><dt>学员性别</dt><dd>{{ genderLabel(req.studentGender) }}</dd></div>
             <div class="xa-row"><dt>联系人</dt><dd>{{ req.contactName || '—' }}</dd></div>
             <div class="xa-row"><dt>所在年级</dt><dd>{{ req.gradeName || '—' }}</dd></div>
@@ -147,7 +147,7 @@
         <!-- 相关订单 -->
         <section class="xa-related" v-if="related.length">
           <h3 class="xa-h"><span class="bullet"></span>相关订单</h3>
-          <NuxtLink v-for="r in related" :key="r.id" :to="'/xy/a' + (r.displayNo || '').replace(/^A/i, '')" class="xa-rel-item">
+          <NuxtLink v-for="r in related" :key="r.id" :to="'/xy/s' + (r.displayNo || '').replace(/^S/i, '')" class="xa-rel-item">
             <div class="rel-head">
               <span class="rel-title">{{ r.title || '家教需求' }}</span>
               <span class="rel-no mono">{{ r.displayNo }}</span>
@@ -184,7 +184,7 @@
               <div>
                 <div class="cs-lbl">客服微信</div>
                 <span class="cs-val mono">{{ csWechat }}</span>
-                <div class="cs-fine">备注「接单 + 编号 A{{ displayNoNum }}」</div>
+                <div class="cs-fine">备注「接单 + 编号 S{{ displayNoNum }}」</div>
               </div>
             </li>
           </ul>
@@ -228,7 +228,7 @@
     </div>
     <div class="dlg-row dlg-row-no">
       <span class="dlg-lbl">提及编号</span>
-      <span class="dlg-val mono">A{{ displayNoNum }}</span>
+      <span class="dlg-val mono">S{{ displayNoNum }}</span>
     </div>
     <p class="dlg-fine">为保障双方权益，平台不在站内放学员联系方式，所有匹配走客服。</p>
     <template #footer>
@@ -251,7 +251,7 @@ const router = useRouter()
 const { get } = useApi()
 
 const displayNo = route.params.id
-const displayNoNum = computed(() => String(displayNo).replace(/^A/i, ''))
+const displayNoNum = computed(() => String(displayNo).replace(/^S/i, ''))
 
 const req = ref(null)
 const related = ref([])
@@ -298,7 +298,7 @@ const shortDate = (s) => {
 const loadReq = async () => {
   loading.value = true
   try {
-    const r = await get('/user/api/requirement/view', { displayNo: 'A' + displayNoNum.value })
+    const r = await get('/user/api/requirement/view', { displayNo: 'S' + displayNoNum.value })
     if (r.code === 200 && r.data) {
       req.value = r.data
       state.value = (r.data.reqStatus === 3) ? 'matched' : 'open'
@@ -315,7 +315,7 @@ const loadReq = async () => {
 
 const loadRelated = async () => {
   try {
-    const r = await get('/user/api/requirement/related', { displayNo: 'A' + displayNoNum.value, limit: 5 })
+    const r = await get('/user/api/requirement/related', { displayNo: 'S' + displayNoNum.value, limit: 5 })
     if (r.code === 200 && Array.isArray(r.data)) {
       related.value = r.data
     }
@@ -325,14 +325,14 @@ const loadRelated = async () => {
 const goApply = () => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录教员账号')
-    router.push('/login?redirect=' + encodeURIComponent(`/xy/apply/A${displayNoNum.value}`))
+    router.push('/login?redirect=' + encodeURIComponent(`/xy/apply/S${displayNoNum.value}`))
     return
   }
   if (!userStore.isTutor) {
     ElMessage.warning('该入口仅教员可用，请使用教员账号登录')
     return
   }
-  router.push(`/xy/apply/A${displayNoNum.value}`)
+  router.push(`/xy/apply/S${displayNoNum.value}`)
 }
 
 const copyContact = async () => {

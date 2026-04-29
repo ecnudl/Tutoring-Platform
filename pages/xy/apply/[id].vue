@@ -1,7 +1,7 @@
 <template>
 <div class="ap-page">
   <Head>
-    <Title>申请订单 A{{ displayNoNum }} - 591家教网</Title>
+    <Title>申请订单 S{{ displayNoNum }} - 591家教网</Title>
     <Meta name="description" content="教员在线申请家教订单。" />
   </Head>
 
@@ -10,7 +10,7 @@
     <span class="sep">›</span>
     <NuxtLink to="/xy">学员库</NuxtLink>
     <span class="sep">›</span>
-    <NuxtLink :to="`/xy/a${displayNoNum}`">A{{ displayNoNum }}</NuxtLink>
+    <NuxtLink :to="`/xy/s${displayNoNum}`">S{{ displayNoNum }}</NuxtLink>
     <span class="sep">›</span>
     <span class="cur">申请订单</span>
   </div>
@@ -21,7 +21,7 @@
       <div class="ap-eyebrow">
         <span class="ap-rule"></span>591 家教 · 在线申请
       </div>
-      <h1 class="ap-h">申请订单 A{{ displayNoNum }}</h1>
+      <h1 class="ap-h">申请订单 S{{ displayNoNum }}</h1>
       <p class="ap-lead">提交您的优势说明，客服会根据"先到先得，择优推荐"原则审核，1-2 个工作日内致电与您匹配。</p>
     </header>
 
@@ -85,7 +85,7 @@ const router = useRouter()
 const { post, get } = useApi()
 
 const displayNo = route.params.id || route.params.displayNo
-const displayNoNum = computed(() => String(displayNo || '').replace(/^A/i, ''))
+const displayNoNum = computed(() => String(displayNo || '').replace(/^S/i, ''))
 
 const text = ref('')
 const wx = ref('')
@@ -98,7 +98,7 @@ const canSubmit = computed(() => text.value.trim().length >= 10)
 if (process.client) {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录教员账号')
-    router.replace('/login?redirect=' + encodeURIComponent(`/xy/apply/A${displayNoNum.value}`))
+    router.replace('/login?redirect=' + encodeURIComponent(`/xy/apply/S${displayNoNum.value}`))
   } else if (!userStore.isTutor) {
     ElMessage.warning('该入口仅教员可用')
     router.replace('/xy')
@@ -107,7 +107,7 @@ if (process.client) {
 
 const loadReqId = async () => {
   try {
-    const r = await get('/user/api/requirement/view', { displayNo: 'A' + displayNoNum.value })
+    const r = await get('/user/api/requirement/view', { displayNo: 'S' + displayNoNum.value })
     if (r.code === 200 && r.data) {
       requirementId.value = r.data.id
     } else {
