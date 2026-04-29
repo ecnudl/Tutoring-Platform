@@ -59,9 +59,6 @@
           <el-collapse-item title="如何发布找老师需求？" name="2">
             登录后进入个人中心，点击"发布需求"，填写科目、年级、上课时间等信息提交。平台审核通过后，教员即可看到并申请。
           </el-collapse-item>
-          <el-collapse-item title="如何开通VIP？" name="3">
-            目前VIP开通请联系客服人工处理。VIP会员可享受每日不限次数申请需求等专属权益。
-          </el-collapse-item>
           <el-collapse-item title="预约教员后多久会有回复？" name="4">
             教员预约后，平台客服将在24小时内致电确认详情。如未收到回复，请通过上方联系方式咨询。
           </el-collapse-item>
