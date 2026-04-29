@@ -43,6 +43,7 @@ public class TutorRequirement implements Serializable {
     private String transportSubsidy;
     private String districtNames;
     private String gradeName;
+    private Integer isUrgent;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -128,4 +129,6 @@ public class TutorRequirement implements Serializable {
     public void setDistrictNames(String districtNames) { this.districtNames = districtNames == null ? null : districtNames.trim(); }
     public String getGradeName() { return gradeName; }
     public void setGradeName(String gradeName) { this.gradeName = gradeName == null ? null : gradeName.trim(); }
+    public Integer getIsUrgent() { return isUrgent; }
+    public void setIsUrgent(Integer isUrgent) { this.isUrgent = isUrgent; }
 }

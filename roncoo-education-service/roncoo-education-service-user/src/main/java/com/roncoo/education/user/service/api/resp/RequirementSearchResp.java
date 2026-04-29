@@ -84,4 +84,7 @@ public class RequirementSearchResp implements Serializable {
 
     @ApiModelProperty(value = "对教员的额外要求")
     private String otherRequirements;
+
+    @ApiModelProperty(value = "是否加急 0 否 1 是")
+    private Integer isUrgent;
 }

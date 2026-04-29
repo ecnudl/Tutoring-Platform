@@ -221,6 +221,8 @@ public class AdminRequirementBiz extends BaseBiz {
 
         // 状态
         if (req.containsKey("reqStatus")) r.setReqStatus(intOrNull(req.get("reqStatus")));
+        // 加急标记
+        if (req.containsKey("isUrgent")) r.setIsUrgent(intOrNull(req.get("isUrgent")));
     }
 
     private static String strOrNull(Object v) {

@@ -76,4 +76,7 @@ public class RequirementListResp implements Serializable {
 
     @ApiModelProperty(value = "大致位置")
     private String address;
+
+    @ApiModelProperty(value = "是否加急 0 否 1 是")
+    private Integer isUrgent;
 }
