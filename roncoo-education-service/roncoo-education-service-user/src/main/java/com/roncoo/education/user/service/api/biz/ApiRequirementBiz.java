@@ -42,26 +42,41 @@ public class ApiRequirementBiz extends BaseBiz {
      * 过滤: MATCHED 状态停留 24h 后从列表中消失 (Java post-filter)
      */
     public Result<Page<RequirementSearchResp>> search(RequirementSearchReq req) {
+        // 在线辅导订单 (teaching_method=3) 是位置无关的, 任何城市/区域 filter 都应展示.
+        //
+        // 三种情况:
+        //  A) 用户指定了 teachingMethod=3 → 单 criteria, 跳过 cityId/district (online 不分城市)
+        //  B) 用户指定了 teachingMethod∈{1,2,4} → 单 criteria, 正常按城市过滤
+        //  C) 用户没指定 teachingMethod 但有 city 或 district → OR (线下匹配位置 ∪ 全部 online)
+        //  D) 用户都没指定 → 单 criteria, 全部 PUBLISHED + 24h MATCHED
         TutorRequirementExample example = new TutorRequirementExample();
-        TutorRequirementExample.Criteria c = example.createCriteria();
-        c.andReqStatusIn(java.util.Arrays.asList(
+        java.util.List<Integer> visibleStatuses = java.util.Arrays.asList(
                 RequirementStatusEnum.PUBLISHED.getCode(),
-                RequirementStatusEnum.MATCHED.getCode()));
-        if (req.getCityId() != null) c.andCityIdEqualTo(req.getCityId());
-        if (req.getGradeId() != null) c.andGradeIdEqualTo(req.getGradeId());
-        if (StringUtils.hasText(req.getKeyword())) c.andTitleLike(PageUtil.like(req.getKeyword()));
-        // 新筛选 (CSV 名字列): 区域 / 科目 / 教员类型 用 LIKE 匹配
-        if (StringUtils.hasText(req.getDistrict())) {
-            c.andDistrictNamesLike(PageUtil.like(req.getDistrict()));
-        }
-        if (StringUtils.hasText(req.getSubject())) {
-            c.andSubjectIdsLike(PageUtil.like(req.getSubject()));
-        }
-        if (StringUtils.hasText(req.getTutorType())) {
-            c.andTutorTypePrefLike(PageUtil.like(req.getTutorType()));
-        }
+                RequirementStatusEnum.MATCHED.getCode());
+        boolean hasLocation = req.getCityId() != null || StringUtils.hasText(req.getDistrict());
+
         if (req.getTeachingMethod() != null) {
+            // A or B
+            TutorRequirementExample.Criteria c = example.createCriteria();
+            c.andReqStatusIn(visibleStatuses);
             c.andTeachingMethodEqualTo(req.getTeachingMethod());
+            applySearchFilters(c, req, /*applyLocation=*/req.getTeachingMethod() != 3);
+        } else if (hasLocation) {
+            // C: 分支 A 线下匹配位置, 分支 B 全部 online
+            TutorRequirementExample.Criteria a = example.createCriteria();
+            a.andReqStatusIn(visibleStatuses);
+            a.andTeachingMethodNotEqualTo(3);
+            applySearchFilters(a, req, /*applyLocation=*/true);
+
+            TutorRequirementExample.Criteria b = example.or();
+            b.andReqStatusIn(visibleStatuses);
+            b.andTeachingMethodEqualTo(3);
+            applySearchFilters(b, req, /*applyLocation=*/false);
+        } else {
+            // D
+            TutorRequirementExample.Criteria c = example.createCriteria();
+            c.andReqStatusIn(visibleStatuses);
+            applySearchFilters(c, req, /*applyLocation=*/false);
         }
 
         // 已匹配的沉底, 同状态内按 id desc
@@ -73,6 +88,28 @@ public class ApiRequirementBiz extends BaseBiz {
         // 过滤: MATCHED 且 matched_at < 24h 前的去掉
         applyMatchedCutoff(page);
         return Result.success(PageUtil.transform(page, RequirementSearchResp.class));
+    }
+
+    /**
+     * 把 search 请求里非位置类的过滤 (科目 / 教员类型 / 关键字 / 年级) 拼到指定 criteria 上.
+     * applyLocation = true 时也会拼 cityId / district (位置类).
+     */
+    private void applySearchFilters(TutorRequirementExample.Criteria c,
+                                    RequirementSearchReq req, boolean applyLocation) {
+        if (applyLocation) {
+            if (req.getCityId() != null) c.andCityIdEqualTo(req.getCityId());
+            if (StringUtils.hasText(req.getDistrict())) {
+                c.andDistrictNamesLike(PageUtil.like(req.getDistrict()));
+            }
+        }
+        if (req.getGradeId() != null) c.andGradeIdEqualTo(req.getGradeId());
+        if (StringUtils.hasText(req.getKeyword())) c.andTitleLike(PageUtil.like(req.getKeyword()));
+        if (StringUtils.hasText(req.getSubject())) {
+            c.andSubjectIdsLike(PageUtil.like(req.getSubject()));
+        }
+        if (StringUtils.hasText(req.getTutorType())) {
+            c.andTutorTypePrefLike(PageUtil.like(req.getTutorType()));
+        }
     }
 
     private static void applyMatchedCutoff(Page<TutorRequirement> page) {

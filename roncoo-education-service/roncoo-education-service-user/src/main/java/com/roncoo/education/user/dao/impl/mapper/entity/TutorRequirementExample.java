@@ -101,6 +101,7 @@ public class TutorRequirementExample {
         public Criteria andSubjectIdsLike(String value) { addCriterion("subject_ids like", value, "subjectIds"); return (Criteria) this; }
         public Criteria andTutorTypePrefLike(String value) { addCriterion("tutor_type_pref like", value, "tutorTypePref"); return (Criteria) this; }
         public Criteria andTeachingMethodEqualTo(Integer value) { addCriterion("teaching_method =", value, "teachingMethod"); return (Criteria) this; }
+        public Criteria andTeachingMethodNotEqualTo(Integer value) { addCriterion("teaching_method <>", value, "teachingMethod"); return (Criteria) this; }
         public Criteria andTutorGenderIsNull() { addCriterion("tutor_gender is null"); return (Criteria) this; }
         public Criteria andTutorGenderIsNotNull() { addCriterion("tutor_gender is not null"); return (Criteria) this; }
         public Criteria andTutorGenderEqualTo(Integer value) { addCriterion("tutor_gender =", value, "tutorGender"); return (Criteria) this; }
