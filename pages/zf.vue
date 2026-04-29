@@ -78,13 +78,14 @@
           <!-- 中介费政策 -->
           <section class="brokerage-card">
             <h2 class="bk-title">中介费政策</h2>
-            <p class="bk-lead">591家教网通过<strong>透明的一次性中介费</strong>覆盖匹配、审核、售后；课时费 <strong>不抽成</strong>，由家长直接支付给教员。</p>
+            <p class="bk-lead">591家教网对成功撮合的订单收取<strong>一次性中介费</strong>，覆盖匹配、审核、售后；<strong>续单</strong>课时费由家长直接支付给教员，平台不再收取。</p>
             <ul class="bk-list">
-              <li><span class="bk-tag tag-parent">家长</span><strong>100 元</strong>中介费 — 不满意可<strong>免费换教员，直到满意为止</strong></li>
-              <li><span class="bk-tag tag-tutor">教员</span>中介费 = <strong>首次上课课时费总额</strong>（如 2 小时 350 元 → 中介费 350 元）</li>
+              <li><span class="bk-tag tag-parent">家长</span>一次性 <strong>100 元</strong> 中介费</li>
+              <li><span class="bk-tag tag-tutor">教员</span>中介费 = <strong>首次上课课时费金额</strong>（如 2 小时 350 元 → 中介费 350 元；首单收益归平台，<strong>续单 100% 归教员</strong>）</li>
               <li><span class="bk-tag tag-once">仅 1 次</span>若学员只上 1 次课，中介费<strong>减半退还</strong></li>
               <li><span class="bk-tag tag-stay">2 次起</span>上 2 次及以上，中介费<strong>不退</strong></li>
-              <li><span class="bk-tag tag-flow">流程</span>客服联系教员说明缴费金额 → 教员撮合时为家长代收 100 元中介费并随首单一并上缴 → 客服将家长电话给教员 → 教员联系家长定时间地点</li>
+              <li><span class="bk-tag tag-swap">售后</span>对教员不满意，可联系客服<strong>免费推荐其他教员</strong>，直到满意为止（家长侧不再额外付中介费）</li>
+              <li><span class="bk-tag tag-flow">流程</span>客服联系教员说明缴费金额 → 教员撮合时为家长代收 100 元中介费 → 双方中介费随首单一并上缴客服 → 客服将家长电话给教员 → 教员联系家长定时间地点</li>
             </ul>
           </section>
         </article>
@@ -126,7 +127,7 @@ const DEFAULT_DATA = {
     '591家教网从数万教员库择优为您服务。',
     '教员执教前，平台会进行严格的实名+学历认证。',
     '对教员的每一份家教都有详细记录，供家长/学员参考。',
-    '平台收取一次性中介费做信息撮合 + 售后保障，<b>不抽成课时费</b>，规则见下方说明。',
+    '平台对成功撮合的订单收取一次性中介费 (家长 100 / 教员首单课时费)，<b>续单 100% 归教员</b>，规则见下方说明。',
     '如有任何疑问，请拨打客服热线。'
   ],
   categories: [
@@ -163,7 +164,7 @@ const DEFAULT_BOTTOM_NOTES = [
   '以上价格为上门一对一辅导参考价格，在线辅导一般可享 <strong>8-9折</strong> 优惠。',
   '艺术类（钢琴、美术、书法等）价格另议，通常高于文化课 20%-50%。',
   '首次上课可安排免费试讲30分钟（需与教员协商）。',
-  '<strong>课时费由教员自定</strong>，由家长直接结算给教员（不经平台）。中介费另算，标准见下方说明。',
+  '<strong>课时费由教员自定</strong>。续单课时费由家长直接结算给教员（不经平台）；首单课时费会作为教员侧中介费上缴客服，规则见下方说明。',
   '以上价格仅供参考，具体价格请与教员沟通确认。'
 ]
 const displayedNotes = computed(() => priceNotes.value.length ? priceNotes.value : DEFAULT_BOTTOM_NOTES)
@@ -364,5 +365,6 @@ onMounted(() => { load() })
 .tag-tutor { background: var(--color-accent); color: #fff; }
 .tag-once { background: rgba(46, 125, 50, 0.12); color: var(--color-success); }
 .tag-stay { background: rgba(198, 40, 40, 0.10); color: var(--color-error); }
+.tag-swap { background: rgba(2, 136, 209, 0.12); color: var(--color-info, #0277bd); }
 .tag-flow { background: var(--color-text-muted); color: #fff; }
 </style>

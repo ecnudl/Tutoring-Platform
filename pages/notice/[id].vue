@@ -211,7 +211,7 @@ const noticeMap = {
       <p>关于课时费结算说明：</p>
       <ul>
         <li>课时费由家长与教员直接协商确定</li>
-        <li>费用由家长直接支付给教员，平台不经手课时费；中介费另算（详见「中介费政策」公告）</li>
+        <li>续单课时费由家长直接支付给教员，平台不经手；首单课时费由教员上缴客服作为中介费（详见「中介费政策」公告）</li>
         <li>建议按课时结算，每次上课后当面支付</li>
         <li>教员和家长可自行约定付款方式（现金、转账等）</li>
       </ul>
@@ -262,11 +262,12 @@ const noticeMap = {
     content: `
       <h3>591家教网中介费规则</h3>
       <ul>
-        <li><strong>家长</strong>：100 元中介费，<strong>不满意可免费推荐教员，直到满意为止</strong></li>
-        <li><strong>教员</strong>：中介费 = 首次上课课时费总额（如 2 小时 350 元 → 中介费 350 元）</li>
-        <li><strong>仅上 1 次课</strong>：中介费减半退还</li>
-        <li><strong>上 2 次及以上</strong>：中介费不退</li>
-        <li>课时费由家长直接支付给教员，平台不经手；中介费由客服线下收取</li>
+        <li><strong>家长</strong>：一次性 100 元中介费</li>
+        <li><strong>教员</strong>：中介费 = 首次上课课时费金额（如 2 小时 350 元 → 中介费 350 元；<strong>首单收益归平台</strong>）</li>
+        <li><strong>仅上 1 次课</strong>：中介费<strong>减半退还</strong></li>
+        <li><strong>上 2 次及以上</strong>：中介费<strong>不退</strong></li>
+        <li><strong>售后</strong>：家长对教员不满意，可联系客服免费推荐其他教员，直到满意为止（家长侧不再额外付中介费）</li>
+        <li><strong>续单</strong>：首单完成后，所有续单课时费由家长直接支付给教员，<strong>平台不再收取</strong></li>
       </ul>
       <h3>具体流程</h3>
       <ol>
