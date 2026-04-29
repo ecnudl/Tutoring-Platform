@@ -479,22 +479,6 @@ CREATE TABLE `sms_log` (
   KEY `idx_mobile` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='短信记录';
 
--- 24. vip_membership VIP会员
-DROP TABLE IF EXISTS `vip_membership`;
-CREATE TABLE `vip_membership` (
-  `id`            BIGINT        NOT NULL                COMMENT '主键',
-  `gmt_create`    datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `gmt_modified`  datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  `status_id`     tinyint       NOT NULL DEFAULT 1      COMMENT '状态 1启用 0禁用',
-  `user_id`       BIGINT        NOT NULL                COMMENT '用户ID',
-  `vip_level`     TINYINT       NOT NULL DEFAULT 1      COMMENT 'VIP等级',
-  `start_time`    DATETIME      DEFAULT NULL            COMMENT '开始时间',
-  `end_time`      DATETIME      DEFAULT NULL            COMMENT '到期时间',
-  `operator_id`   BIGINT        DEFAULT NULL            COMMENT '操作人',
-  `remark`        VARCHAR(500)  DEFAULT NULL            COMMENT '备注',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='VIP会员';
 
 -- ===========================================================
 -- 八、内容管理

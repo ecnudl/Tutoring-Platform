@@ -14,7 +14,6 @@ import com.roncoo.education.user.dao.TutorApplicationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
 import com.roncoo.education.user.dao.TutorRequirementDao;
 import com.roncoo.education.user.dao.UsersDao;
-import com.roncoo.education.user.dao.VipMembershipDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +36,6 @@ public class AuthApplicationBiz extends BaseBiz {
     private final TutorRequirementDao tutorRequirementDao;
     @NotNull
     private final UsersDao usersDao;
-    @NotNull
-    private final VipMembershipDao vipMembershipDao;
     @NotNull
     private final MsgDao msgDao;
     @NotNull
@@ -107,15 +104,14 @@ public class AuthApplicationBiz extends BaseBiz {
         if (existing != null) {
             return Result.error("您已申请过该需求，不能重复申请");
         }
-        if (!isVipUser(userId)) {
-            LocalDateTime todayStart = LocalDate.now().atStartOfDay();
-            List<TutorApplication> todayApps = tutorApplicationDao.listByUserId(userId);
-            long todayCount = todayApps.stream()
-                    .filter(a -> a.getGmtCreate() != null && a.getGmtCreate().isAfter(todayStart))
-                    .count();
-            if (todayCount >= DAILY_APPLY_LIMIT) {
-                return Result.error("今日申请次数已用完（" + DAILY_APPLY_LIMIT + "次/天），开通VIP可不受限制");
-            }
+        // 每日申请上限 (统一限制, 无 VIP 例外)
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        List<TutorApplication> todayApps = tutorApplicationDao.listByUserId(userId);
+        long todayCount = todayApps.stream()
+                .filter(a -> a.getGmtCreate() != null && a.getGmtCreate().isAfter(todayStart))
+                .count();
+        if (todayCount >= DAILY_APPLY_LIMIT) {
+            return Result.error("今日申请次数已用完 (" + DAILY_APPLY_LIMIT + " 次/天), 请明天再试");
         }
         TutorApplication application = new TutorApplication();
         application.setRequirementId(requirementId);
@@ -215,12 +211,4 @@ public class AuthApplicationBiz extends BaseBiz {
         }
     }
 
-    private boolean isVipUser(Long userId) {
-        VipMembership vip = vipMembershipDao.getByUserId(userId);
-        if (vip == null) {
-            return false;
-        }
-        return vip.getStatusId() != null && vip.getStatusId() == 1
-                && vip.getEndTime() != null && vip.getEndTime().isAfter(LocalDateTime.now());
-    }
 }
