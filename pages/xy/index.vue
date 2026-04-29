@@ -99,7 +99,6 @@
               </template>
               <template v-else>
                 <div class="rc-region">{{ buildRegion(r) }}</div>
-                <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
               </template>
             </div>
             <div class="rc-c3">
@@ -127,7 +126,6 @@
               </template>
               <template v-else>
                 <div class="rc-region">{{ buildRegion(r) }}</div>
-                <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
               </template>
             </div>
             <div class="rc-c3">
