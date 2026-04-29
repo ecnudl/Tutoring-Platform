@@ -35,9 +35,6 @@ const routes = [
     // 审核日志
     { path: 'audit-log/list', component: () => import('@/views/system/AuditLogList.vue') },
     // 系统管理
-    { path: 'system/user', component: () => import('@/views/system/UserList.vue') },
-    { path: 'system/role', component: () => import('@/views/system/RoleList.vue') },
-    { path: 'system/menu', component: () => import('@/views/system/MenuList.vue') },
   ]}
 ]
 const router = createRouter({ history: createWebHistory('/admin/'), routes })

@@ -44,7 +44,6 @@
           <Cropper
             :src="cropSrc"
             :stencil-props="{ aspectRatio: 1 }"
-            stencil-component="square-stencil"
             :auto-zoom="true"
             class="tg-cropper"
             ref="cropperRef"

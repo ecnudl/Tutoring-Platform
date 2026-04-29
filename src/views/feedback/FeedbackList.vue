@@ -27,7 +27,7 @@
           <el-button size="small" @click="viewDetail(row)">查看</el-button>
           <el-button size="small" type="success" v-if="row.fbStatus===0" @click="handleAudit(row, 'pass')">通过</el-button>
           <el-button size="small" type="danger"  v-if="row.fbStatus===0" @click="handleAudit(row, 'reject')">驳回</el-button>
-          <el-button size="small" type="warning" v-if="row.fbStatus===1" @click="handleAudit(row, 'reject')">下架</el-button>
+          <el-button size="small" type="warning" v-if="row.fbStatus===1" @click="handleAudit(row, 'unshelf')">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -48,7 +48,7 @@
       </el-descriptions>
     </el-dialog>
 
-    <el-dialog v-model="auditVisible" :title="auditAction==='pass'?'审核通过':'审核驳回'" width="450px">
+    <el-dialog v-model="auditVisible" :title="auditAction==='pass'?'审核通过':(auditAction==='unshelf'?'下架感言':'审核驳回')" width="450px">
       <el-form label-width="90px">
         <el-form-item label="感言内容">
           <div style="color:#666">{{ auditRow?.content }}</div>
@@ -60,7 +60,7 @@
       <template #footer>
         <el-button @click="auditVisible = false">取消</el-button>
         <el-button :type="auditAction==='pass'?'success':'danger'" :loading="auditing" @click="submitAudit">
-          {{ auditAction==='pass'?'确认通过':'确认驳回' }}
+          {{ auditAction==='pass'?'确认通过':(auditAction==='unshelf'?'确认下架':'确认驳回') }}
         </el-button>
       </template>
     </el-dialog>
@@ -80,7 +80,7 @@ const detailVisible = ref(false)
 const detail = ref<any>(null)
 const auditVisible = ref(false)
 const auditRow = ref<any>(null)
-const auditAction = ref<'pass'|'reject'>('pass')
+const auditAction = ref<'pass'|'reject'|'unshelf'>('pass')
 const auditNote = ref('')
 const auditing = ref(false)
 
@@ -108,7 +108,7 @@ const viewDetail = async (row: any) => {
   } catch (e) { console.error(e) }
 }
 
-const handleAudit = (row: any, action: 'pass'|'reject') => {
+const handleAudit = (row: any, action: 'pass'|'reject'|'unshelf') => {
   auditRow.value = row
   auditAction.value = action
   auditNote.value = ''
@@ -118,10 +118,12 @@ const handleAudit = (row: any, action: 'pass'|'reject') => {
 const submitAudit = async () => {
   auditing.value = true
   try {
-    const path = auditAction.value === 'pass' ? '/user/admin/feedback/audit-pass' : '/user/admin/feedback/audit-reject'
+    const path = auditAction.value === 'pass'
+      ? '/user/admin/feedback/audit-pass'
+      : '/user/admin/feedback/audit-reject'  // 'reject' / 'unshelf' 都走同一端点, 文案区分仅在 UI
     const res = await put(path, { id: auditRow.value.id, reply: auditNote.value })
     if (res.code === 200) {
-      ElMessage.success(res.data || (auditAction.value === 'pass' ? '已通过' : '已驳回'))
+      ElMessage.success(res.data || (auditAction.value === 'pass' ? '已通过' : (auditAction.value === 'unshelf' ? '已下架' : '已驳回')))
       auditVisible.value = false
       await search()
     } else {

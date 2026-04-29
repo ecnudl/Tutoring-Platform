@@ -145,7 +145,7 @@ const viewDetail = async (row: any) => {
 }
 
 const handleEdit = (row: any) => {
-  editForm.value = { id: row.id, sort: row.sort || 0, statusId: row.statusId || 1 }
+  editForm.value = { id: row.id, sort: row.sort ?? 0, statusId: row.statusId ?? 1 }
   editVisible.value = true
 }
 
@@ -169,7 +169,7 @@ const quickToggle = async (row: any, target: 0 | 1) => {
     })
   } catch { return }
   try {
-    const res = await put('/user/admin/tutor/edit', { id: row.id, sort: row.sort || 0, statusId: target })
+    const res = await put('/user/admin/tutor/edit', { id: row.id, sort: row.sort ?? 0, statusId: target })
     if (res.code === 200) { ElMessage.success(`${action}成功`); await search() }
     else ElMessage.error(res.msg || '操作失败')
   } catch (e) { ElMessage.error('网络错误') }

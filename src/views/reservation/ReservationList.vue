@@ -9,7 +9,7 @@
         <el-radio-button :label="0">待处理</el-radio-button>
         <el-radio-button :label="1">已匹配</el-radio-button>
         <el-radio-button :label="3">已驳回/取消</el-radio-button>
-        <el-radio-button :label="2">已过期</el-radio-button>
+        <el-radio-button :label="2">已完成/归档</el-radio-button>
       </el-radio-group>
     </div>
 
@@ -84,32 +84,34 @@ const loading = ref(false)
 const detailVisible = ref(false)
 const detail = ref<any>(null)
 const tutorMap = ref<Record<string, any>>({})
+let searchSeq = 0  // 抗 stale-result
 
-const statusLabel = (s: number) => ({ 0: '待处理', 1: '已匹配', 2: '已过期', 3: '已驳回/取消' }[s] || '未知')
+const statusLabel = (s: number) => ({ 0: '待处理', 1: '已匹配', 2: '已完成', 3: '已驳回/取消' }[s] || '未知')
 const statusType = (s: number) => ({ 0: 'warning', 1: 'success', 2: 'info', 3: 'danger' }[s] || 'info')
 
 const search = async () => {
+  const mySeq = ++searchSeq
   loading.value = true
   try {
     const res = await post('/user/admin/reservation/page', {
       pageCurrent: page.value, pageSize: 20, resStatus: resStatus.value
     })
+    if (mySeq !== searchSeq) return  // 旧请求, 丢弃
     if (res.code === 200 && res.data) {
       list.value = res.data.list || []
       total.value = res.data.totalCount || 0
-      // Hydrate tutor info
+      // Hydrate tutor info — 并行
       const tutorIds = [...new Set(list.value.map(r => r.tutorId).filter(Boolean))]
-      for (const tid of tutorIds) {
-        if (!tutorMap.value[tid]) {
-          try {
-            const tres = await get('/user/admin/tutor/view', { id: tid })
-            if (tres.code === 200) tutorMap.value[tid] = tres.data
-          } catch (_) {}
-        }
-      }
+                          .filter(tid => !tutorMap.value[tid])
+      await Promise.all(tutorIds.map(async tid => {
+        try {
+          const tres = await get('/user/admin/tutor/view', { id: tid })
+          if (mySeq === searchSeq && tres.code === 200) tutorMap.value[tid] = tres.data
+        } catch (_) {}
+      }))
     }
   } catch (e) { console.error(e) }
-  finally { loading.value = false }
+  finally { if (mySeq === searchSeq) loading.value = false }
 }
 
 const viewDetail = (row: any) => { detail.value = row; detailVisible.value = true }
