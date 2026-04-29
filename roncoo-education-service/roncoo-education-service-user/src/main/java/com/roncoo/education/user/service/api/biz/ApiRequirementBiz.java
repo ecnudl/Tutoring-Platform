@@ -50,6 +50,19 @@ public class ApiRequirementBiz extends BaseBiz {
         if (req.getCityId() != null) c.andCityIdEqualTo(req.getCityId());
         if (req.getGradeId() != null) c.andGradeIdEqualTo(req.getGradeId());
         if (StringUtils.hasText(req.getKeyword())) c.andTitleLike(PageUtil.like(req.getKeyword()));
+        // 新筛选 (CSV 名字列): 区域 / 科目 / 教员类型 用 LIKE 匹配
+        if (StringUtils.hasText(req.getDistrict())) {
+            c.andDistrictNamesLike(PageUtil.like(req.getDistrict()));
+        }
+        if (StringUtils.hasText(req.getSubject())) {
+            c.andSubjectIdsLike(PageUtil.like(req.getSubject()));
+        }
+        if (StringUtils.hasText(req.getTutorType())) {
+            c.andTutorTypePrefLike(PageUtil.like(req.getTutorType()));
+        }
+        if (req.getTeachingMethod() != null) {
+            c.andTeachingMethodEqualTo(req.getTeachingMethod());
+        }
 
         // 已匹配的沉底, 同状态内按 id desc
         example.setOrderByClause(
