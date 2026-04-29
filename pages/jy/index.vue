@@ -413,21 +413,23 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  align-items: center;
+  align-items: flex-start;     /* 改: 顶对齐, 头像靠上 */
   transition: border-color var(--transition-fast);
 }
 .tutor-card-h:hover {
   border-color: var(--color-primary);
 }
 
-/* 头像列固定 64×64, 防止 chip 撑列宽导致头像水平偏移 */
+/* 头像列: 列宽固定 80px (容纳 chip), 头像 + chip 上下排列, 永远在 card 内 */
 .tutor-avatar {
-  position: relative;
-  width: 64px;
-  height: 64px;
+  width: 80px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
-.tutor-body { flex: 1; }
+.tutor-body { flex: 1; min-width: 0; padding-top: 4px; }   /* body 与头像顶端微对齐 */
 
 .tutor-top {
   display: flex;
@@ -482,16 +484,12 @@ onMounted(() => {
   .tutor-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
 }
 
-/* 证件认证 chip — 绝对定位锚到头像下方居中, 不参与 flex 列宽计算 */
+/* 证件认证 chip — 在 flow 内, 列宽 80px 容下, 不会越过 card 边界 */
 .cert-verified-chip {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  padding: 2px 9px;
-  font-size: 11px;
+  padding: 2px 8px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.2px;
   color: #047857;
@@ -500,6 +498,5 @@ onMounted(() => {
   border-radius: 999px;
   white-space: nowrap;
   box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
-  z-index: 1;
 }
 </style>
