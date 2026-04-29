@@ -114,6 +114,7 @@
             <div class="xa-row"><dt>辅导时间</dt><dd>{{ req.schedule || '—' }}</dd></div>
             <div class="xa-row" v-if="req.requirementType"><dt>求教性质</dt><dd>{{ requirementTypeMap[req.requirementType] || '—' }}</dd></div>
             <div class="xa-row"><dt>性别要求</dt><dd>{{ genderLabel(req.tutorGender, '不限') }}</dd></div>
+            <div class="xa-row" v-if="tutorTypeLabel"><dt>教员类型</dt><dd>{{ tutorTypeLabel }}</dd></div>
             <div class="xa-row" v-if="req.otherRequirements"><dt>其它要求</dt><dd>{{ req.otherRequirements }}</dd></div>
             <div class="xa-row xa-row-budget">
               <dt>报　　酬</dt>
@@ -273,12 +274,20 @@ const genderLabel = (g, defaultLbl = '不限') => {
   return defaultLbl
 }
 
-const subjectsLabel = computed(() => req.value?.subjectNames || req.value?.subjectIds || '')
+const subjectsLabel = computed(() => {
+  const v = req.value?.subjectNames || req.value?.subjectIds || ''
+  return Array.isArray(v) ? v.join(' · ') : String(v).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
+})
 const locationLabel = computed(() => {
   if (!req.value) return ''
-  const city = req.value.cityName || (req.value.cityId === '1' || req.value.cityId === 1 ? '上海' : '')
-  const dist = req.value.districtName || ''
-  return [city, dist].filter(Boolean).join(' · ')
+  const dn = req.value.districtNames
+  if (dn) return String(dn).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
+  return req.value.districtName || ''
+})
+const tutorTypeLabel = computed(() => {
+  const v = req.value?.tutorTypePref
+  if (!v) return ''
+  return String(v).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
 })
 
 const shortDate = (s) => {
