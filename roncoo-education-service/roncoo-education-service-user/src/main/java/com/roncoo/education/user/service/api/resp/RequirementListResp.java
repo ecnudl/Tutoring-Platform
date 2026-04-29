@@ -64,4 +64,16 @@ public class RequirementListResp implements Serializable {
 
     @ApiModelProperty(value = "需求状态")
     private Integer reqStatus;
+
+    @ApiModelProperty(value = "城市 ID (源字段, 用于子域名匹配)")
+    private Long cityId;
+
+    @ApiModelProperty(value = "区域 CSV (源字段, 多区域逗号分隔)")
+    private String districtNames;
+
+    @ApiModelProperty(value = "科目 CSV (源字段, 与 subjectNames 不同)")
+    private String subjectIds;
+
+    @ApiModelProperty(value = "大致位置")
+    private String address;
 }
