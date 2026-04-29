@@ -26,6 +26,11 @@
           <el-tag :type="statusType(row.reqStatus)" size="small">{{ statusLabel(row.reqStatus) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="加急" width="60">
+        <template #default="{ row }">
+          <el-tag v-if="row.isUrgent === 1" type="danger" size="small">急</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="viewCount" label="浏览" width="70" />
       <el-table-column prop="applicationCount" label="申请" width="70" />
       <el-table-column prop="gmtCreate" label="创建时间" width="160" />
@@ -195,6 +200,12 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="加急">
+              <el-switch v-model="form.isUrgent" :active-value="1" :inactive-value="0" active-text="加急" inactive-text="普通" inline-prompt />
+              <span style="margin-left:10px;font-size:12px;color:#94a3b8">加急订单首页 \"急\" 红标</span>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -274,7 +285,8 @@ function emptyForm() {
     frequency: '', schedule: '',
     tutorGender: 0, budgetMin: 0, budgetMax: 0,
     otherRequirements: '', teachingMethod: 1, transportSubsidy: '',
-    reqStatus: 2
+    reqStatus: 2,
+    isUrgent: 0
   }
 }
 
@@ -362,7 +374,8 @@ const openEdit = async (row: any) => {
         frequency: d.frequency || '', schedule: d.schedule || '',
         tutorGender: d.tutorGender ?? 0, budgetMin: d.budgetMin ?? 0, budgetMax: d.budgetMax ?? 0,
         otherRequirements: d.otherRequirements || '', teachingMethod: d.teachingMethod ?? 1, transportSubsidy: d.transportSubsidy || '',
-        reqStatus: d.reqStatus ?? 2
+        reqStatus: d.reqStatus ?? 2,
+        isUrgent: d.isUrgent ?? 0
       }
       // 先把当前城市的区列表拉好, 再根据已存的区名打勾
       await loadDistricts(cityIdNum)
