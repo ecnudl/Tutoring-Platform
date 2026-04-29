@@ -19,6 +19,72 @@
         <div class="sub">名校名师 · 优质家教平台 · 价格参考</div>
       </div>
 
+      <!-- 中介费政策 (置顶 / 全宽) -->
+      <section class="bk-feature" aria-labelledby="bk-h">
+        <header class="bk-head">
+          <div class="bk-eyebrow">
+            <span class="bk-eye-rule" aria-hidden="true"></span>
+            <span>591 家教 · 收费规则</span>
+          </div>
+          <h2 id="bk-h" class="bk-h">中介费政策</h2>
+          <p class="bk-lead">591家教网对成功撮合的订单收取<strong>一次性中介费</strong>，覆盖匹配、审核与售后保障；首单完成后，<strong>续单课时费</strong>由家长直接支付给教员，平台不再收取。</p>
+        </header>
+
+        <div class="bk-grid">
+          <div class="bk-pillar bk-pillar--parent">
+            <div class="bk-pillar-label">家长侧</div>
+            <div class="bk-pillar-num">¥100<small>·一次性</small></div>
+            <div class="bk-pillar-desc">中介费一次性结算，含售后保障</div>
+          </div>
+          <div class="bk-pillar bk-pillar--tutor">
+            <div class="bk-pillar-label">教员侧</div>
+            <div class="bk-pillar-num">首单<small>·课时费</small></div>
+            <div class="bk-pillar-desc">续单课时费 100% 归教员，平台不再收取</div>
+          </div>
+          <ul class="bk-rules">
+            <li class="bk-rule">
+              <span class="bk-rule-num">01</span>
+              <div class="bk-rule-text">
+                <div class="bk-rule-h">仅上 1 次课</div>
+                <div class="bk-rule-d">中介费减半退还</div>
+              </div>
+            </li>
+            <li class="bk-rule">
+              <span class="bk-rule-num">02</span>
+              <div class="bk-rule-text">
+                <div class="bk-rule-h">上 2 次及以上</div>
+                <div class="bk-rule-d">中介费不退</div>
+              </div>
+            </li>
+            <li class="bk-rule">
+              <span class="bk-rule-num">03</span>
+              <div class="bk-rule-text">
+                <div class="bk-rule-h">不满意 · 换教员</div>
+                <div class="bk-rule-d">客服免费推荐至满意，家长不再付费</div>
+              </div>
+            </li>
+            <li class="bk-rule">
+              <span class="bk-rule-num">04</span>
+              <div class="bk-rule-text">
+                <div class="bk-rule-h">续单课时费</div>
+                <div class="bk-rule-d">家长直接结算给教员，不经平台</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bk-flow">
+          <div class="bk-flow-h">缴纳与对接流程</div>
+          <ol class="bk-flow-steps">
+            <li><span class="bk-step-num">1</span><span class="bk-step-text">客服联系教员，说明缴费金额</span></li>
+            <li><span class="bk-step-num">2</span><span class="bk-step-text">教员撮合时代收家长 100 元中介费</span></li>
+            <li><span class="bk-step-num">3</span><span class="bk-step-text">双方中介费随首单一并上缴客服</span></li>
+            <li><span class="bk-step-num">4</span><span class="bk-step-text">客服将家长联系方式发给教员</span></li>
+            <li><span class="bk-step-num">5</span><span class="bk-step-text">教员联系家长，确定时间地点</span></li>
+          </ol>
+        </div>
+      </section>
+
       <div class="zf-body">
         <article class="zf-main">
           <!-- 说明 -->
@@ -74,20 +140,6 @@
               <NuxtLink to="/jy"><el-button size="large">浏览教员库</el-button></NuxtLink>
             </div>
           </div>
-
-          <!-- 中介费政策 -->
-          <section class="brokerage-card">
-            <h2 class="bk-title">中介费政策</h2>
-            <p class="bk-lead">591家教网对成功撮合的订单收取<strong>一次性中介费</strong>，覆盖匹配、审核、售后；<strong>续单</strong>课时费由家长直接支付给教员，平台不再收取。</p>
-            <ul class="bk-list">
-              <li><span class="bk-tag tag-parent">家长</span>一次性 <strong>100 元</strong> 中介费</li>
-              <li><span class="bk-tag tag-tutor">教员</span>中介费 = <strong>首次上课课时费金额</strong>（如 2 小时 350 元 → 中介费 350 元；首单收益归平台，<strong>续单 100% 归教员</strong>）</li>
-              <li><span class="bk-tag tag-once">仅 1 次</span>若学员只上 1 次课，中介费<strong>减半退还</strong></li>
-              <li><span class="bk-tag tag-stay">2 次起</span>上 2 次及以上，中介费<strong>不退</strong></li>
-              <li><span class="bk-tag tag-swap">售后</span>对教员不满意，可联系客服<strong>免费推荐其他教员</strong>，直到满意为止（家长侧不再额外付中介费）</li>
-              <li><span class="bk-tag tag-flow">流程</span>客服联系教员说明缴费金额 → 教员撮合时为家长代收 100 元中介费 → 双方中介费随首单一并上缴客服 → 客服将家长电话给教员 → 教员联系家长定时间地点</li>
-            </ul>
-          </section>
         </article>
 
         <aside class="zf-side">
@@ -323,48 +375,220 @@ onMounted(() => { load() })
   .zf-side { position: static; }
 }
 
-.brokerage-card {
-  background: linear-gradient(155deg, #fff 0%, var(--color-primary-lighter) 100%);
-  border: 1px solid var(--color-border-light);
-  border-radius: 14px;
-  padding: 28px 32px 30px;
-  margin-top: 28px;
+/* ============================================
+   中介费政策 (置顶 / 全宽)
+   ============================================ */
+.bk-feature {
+  background: #fff;
+  border-radius: 12px;
+  padding: 36px 44px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
 }
-.brokerage-card::before {
-  content: "";
+.bk-feature::before {
+  content: '';
   position: absolute;
-  inset: 0 0 auto 0;
-  height: 4px;
-  background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right,
+    var(--color-primary, #163B6B) 0%,
+    #264e82 45%,
+    #d97706 100%);
 }
-.bk-title {
-  font-size: 22px; font-weight: 700; letter-spacing: 4px;
-  color: var(--color-primary-dark); margin: 0 0 12px;
+
+/* Header */
+.bk-head { margin-bottom: 26px; max-width: 820px; }
+.bk-eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; letter-spacing: 4px; font-weight: 600;
+  color: var(--color-primary, #163B6B);
+  margin-bottom: 14px;
+}
+.bk-eye-rule {
+  width: 36px; height: 2px;
+  background: var(--color-primary, #163B6B);
+}
+.bk-h {
+  font-size: 26px; font-weight: 700;
+  letter-spacing: 4px; color: var(--color-primary, #163B6B);
+  margin: 0 0 14px;
 }
 .bk-lead {
-  font-size: 14px; color: var(--color-text-secondary);
-  line-height: 1.85; margin: 0 0 18px;
+  font-size: 14px; color: #475569;
+  line-height: 1.85; margin: 0;
 }
-.bk-lead strong { color: var(--color-primary-dark); font-weight: 600; }
-.bk-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
-.bk-list li {
-  display: grid; grid-template-columns: 92px 1fr; align-items: start; gap: 14px;
-  padding: 12px 14px; background: #fff; border-radius: 8px;
-  border-left: 3px solid var(--color-primary);
-  font-size: 14px; line-height: 1.75; color: var(--color-text);
+.bk-lead strong { color: var(--color-primary, #163B6B); font-weight: 600; }
+
+/* Main grid: 2 stat pillars + rules block */
+.bk-grid {
+  display: grid;
+  grid-template-columns: 200px 200px 1fr;
+  gap: 18px;
+  margin-bottom: 26px;
+  align-items: stretch;
 }
-.bk-list li strong { color: var(--color-accent-dark); font-weight: 700; }
-.bk-tag {
-  display: inline-block; padding: 4px 10px;
-  font-size: 12px; letter-spacing: 1px; font-weight: 600;
-  border-radius: 4px; text-align: center; align-self: start;
+
+.bk-pillar {
+  border-radius: 10px;
+  padding: 22px 22px 20px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 8px;
+  position: relative; overflow: hidden;
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(22, 59, 107, 0.18);
+  min-height: 168px;
 }
-.tag-parent { background: var(--color-primary); color: #fff; }
-.tag-tutor { background: var(--color-accent); color: #fff; }
-.tag-once { background: rgba(46, 125, 50, 0.12); color: var(--color-success); }
-.tag-stay { background: rgba(198, 40, 40, 0.10); color: var(--color-error); }
-.tag-swap { background: rgba(2, 136, 209, 0.12); color: var(--color-info, #0277bd); }
-.tag-flow { background: var(--color-text-muted); color: #fff; }
+.bk-pillar::after {
+  /* corner watermark */
+  content: ''; position: absolute;
+  right: -28px; bottom: -28px;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+.bk-pillar--parent {
+  background: linear-gradient(140deg, #163B6B 0%, #264e82 100%);
+}
+.bk-pillar--tutor {
+  background: linear-gradient(140deg, #b45309 0%, #d97706 100%);
+  box-shadow: 0 8px 22px rgba(180, 83, 9, 0.22);
+}
+.bk-pillar-label {
+  font-size: 12px; letter-spacing: 4px; font-weight: 600;
+  opacity: 0.86;
+  position: relative; z-index: 1;
+}
+.bk-pillar-num {
+  font-size: 30px; font-weight: 700; letter-spacing: 1px;
+  font-family: Georgia, serif; line-height: 1.1;
+  position: relative; z-index: 1;
+}
+.bk-pillar-num small {
+  display: block; margin-top: 6px;
+  font-size: 12px; font-weight: 400;
+  letter-spacing: 2px; opacity: 0.82;
+  font-family: inherit;
+}
+.bk-pillar-desc {
+  font-size: 13px; line-height: 1.55;
+  opacity: 0.94; letter-spacing: 0.4px;
+  position: relative; z-index: 1;
+}
+
+/* Rules grid */
+.bk-rules {
+  list-style: none; padding: 0; margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  align-content: stretch;
+}
+.bk-rule {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-left: 3px solid var(--color-primary, #163B6B);
+  border-radius: 6px;
+  transition: background 0.2s, transform 0.2s;
+}
+.bk-rule:hover {
+  background: #f0f6fd;
+  transform: translateX(2px);
+}
+.bk-rule-num {
+  font-family: Georgia, serif;
+  font-size: 22px; font-weight: 700; letter-spacing: 1px;
+  color: var(--color-primary, #163B6B);
+  line-height: 1; flex-shrink: 0; opacity: 0.7;
+}
+.bk-rule-text { flex: 1; min-width: 0; }
+.bk-rule-h {
+  font-size: 14px; font-weight: 600; color: #111827;
+  margin-bottom: 3px; letter-spacing: 0.5px;
+}
+.bk-rule-d {
+  font-size: 13px; color: #64748b; line-height: 1.55;
+}
+
+/* Flow steps */
+.bk-flow {
+  border-top: 1px dashed #e5e7eb;
+  padding-top: 22px;
+}
+.bk-flow-h {
+  font-size: 12px; letter-spacing: 4px; font-weight: 700;
+  color: var(--color-primary, #163B6B);
+  margin-bottom: 16px;
+}
+.bk-flow-steps {
+  list-style: none; padding: 0; margin: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  position: relative;
+}
+.bk-flow-steps::before {
+  content: '';
+  position: absolute;
+  top: 18px; left: calc(10% + 18px); right: calc(10% + 18px);
+  height: 2px;
+  background: repeating-linear-gradient(to right,
+    #cbd5e1 0, #cbd5e1 6px,
+    transparent 6px, transparent 12px);
+  z-index: 0;
+}
+.bk-flow-steps li {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 10px;
+  position: relative; z-index: 1;
+  padding: 0 8px;
+}
+.bk-step-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary, #163B6B);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: Georgia, serif;
+  font-size: 16px; font-weight: 700;
+  box-shadow: 0 4px 12px rgba(22, 59, 107, 0.25);
+  flex-shrink: 0;
+}
+.bk-step-text {
+  font-size: 13px; color: #475569; line-height: 1.55;
+  letter-spacing: 0.3px;
+}
+
+/* Tablet (3 cols pillar grid breaks) */
+@media (max-width: 1100px) {
+  .bk-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bk-rules {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .bk-feature { padding: 24px 18px 22px; }
+  .bk-h { font-size: 20px; letter-spacing: 2px; }
+  .bk-eyebrow { font-size: 11px; letter-spacing: 3px; }
+  .bk-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .bk-pillar { min-height: 140px; padding: 18px 16px; }
+  .bk-pillar-num { font-size: 24px; }
+  .bk-rules {
+    grid-template-columns: 1fr;
+  }
+  .bk-flow-steps {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 6px;
+  }
+  .bk-flow-steps::before { display: none; }
+}
 </style>
