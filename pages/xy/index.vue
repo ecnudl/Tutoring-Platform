@@ -78,34 +78,50 @@
     </div>
 
     <template v-else>
-      <div class="req-list">
-        <div v-for="r in requirements" :key="r.id" class="req-card">
-          <div class="req-body">
-            <div class="req-title-row">
-              <span class="req-title">{{ r.title || r.subjectName || '家教需求' }}</span>
-              <el-tag size="small" :type="r.reqStatus === 3 ? 'warning' : 'success'">{{ r.reqStatus === 3 ? '已接单' : '招募中' }}</el-tag>
-            </div>
-            <div class="req-no">订单编号：A{{ r.displayNo || r.id }}</div>
-            <div class="req-info">
-              <span v-if="r.districtName">{{ r.districtName }}</span>
-              <span v-if="r.description" class="req-desc">{{ r.description.substring(0, 60) }}{{ r.description.length > 60 ? '...' : '' }}</span>
-            </div>
-            <div class="req-tags">
-              <el-tag size="small" type="info" v-if="r.studentGender === 1">男学员</el-tag>
-              <el-tag size="small" type="info" v-if="r.studentGender === 2">女学员</el-tag>
-              <el-tag size="small" v-if="r.tutorTypePreference">要求{{ tutorTypeMap[r.tutorTypePreference] }}</el-tag>
-              <el-tag size="small" type="warning" v-if="r.budgetMin">{{ r.budgetMin }}-{{ r.budgetMax }}元/时</el-tag>
-            </div>
+      <div class="req-list" v-if="requirements.length">
+        <NuxtLink
+          v-for="r in requirements"
+          :key="r.id"
+          :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)"
+          class="req-row"
+          :class="{ 'is-matched': r.reqStatus === 3 }"
+        >
+          <!-- col 1: 标题 + 编号 -->
+          <div class="rc-c1">
+            <div class="rc-title">{{ buildCardTitle(r) }}</div>
+            <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
+            <span v-if="r.reqStatus === 3" class="rc-matched-pill">已接单</span>
           </div>
-          <div class="req-action">
-            <NuxtLink :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)">
-              <el-button type="primary" size="small">详情</el-button>
-            </NuxtLink>
+
+          <!-- col 2: 区域 + 大致位置 / 在线辅导 -->
+          <div class="rc-c2">
+            <template v-if="Number(r.teachingMethod) === 3">
+              <div class="rc-online">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                网络授课
+              </div>
+            </template>
+            <template v-else>
+              <div class="rc-region">{{ buildRegion(r) }}</div>
+              <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
+            </template>
           </div>
-        </div>
+
+          <!-- col 3: 对教员要求 + 教员类型限制 -->
+          <div class="rc-c3">
+            <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+            <div class="rc-pref">{{ buildTutorPref(r) }}</div>
+          </div>
+
+          <!-- col 4: 报酬 + 详情 -->
+          <div class="rc-c4">
+            <div class="rc-budget">{{ buildBudget(r) }}</div>
+            <span class="rc-cta">详情</span>
+          </div>
+        </NuxtLink>
       </div>
 
-      <div v-if="!requirements.length" style="text-align:center;padding:60px;color:var(--color-text-muted)">暂无符合条件的需求</div>
+      <div v-else style="text-align:center;padding:60px;color:var(--color-text-muted)">暂无符合条件的需求</div>
 
       <div style="display:flex;justify-content:center;margin:24px 0" v-if="total > 0">
         <el-pagination
@@ -134,6 +150,41 @@ const { post } = useApi()
 const { districts, universities } = useCityData()
 
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
+
+// ---- 卡片渲染助手 ----
+const csvFirst = (s) => {
+  if (!s) return ''
+  return String(s).split(',').map(x => x.trim()).filter(Boolean)[0] || ''
+}
+const csvJoin = (s) => {
+  if (!s) return ''
+  return String(s).split(',').map(x => x.trim()).filter(Boolean).join('、')
+}
+const buildCardTitle = (r) => {
+  if (r && r.title) return r.title
+  const parts = []
+  if (r.gradeName) parts.push(r.gradeName)
+  const sub = csvFirst(r.subjectIds)
+  if (sub) parts.push(sub)
+  return parts.length ? parts.join('') : '家教需求'
+}
+const buildRegion = (r) => {
+  const dn = csvFirst(r.districtNames)
+  return dn || '区域待确认'
+}
+const buildTutorPref = (r) => {
+  const gPart = r.tutorGender === 1 ? '[男]' : r.tutorGender === 2 ? '[女]' : '[无限制]'
+  const types = csvJoin(r.tutorTypePref)
+  return types ? `${gPart}需要教员身份${types}` : `${gPart}不限教员类型`
+}
+const buildBudget = (r) => {
+  if (r.budgetMin && r.budgetMax && Number(r.budgetMin) !== Number(r.budgetMax)) {
+    return `${r.budgetMin}-${r.budgetMax} 元/小时`
+  }
+  if (r.budgetMin) return `${r.budgetMin} 元/小时`
+  if (r.budgetMax) return `${r.budgetMax} 元/小时`
+  return '面议'
+}
 
 const subjectExpanded = ref(false)
 const universityExpanded = ref(false)
@@ -299,35 +350,166 @@ onMounted(() => { search() })
 .result-header { margin-bottom: var(--space-md); font-size: var(--font-size-base); color: var(--color-text-secondary); }
 .result-header strong { color: var(--color-primary); }
 
-.req-list { display: flex; flex-direction: column; gap: var(--space-md); }
-
-.req-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  transition: border-color var(--transition-fast);
+/* ============================================
+   学员订单 ttgood 风格行卡 (4 列)
+   ============================================ */
+.req-list {
+  display: flex; flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
-.req-card:hover { border-color: var(--color-primary); }
 
-.req-body { flex: 1; }
-.req-title-row { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: 4px; }
-.req-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-text); }
-.req-no { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 6px; }
-.req-info { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 6px; display: flex; gap: var(--space-md); }
-.req-desc { color: var(--color-text-secondary); }
-.req-tags { display: flex; gap: 4px; flex-wrap: wrap; }
-.req-action { flex-shrink: 0; margin-left: var(--space-lg); }
+.req-row {
+  display: grid;
+  grid-template-columns: 220px 200px 1fr 160px;
+  gap: 24px;
+  align-items: center;
+  padding: 22px 24px;
+  background: #fff;
+  border-bottom: 1px dashed #e5e7eb;
+  text-decoration: none;
+  position: relative;
+  transition: background 0.15s, transform 0.15s;
+}
+.req-row:hover {
+  background: #f8fafc;
+}
+.req-row:hover .rc-cta {
+  background: #b45309;
+  transform: translateX(2px);
+  box-shadow: 0 6px 20px -8px rgba(180, 83, 9, 0.45);
+}
+.req-row:first-child { border-top: 1px dashed #e5e7eb; }
+.req-row.is-matched { opacity: 0.7; }
+.req-row.is-matched:hover { opacity: 0.92; }
+
+/* col 1 */
+.rc-c1 { display: flex; flex-direction: column; gap: 4px; min-width: 0; position: relative; }
+.rc-title {
+  font-size: 18px; font-weight: 700;
+  color: #111827;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rc-no {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12.5px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+.rc-matched-pill {
+  position: absolute;
+  top: -2px; right: -8px;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  background: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* col 2 */
+.rc-c2 { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rc-region {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rc-addr {
+  font-size: 13px;
+  color: #64748b;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rc-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #d97706;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.rc-online svg { flex-shrink: 0; }
+
+/* col 3 */
+.rc-c3 { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rc-req {
+  font-size: 14px;
+  color: #111827;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.rc-pref {
+  font-size: 13px;
+  color: #64748b;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* col 4 */
+.rc-c4 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  min-width: 0;
+}
+.rc-budget {
+  font-size: 16px;
+  font-weight: 700;
+  color: #d97706;
+  font-family: Georgia, serif;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.rc-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  background: #d97706;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+@media (max-width: 1100px) {
+  .req-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    padding: 18px 20px;
+  }
+  .rc-c4 {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    border-top: 1px dashed #f1f5f9;
+    padding-top: 14px;
+  }
+}
 
 @media (max-width: 768px) {
   .xy-page { padding: var(--space-md); }
   .filter-row { flex-direction: column; }
   .filter-label { width: auto; margin-bottom: 4px; }
-  .req-card { flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
-  .req-action { margin-left: 0; width: 100%; }
-  .req-action .el-button { width: 100%; }
+  .req-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 16px;
+  }
+  .rc-c4 {
+    flex-direction: row-reverse;
+    border-top: 1px dashed #f1f5f9;
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+  .rc-cta { padding: 8px 16px; }
 }
 </style>
