@@ -92,14 +92,27 @@ const brandDomains = runtimeConfig.public.brandDomains || ['www.591jiajiao.com',
 
 const route = useRoute()
 let unreadTimer = null
+const startUnreadTimer = () => {
+  if (unreadTimer) return
+  userStore.fetchUnreadCount()
+  unreadTimer = setInterval(() => userStore.fetchUnreadCount(), 60000)
+}
+const stopUnreadTimer = () => {
+  if (unreadTimer) { clearInterval(unreadTimer); unreadTimer = null }
+  userStore.unreadCount = 0
+}
 onMounted(() => {
   if (userStore.isLoggedIn) {
     userStore.fetchNickname()
-    userStore.fetchUnreadCount()
-    unreadTimer = setInterval(() => userStore.fetchUnreadCount(), 60000)
+    startUnreadTimer()
   }
 })
-onBeforeUnmount(() => { if (unreadTimer) clearInterval(unreadTimer) })
+onBeforeUnmount(stopUnreadTimer)
+// 监听登录态切换 (登录/登出): 启停轮询
+watch(() => userStore.token, (t) => {
+  if (t) startUnreadTimer()
+  else stopUnreadTimer()
+})
 watch(() => route.fullPath, () => {
   if (userStore.isLoggedIn) userStore.fetchUnreadCount()
 })

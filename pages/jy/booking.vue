@@ -104,6 +104,11 @@ import { useSiteConfig } from '~/composables/useSiteConfig'
 definePageMeta({ middleware: 'auth' })
 
 const userStore = useUserStore()
+// 仅家长/学员可发起预约 (教员/未设角色不可)
+if (process.client && userStore.isLoggedIn && !userStore.isStudent) {
+  ElMessage.warning('该入口仅家长/学员使用')
+  useRouter().replace('/jy')
+}
 const { post, get } = useApi()
 const router = useRouter()
 const route = useRoute()

@@ -7,7 +7,6 @@ export interface SiteConfig {
   siteBrandName?: string
   siteBrandSlogan?: string
   siteHotline?: string
-  tutorGroupQrUrl?: string
   siteCsEmail?: string
   siteCsWechat?: string
   siteWorkTime?: string

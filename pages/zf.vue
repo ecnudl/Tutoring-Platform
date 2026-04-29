@@ -84,7 +84,7 @@
               <li><span class="bk-tag tag-tutor">教员</span>中介费 = <strong>首次上课课时费总额</strong>（如 2 小时 350 元 → 中介费 350 元）</li>
               <li><span class="bk-tag tag-once">仅 1 次</span>若学员只上 1 次课，中介费<strong>减半退还</strong></li>
               <li><span class="bk-tag tag-stay">2 次起</span>上 2 次及以上，中介费<strong>不退</strong></li>
-              <li><span class="bk-tag tag-flow">流程</span>客服联系教员告知缴费方式 → 教员先垫付家长 100 元 → 中介费收齐 → 客服将家长电话给教员 → 教员联系家长定时间地点</li>
+              <li><span class="bk-tag tag-flow">流程</span>客服联系教员说明缴费金额 → 教员撮合时为家长代收 100 元中介费并随首单一并上缴 → 客服将家长电话给教员 → 教员联系家长定时间地点</li>
             </ul>
           </section>
         </article>

@@ -1,8 +1,8 @@
 <template>
 <div class="xa-page">
   <Head>
-    <Title>A{{ displayNo }} 学员需求 - 591家教网</Title>
-    <Meta name="description" :content="`A${displayNo}学员需求详情，区域 / 年级 / 科目 / 预算 / 上课要求。`" />
+    <Title>A{{ displayNoNum }} 学员需求 - 591家教网</Title>
+    <Meta name="description" :content="`A${displayNoNum}学员需求详情，区域 / 年级 / 科目 / 预算 / 上课要求。`" />
   </Head>
 
   <!-- 面包屑 -->
@@ -11,7 +11,7 @@
     <span class="sep">›</span>
     <NuxtLink to="/xy">学员库</NuxtLink>
     <span class="sep">›</span>
-    <span class="cur">A{{ displayNo }}</span>
+    <span class="cur">A{{ displayNoNum }}</span>
   </div>
 
   <div v-loading="loading">
@@ -25,7 +25,7 @@
             <path d="M20 33 L29 42 L45 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <p class="state-eyebrow">需求 A{{ displayNo }}</p>
+        <p class="state-eyebrow">需求 A{{ displayNoNum }}</p>
         <h2 class="state-title">该需求已接单</h2>
         <p class="state-desc">感谢您的关注。客服已为这位学员安排了合适的教员，本订单不再公开接受新申请。</p>
         <p class="state-tip">还可以为您匹配类似订单 — 在学员库继续挑选，或直接联系客服。</p>
@@ -46,7 +46,7 @@
             <circle cx="32" cy="48" r="2.5" fill="currentColor"/>
           </svg>
         </div>
-        <p class="state-eyebrow">需求 A{{ displayNo }}</p>
+        <p class="state-eyebrow">需求 A{{ displayNoNum }}</p>
         <h2 class="state-title">未找到该需求</h2>
         <p class="state-desc">需求可能已下架、已关闭或暂未通过审核。请返回学员库挑选其他订单。</p>
         <div class="state-actions">
@@ -167,7 +167,7 @@
               <div>
                 <div class="cs-lbl">客服微信</div>
                 <span class="cs-val mono">{{ csWechat }}</span>
-                <div class="cs-fine">备注「接单 + 编号 A{{ displayNo }}」</div>
+                <div class="cs-fine">备注「接单 + 编号 A{{ displayNoNum }}」</div>
               </div>
             </li>
           </ul>
@@ -211,7 +211,7 @@
     </div>
     <div class="dlg-row dlg-row-no">
       <span class="dlg-lbl">提及编号</span>
-      <span class="dlg-val mono">A{{ displayNo }}</span>
+      <span class="dlg-val mono">A{{ displayNoNum }}</span>
     </div>
     <p class="dlg-fine">为保障双方权益，平台不在站内放学员联系方式，所有匹配走客服。</p>
     <template #footer>
@@ -287,7 +287,7 @@ const loadReq = async () => {
 }
 
 const copyContact = async () => {
-  const text = `客服微信 ${csWechat.value}\n客服电话 ${csHotline.value}\n订单编号 A${displayNo}\n（591家教网）`
+  const text = `客服微信 ${csWechat.value}\n客服电话 ${csHotline.value}\n订单编号 A${displayNoNum.value}\n（591家教网）`
   try {
     await navigator.clipboard.writeText(text)
     ElMessage.success('客服联系方式已复制')

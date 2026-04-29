@@ -46,7 +46,7 @@
       <h4 class="tg-tips-title">入群须知</h4>
       <ol class="tg-tips-list">
         <li>群内仅发布<strong>已审核</strong>的家长订单，不发广告。</li>
-        <li>看到合适订单可在群内回复或在站内"申请"，先到先得。</li>
+        <li>看到合适订单可在群内回复或在站内"申请"，群内按客服指引报名。</li>
         <li>请<strong>实名修改群昵称</strong>为「姓+科目+教龄」，例：李数学5年。</li>
         <li>禁止在群内私加家长、绕过平台联系，违规将被移出并下线账号。</li>
         <li>群二维码定期更新，过期请回到本页重新扫码。</li>
@@ -67,6 +67,7 @@ definePageMeta({ layout: 'center', middleware: 'auth' })
 const userStore = useUserStore()
 const router = useRouter()
 const { config, load: loadSiteConfig } = useSiteConfig()
+const { get } = useApi()
 
 // 直接访问 URL 时也要拦非教员
 if (process.client && userStore.isLoggedIn && !userStore.isTutor) {
@@ -74,10 +75,18 @@ if (process.client && userStore.isLoggedIn && !userStore.isTutor) {
   router.replace('/center')
 }
 
-const qrUrl = computed(() => config.value.tutorGroupQrUrl || '')
+const qrUrl = ref('')
 const hotline = computed(() => config.value.siteHotline || '13795420591')
 
-onMounted(() => { loadSiteConfig() })
+const loadQr = async () => {
+  if (!userStore.isTutor) return
+  try {
+    const res = await get('/user/auth/tutor-group/qr')
+    if (res?.code === 200) qrUrl.value = res.data?.qrUrl || ''
+  } catch (e) { /* anon/student 应该已经被前置 redirect 拦下来, 兜底无需提示 */ }
+}
+
+onMounted(() => { loadSiteConfig(); loadQr() })
 </script>
 
 <style scoped>
