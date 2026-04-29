@@ -14,7 +14,6 @@ const routes = [
     { path: 'application/list', component: () => import('@/views/application/ApplicationList.vue') },
     { path: 'student/list', component: () => import('@/views/student/StudentList.vue') },
     { path: 'feedback/list', component: () => import('@/views/feedback/FeedbackList.vue') },
-    { path: 'vip/list', component: () => import('@/views/vip/VipList.vue') },
     { path: 'dict/subject', component: () => import('@/views/dict/SubjectList.vue') },
     { path: 'dict/grade', component: () => import('@/views/dict/GradeList.vue') },
     { path: 'dict/tag', component: () => import('@/views/dict/TagList.vue') },

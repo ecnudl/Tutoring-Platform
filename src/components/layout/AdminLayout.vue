@@ -14,7 +14,6 @@
         <el-menu-item index="/application/list"><el-icon><List /></el-icon><span>申请管理</span></el-menu-item>
         <el-menu-item index="/student/list"><el-icon><UserFilled /></el-icon><span>学员管理</span></el-menu-item>
         <el-menu-item index="/feedback/list"><el-icon><ChatDotRound /></el-icon><span>反馈管理</span></el-menu-item>
-        <el-menu-item index="/vip/list"><el-icon><StarFilled /></el-icon><span>VIP管理</span></el-menu-item>
         <el-sub-menu index="geo"><template #title><el-icon><Location /></el-icon><span>地理配置</span></template>
           <el-menu-item index="/city/list">城市管理</el-menu-item><el-menu-item index="/district/list">区域管理</el-menu-item><el-menu-item index="/university/list">高校管理</el-menu-item></el-sub-menu>
         <el-sub-menu index="dict"><template #title><el-icon><Collection /></el-icon><span>科目配置</span></template>
