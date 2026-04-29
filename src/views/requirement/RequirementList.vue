@@ -90,18 +90,22 @@
 
           <el-col :span="24">
             <el-form-item label="城市">
-              <el-select v-model="form.cityId" placeholder="选择城市" style="width:240px" @change="onCityChange">
+              <el-select v-model="form.cityId" placeholder="请选择城市" clearable filterable style="width:240px" @change="onCityChange">
                 <el-option v-for="c in cityOptions" :key="c.id" :label="c.cityName" :value="Number(c.id)" />
               </el-select>
               <span v-if="!cityOptions.length" style="margin-left:12px;color:#94a3b8;font-size:12px">加载中...</span>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
+          <el-col :span="24" v-if="form.cityId && districtOptions.length">
             <el-form-item label="区域 (多选)">
-              <el-checkbox-group v-model="districtSel" class="chip-group" v-if="districtOptions.length">
+              <el-checkbox-group v-model="districtSel" class="chip-group">
                 <el-checkbox v-for="d in districtOptions" :key="d.id" :value="d.districtName" :label="d.districtName" border size="small" />
               </el-checkbox-group>
-              <span v-else style="color:#94a3b8;font-size:12px">{{ form.cityId ? '该城市暂无区数据 (请先在 dict_district 录入)' : '请先选择城市' }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24" v-else-if="form.cityId && !districtOptions.length">
+            <el-form-item label="区域 (多选)">
+              <span style="color:#94a3b8;font-size:12px">该城市暂无区数据</span>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -330,7 +334,11 @@ const openEdit = async (row: any) => {
     if (res.code === 200 && res.data) {
       const d = res.data
       formId.value = d.id
-      const cityIdNum = d.cityId ? Number(d.cityId) : null
+      let cityIdNum: number | null = d.cityId ? Number(d.cityId) : null
+      // 历史数据里的 cityId 可能 dict 里已经没有 -> 当作未设置
+      if (cityIdNum != null && !cityOptions.value.some((c: any) => Number(c.id) === cityIdNum)) {
+        cityIdNum = null
+      }
       form.value = {
         title: d.title || '',
         contactName: d.contactName || '', contactMobile: d.contactMobile || '', contactWechat: d.contactWechat || '',
