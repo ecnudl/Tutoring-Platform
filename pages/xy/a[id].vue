@@ -92,26 +92,31 @@
             <span class="bullet"></span>学员信息
           </h3>
           <dl class="xa-dl">
-            <div class="xa-row"><dt>联系人</dt><dd>{{ req.contactName || '—' }}</dd></div>
-            <div class="xa-row"><dt>所在区域</dt><dd>{{ locationLabel || '—' }}</dd></div>
-            <div class="xa-row"><dt>大致位置</dt><dd>{{ req.address || '面议' }}</dd></div>
+            <div class="xa-row"><dt>订单编号</dt><dd class="mono">A{{ displayNoNum }}</dd></div>
             <div class="xa-row"><dt>学员性别</dt><dd>{{ genderLabel(req.studentGender) }}</dd></div>
+            <div class="xa-row"><dt>联系人</dt><dd>{{ req.contactName || '—' }}</dd></div>
             <div class="xa-row"><dt>所在年级</dt><dd>{{ req.gradeName || '—' }}</dd></div>
+            <div class="xa-row"><dt>所在区域</dt><dd>{{ locationLabel || '—' }}</dd></div>
+            <div class="xa-row"><dt>大致位置</dt><dd>{{ req.displayLocation || req.address || '面议' }}</dd></div>
+            <div class="xa-row" v-if="req.transport"><dt>交通线路</dt><dd>{{ req.transport }}</dd></div>
           </dl>
         </section>
 
-        <!-- 教学要求 -->
+        <!-- 家教信息 -->
         <section class="xa-block">
           <h3 class="xa-h">
-            <span class="bullet"></span>教学要求
+            <span class="bullet"></span>家教信息
           </h3>
           <dl class="xa-dl">
             <div class="xa-row"><dt>求教科目</dt><dd>{{ subjectsLabel || '—' }}</dd></div>
-            <div class="xa-row"><dt>教员性别</dt><dd>{{ genderLabel(req.tutorGender, '不限') }}</dd></div>
-            <div class="xa-row"><dt>授课方式</dt><dd>{{ teachingMethodMap[req.teachingMethod] || '不限' }}</dd></div>
-            <div class="xa-row"><dt>上课时间</dt><dd>{{ req.schedule || '—' }}</dd></div>
+            <div class="xa-row" v-if="req.requirementDetail"><dt>学员情况</dt><dd>{{ req.requirementDetail }}</dd></div>
+            <div class="xa-row" v-if="req.frequency"><dt>频　　次</dt><dd>{{ req.frequency }}</dd></div>
+            <div class="xa-row"><dt>辅导时间</dt><dd>{{ req.schedule || '—' }}</dd></div>
+            <div class="xa-row" v-if="req.requirementType"><dt>求教性质</dt><dd>{{ requirementTypeMap[req.requirementType] || '—' }}</dd></div>
+            <div class="xa-row"><dt>性别要求</dt><dd>{{ genderLabel(req.tutorGender, '不限') }}</dd></div>
+            <div class="xa-row" v-if="req.otherRequirements"><dt>其它要求</dt><dd>{{ req.otherRequirements }}</dd></div>
             <div class="xa-row xa-row-budget">
-              <dt>课时报酬</dt>
+              <dt>报　　酬</dt>
               <dd>
                 <span v-if="req.budgetMin || req.budgetMax" class="budget">
                   <em>{{ req.budgetMin || 0 }}</em>
@@ -121,29 +126,40 @@
                 <span v-else>面议</span>
               </dd>
             </div>
+            <div class="xa-row"><dt>教学方式</dt><dd>{{ teachingMethodMap[req.teachingMethod] || '不限' }}</dd></div>
+            <div class="xa-row" v-if="req.transportSubsidy"><dt>有无车贴</dt><dd>{{ req.transportSubsidy }}</dd></div>
           </dl>
-        </section>
-
-        <!-- 详细需求 -->
-        <section class="xa-block xa-quote-block">
-          <h3 class="xa-h">
-            <span class="bullet"></span>详细需求
-          </h3>
-          <blockquote class="xa-quote">
-            <span class="qmark left">「</span>
-            {{ req.requirementDetail || '学员未填写详细需求，可联系客服了解更多。' }}
-            <span class="qmark right">」</span>
-          </blockquote>
         </section>
 
         <!-- 行动条 -->
         <div class="xa-action-bar">
-          <button class="xa-cta" @click="showCs = true">
-            <span>联系客服接单</span>
+          <button class="xa-cta" @click="goApply">
+            <span>申请订单</span>
             <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+          <span class="xa-applied">已有 <strong>{{ req.applicationCount || 0 }}</strong> 人申请</span>
           <NuxtLink to="/xy" class="xa-back">‹ 返回学员库</NuxtLink>
         </div>
+
+        <p class="xa-apply-tip">注：申请订单后，若条件匹配，客服会在 1-2 个工作日与您联系；若超过 2 个工作日，请申请其他订单。</p>
+
+        <!-- 相关订单 -->
+        <section class="xa-related" v-if="related.length">
+          <h3 class="xa-h"><span class="bullet"></span>相关订单</h3>
+          <NuxtLink v-for="r in related" :key="r.id" :to="'/xy/a' + (r.displayNo || '').replace(/^A/i, '')" class="xa-rel-item">
+            <div class="rel-head">
+              <span class="rel-title">{{ r.title || '家教需求' }}</span>
+              <span class="rel-no mono">{{ r.displayNo }}</span>
+            </div>
+            <div class="rel-meta">
+              <span v-if="r.address">{{ r.address }}</span>
+              <span class="rel-budget" v-if="r.budgetMin || r.budgetMax">
+                {{ r.budgetMin || 0 }}<span v-if="r.budgetMax">-{{ r.budgetMax }}</span> 元/h
+              </span>
+              <span class="rel-budget" v-else>面议</span>
+            </div>
+          </NuxtLink>
+        </section>
       </article>
 
       <!-- RIGHT · 客服 + 小贴士 -->
@@ -237,6 +253,7 @@ const displayNo = route.params.id
 const displayNoNum = computed(() => String(displayNo).replace(/^A/i, ''))
 
 const req = ref(null)
+const related = ref([])
 const loading = ref(true)
 const state = ref('loading')          // 'open' | 'matched' | 'missing' | 'loading'
 const showCs = ref(false)
@@ -248,6 +265,7 @@ const csHotline = computed(() => config.value.siteHotline || '13795420591')
 const genderMap = { 1: '男', 2: '女' }
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
 const teachingMethodMap = { 1: '教师上门', 2: '学员上门', 3: '在线辅导', 4: '均可' }
+const requirementTypeMap = { 1: '提高型', 2: '同步辅导', 3: '竞赛', 4: '考前冲刺', 5: '陪学', 6: '其他' }
 
 const genderLabel = (g, defaultLbl = '不限') => {
   if (g === 1) return '男'
@@ -286,6 +304,28 @@ const loadReq = async () => {
   }
 }
 
+const loadRelated = async () => {
+  try {
+    const r = await get('/user/api/requirement/related', { displayNo: 'A' + displayNoNum.value, limit: 5 })
+    if (r.code === 200 && Array.isArray(r.data)) {
+      related.value = r.data
+    }
+  } catch (e) { /* ignore */ }
+}
+
+const goApply = () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录教员账号')
+    router.push('/login?redirect=' + encodeURIComponent(`/xy/apply/A${displayNoNum.value}`))
+    return
+  }
+  if (!userStore.isTutor) {
+    ElMessage.warning('该入口仅教员可用，请使用教员账号登录')
+    return
+  }
+  router.push(`/xy/apply/A${displayNoNum.value}`)
+}
+
 const copyContact = async () => {
   const text = `客服微信 ${csWechat.value}\n客服电话 ${csHotline.value}\n订单编号 A${displayNoNum.value}\n（591家教网）`
   try {
@@ -299,6 +339,7 @@ const copyContact = async () => {
 onMounted(async () => {
   loadSiteConfig()
   await loadReq()
+  loadRelated()
 })
 </script>
 
@@ -568,8 +609,94 @@ onMounted(async () => {
   color: var(--color-text-secondary);
   letter-spacing: 1px;
   transition: color .15s;
+  margin-left: auto;
 }
 .xa-back:hover { color: var(--color-primary); }
+
+.xa-applied {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+}
+.xa-applied strong {
+  color: #d97706;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 2px;
+}
+
+.xa-apply-tip {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+}
+
+/* ----- Related orders ----- */
+.xa-related {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--color-border-light);
+}
+.xa-rel-item {
+  display: block;
+  padding: 14px 18px;
+  margin-top: 10px;
+  background: #f8fafc;
+  border-left: 3px solid var(--color-primary, #163B6B);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.xa-rel-item:hover {
+  background: #f0f6fd;
+  transform: translateX(2px);
+}
+.rel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.rel-title {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rel-no {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  color: var(--color-primary, #163B6B);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.rel-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+.rel-meta span { padding: 1px 0; }
+.rel-budget {
+  color: #d97706;
+  font-weight: 600;
+  font-family: Georgia, serif;
+}
+
+/* ----- mono helper ----- */
+.mono {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  letter-spacing: 0.5px;
+  color: var(--color-primary, #163B6B);
+}
 
 /* ===== Aside ===== */
 .xa-aside {
