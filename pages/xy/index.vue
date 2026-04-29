@@ -79,47 +79,67 @@
 
     <template v-else>
       <div class="req-list" v-if="requirements.length">
-        <component
-          v-for="r in requirements"
-          :key="r.id"
-          :is="r.reqStatus === 3 ? 'div' : 'NuxtLink'"
-          :to="r.reqStatus === 3 ? null : ('/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id))"
-          class="req-row"
-          :class="{ 'is-matched': r.reqStatus === 3 }"
-        >
-          <!-- col 1: 科目 + 编号 -->
-          <div class="rc-c1">
-            <div class="rc-title">{{ buildCardTitle(r) }}</div>
-            <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
-          </div>
+        <template v-for="r in requirements" :key="r.id">
+          <!-- 未接单: NuxtLink, 整行可点 -->
+          <NuxtLink
+            v-if="r.reqStatus !== 3"
+            :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)"
+            class="req-row"
+          >
+            <div class="rc-c1">
+              <div class="rc-title">{{ buildCardTitle(r) }}</div>
+              <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
+            </div>
+            <div class="rc-c2">
+              <template v-if="Number(r.teachingMethod) === 3">
+                <div class="rc-online">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                  网络授课
+                </div>
+              </template>
+              <template v-else>
+                <div class="rc-region">{{ buildRegion(r) }}</div>
+                <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
+              </template>
+            </div>
+            <div class="rc-c3">
+              <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+              <div class="rc-pref">{{ buildTutorPref(r) }}</div>
+            </div>
+            <div class="rc-c4">
+              <div class="rc-budget">{{ buildBudget(r) }}</div>
+              <span class="rc-cta">详情</span>
+            </div>
+          </NuxtLink>
 
-          <!-- col 2: 区域 + 大致位置 / 在线辅导 -->
-          <div class="rc-c2">
-            <template v-if="Number(r.teachingMethod) === 3">
-              <div class="rc-online">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
-                网络授课
-              </div>
-            </template>
-            <template v-else>
-              <div class="rc-region">{{ buildRegion(r) }}</div>
-              <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
-            </template>
+          <!-- 已接单: 不可点 -->
+          <div v-else class="req-row is-matched">
+            <div class="rc-c1">
+              <div class="rc-title">{{ buildCardTitle(r) }}</div>
+              <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
+            </div>
+            <div class="rc-c2">
+              <template v-if="Number(r.teachingMethod) === 3">
+                <div class="rc-online">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                  网络授课
+                </div>
+              </template>
+              <template v-else>
+                <div class="rc-region">{{ buildRegion(r) }}</div>
+                <div class="rc-addr">{{ r.address || '大致位置需确认' }}</div>
+              </template>
+            </div>
+            <div class="rc-c3">
+              <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+              <div class="rc-pref">{{ buildTutorPref(r) }}</div>
+            </div>
+            <div class="rc-c4">
+              <div class="rc-budget">{{ buildBudget(r) }}</div>
+              <span class="rc-done">已接单</span>
+            </div>
           </div>
-
-          <!-- col 3: 对教员要求 + 教员类型限制 -->
-          <div class="rc-c3">
-            <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
-            <div class="rc-pref">{{ buildTutorPref(r) }}</div>
-          </div>
-
-          <!-- col 4: 报酬 + 详情/已接单 -->
-          <div class="rc-c4">
-            <div class="rc-budget">{{ buildBudget(r) }}</div>
-            <span v-if="r.reqStatus === 3" class="rc-done">已接单</span>
-            <span v-else class="rc-cta">详情</span>
-          </div>
-        </component>
+        </template>
       </div>
 
       <div v-else style="text-align:center;padding:60px;color:var(--color-text-muted)">暂无符合条件的需求</div>
