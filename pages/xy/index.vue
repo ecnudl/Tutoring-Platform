@@ -17,7 +17,7 @@
         <span class="filter-label">区域：</span>
         <div class="filter-tags">
           <span class="ftag" :class="{ active: !filters.district }" @click="setFilter('district', null)">不限</span>
-          <span v-for="d in districts" :key="d.id" class="ftag" :class="{ active: filters.district === d.id }" @click="setFilter('district', d.id)">{{ d.name }}</span>
+          <span v-for="d in districts" :key="d.id" class="ftag" :class="{ active: filters.district === d.name }" @click="setFilter('district', d.name)">{{ d.name }}</span>
         </div>
       </div>
       <div class="filter-row">
@@ -51,9 +51,9 @@
         <span class="filter-label">教员类型：</span>
         <div class="filter-tags">
           <span class="ftag" :class="{ active: !filters.tutorType }" @click="setFilter('tutorType', null)">不限</span>
-          <span class="ftag" :class="{ active: filters.tutorType === 1 }" @click="setFilter('tutorType', 1)">大学生</span>
-          <span class="ftag" :class="{ active: filters.tutorType === 2 }" @click="setFilter('tutorType', 2)">专职教员</span>
-          <span class="ftag" :class="{ active: filters.tutorType === 3 }" @click="setFilter('tutorType', 3)">在职教师</span>
+          <span class="ftag" :class="{ active: filters.tutorType === '大学生' }" @click="setFilter('tutorType', '大学生')">大学生</span>
+          <span class="ftag" :class="{ active: filters.tutorType === '专职教员' }" @click="setFilter('tutorType', '专职教员')">专职教员</span>
+          <span class="ftag" :class="{ active: filters.tutorType === '在职教师' }" @click="setFilter('tutorType', '在职教师')">在职教师</span>
         </div>
       </div>
       <div class="filter-row">
@@ -173,7 +173,7 @@ const search = async () => {
       pageCurrent: pageCurrent.value,
       pageSize: pageSize.value,
       cityId: cityStore.cityId,
-      districtId: f.district || undefined,
+      district: f.district || undefined,
       subject: f.subject || undefined,
       university: f.university || undefined,
       tutorType: f.tutorType || undefined,
