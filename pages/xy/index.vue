@@ -79,18 +79,18 @@
 
     <template v-else>
       <div class="req-list" v-if="requirements.length">
-        <NuxtLink
+        <component
           v-for="r in requirements"
           :key="r.id"
-          :to="'/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id)"
+          :is="r.reqStatus === 3 ? 'div' : 'NuxtLink'"
+          :to="r.reqStatus === 3 ? null : ('/xy/a' + (r.displayNo ? r.displayNo.replace(/^A/i, '') : r.id))"
           class="req-row"
           :class="{ 'is-matched': r.reqStatus === 3 }"
         >
-          <!-- col 1: 标题 + 编号 -->
+          <!-- col 1: 科目 + 编号 -->
           <div class="rc-c1">
             <div class="rc-title">{{ buildCardTitle(r) }}</div>
             <div class="rc-no">{{ r.displayNo || ('A' + r.id) }}</div>
-            <span v-if="r.reqStatus === 3" class="rc-matched-pill">已接单</span>
           </div>
 
           <!-- col 2: 区域 + 大致位置 / 在线辅导 -->
@@ -113,12 +113,13 @@
             <div class="rc-pref">{{ buildTutorPref(r) }}</div>
           </div>
 
-          <!-- col 4: 报酬 + 详情 -->
+          <!-- col 4: 报酬 + 详情/已接单 -->
           <div class="rc-c4">
             <div class="rc-budget">{{ buildBudget(r) }}</div>
-            <span class="rc-cta">详情</span>
+            <span v-if="r.reqStatus === 3" class="rc-done">已接单</span>
+            <span v-else class="rc-cta">详情</span>
           </div>
-        </NuxtLink>
+        </component>
       </div>
 
       <div v-else style="text-align:center;padding:60px;color:var(--color-text-muted)">暂无符合条件的需求</div>
@@ -161,12 +162,8 @@ const csvJoin = (s) => {
   return String(s).split(',').map(x => x.trim()).filter(Boolean).join('、')
 }
 const buildCardTitle = (r) => {
-  if (r && r.title) return r.title
-  const parts = []
-  if (r.gradeName) parts.push(r.gradeName)
-  const sub = csvFirst(r.subjectIds)
-  if (sub) parts.push(sub)
-  return parts.length ? parts.join('') : '家教需求'
+  const subjects = csvJoin(r.subjectIds)
+  return subjects || '暂无科目要求'
 }
 const buildRegion = (r) => {
   const dn = csvFirst(r.districtNames)
@@ -382,8 +379,13 @@ onMounted(() => { search() })
   box-shadow: 0 6px 20px -8px rgba(180, 83, 9, 0.45);
 }
 .req-row:first-child { border-top: 1px dashed #e5e7eb; }
-.req-row.is-matched { opacity: 0.7; }
-.req-row.is-matched:hover { opacity: 0.92; }
+.req-row.is-matched {
+  opacity: 0.65;
+  cursor: default;
+  background: #fafbfc;
+}
+.req-row.is-matched:hover { background: #fafbfc; }
+.req-row.is-matched:hover .rc-cta { background: #d97706; transform: none; box-shadow: none; }
 
 /* col 1 */
 .rc-c1 { display: flex; flex-direction: column; gap: 4px; min-width: 0; position: relative; }
@@ -400,17 +402,6 @@ onMounted(() => { search() })
   font-size: 12.5px;
   color: #94a3b8;
   letter-spacing: 0.5px;
-}
-.rc-matched-pill {
-  position: absolute;
-  top: -2px; right: -8px;
-  font-size: 10.5px;
-  letter-spacing: 1px;
-  background: rgba(148, 163, 184, 0.18);
-  color: #64748b;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-weight: 600;
 }
 
 /* col 2 */
@@ -479,6 +470,21 @@ onMounted(() => { search() })
   font-weight: 600;
   letter-spacing: 4px;
   transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.rc-done {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  color: #94a3b8;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
+  cursor: default;
+  user-select: none;
+  background: transparent;
 }
 
 @media (max-width: 1100px) {
