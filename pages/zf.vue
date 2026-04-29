@@ -72,17 +72,6 @@
             </li>
           </ul>
         </div>
-
-        <div class="bk-flow">
-          <div class="bk-flow-h">缴纳与对接流程</div>
-          <ol class="bk-flow-steps">
-            <li><span class="bk-step-num">1</span><span class="bk-step-text">客服联系教员，说明缴费金额</span></li>
-            <li><span class="bk-step-num">2</span><span class="bk-step-text">教员撮合时代收家长 100 元中介费</span></li>
-            <li><span class="bk-step-num">3</span><span class="bk-step-text">双方中介费随首单一并上缴客服</span></li>
-            <li><span class="bk-step-num">4</span><span class="bk-step-text">客服将家长联系方式发给教员</span></li>
-            <li><span class="bk-step-num">5</span><span class="bk-step-text">教员联系家长，确定时间地点</span></li>
-          </ol>
-        </div>
       </section>
 
       <div class="zf-body">
@@ -381,7 +370,7 @@ onMounted(() => { load() })
 .bk-feature {
   background: #fff;
   border-radius: 12px;
-  padding: 36px 44px 32px;
+  padding: 30px 40px 28px;
   margin-bottom: 24px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   position: relative;
@@ -399,52 +388,50 @@ onMounted(() => { load() })
 }
 
 /* Header */
-.bk-head { margin-bottom: 26px; max-width: 820px; }
+.bk-head { margin-bottom: 22px; max-width: 820px; }
 .bk-eyebrow {
   display: flex; align-items: center; gap: 12px;
   font-size: 12px; letter-spacing: 4px; font-weight: 600;
   color: var(--color-primary, #163B6B);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .bk-eye-rule {
-  width: 36px; height: 2px;
+  width: 30px; height: 2px;
   background: var(--color-primary, #163B6B);
 }
 .bk-h {
-  font-size: 26px; font-weight: 700;
+  font-size: 24px; font-weight: 700;
   letter-spacing: 4px; color: var(--color-primary, #163B6B);
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 }
 .bk-lead {
-  font-size: 14px; color: #475569;
-  line-height: 1.85; margin: 0;
+  font-size: 13.5px; color: #475569;
+  line-height: 1.8; margin: 0;
 }
 .bk-lead strong { color: var(--color-primary, #163B6B); font-weight: 600; }
 
 /* Main grid: 2 stat pillars + rules block */
 .bk-grid {
   display: grid;
-  grid-template-columns: 200px 200px 1fr;
-  gap: 18px;
-  margin-bottom: 26px;
+  grid-template-columns: 190px 190px 1fr;
+  gap: 16px;
   align-items: stretch;
 }
 
 .bk-pillar {
   border-radius: 10px;
-  padding: 22px 22px 20px;
+  padding: 20px 20px 18px;
   display: flex; flex-direction: column; justify-content: space-between;
   gap: 8px;
   position: relative; overflow: hidden;
   color: #fff;
-  box-shadow: 0 8px 22px rgba(22, 59, 107, 0.18);
-  min-height: 168px;
+  box-shadow: 0 6px 18px rgba(22, 59, 107, 0.18);
+  min-height: 152px;
 }
 .bk-pillar::after {
-  /* corner watermark */
   content: ''; position: absolute;
   right: -28px; bottom: -28px;
-  width: 110px; height: 110px;
+  width: 100px; height: 100px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
 }
@@ -453,26 +440,26 @@ onMounted(() => { load() })
 }
 .bk-pillar--tutor {
   background: linear-gradient(140deg, #b45309 0%, #d97706 100%);
-  box-shadow: 0 8px 22px rgba(180, 83, 9, 0.22);
+  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.22);
 }
 .bk-pillar-label {
-  font-size: 12px; letter-spacing: 4px; font-weight: 600;
+  font-size: 11.5px; letter-spacing: 4px; font-weight: 600;
   opacity: 0.86;
   position: relative; z-index: 1;
 }
 .bk-pillar-num {
-  font-size: 30px; font-weight: 700; letter-spacing: 1px;
+  font-size: 28px; font-weight: 700; letter-spacing: 1px;
   font-family: Georgia, serif; line-height: 1.1;
   position: relative; z-index: 1;
 }
 .bk-pillar-num small {
-  display: block; margin-top: 6px;
-  font-size: 12px; font-weight: 400;
+  display: block; margin-top: 5px;
+  font-size: 11.5px; font-weight: 400;
   letter-spacing: 2px; opacity: 0.82;
   font-family: inherit;
 }
 .bk-pillar-desc {
-  font-size: 13px; line-height: 1.55;
+  font-size: 12.5px; line-height: 1.55;
   opacity: 0.94; letter-spacing: 0.4px;
   position: relative; z-index: 1;
 }
@@ -509,59 +496,10 @@ onMounted(() => { load() })
   margin-bottom: 3px; letter-spacing: 0.5px;
 }
 .bk-rule-d {
-  font-size: 13px; color: #64748b; line-height: 1.55;
+  font-size: 12.5px; color: #64748b; line-height: 1.55;
 }
 
-/* Flow steps */
-.bk-flow {
-  border-top: 1px dashed #e5e7eb;
-  padding-top: 22px;
-}
-.bk-flow-h {
-  font-size: 12px; letter-spacing: 4px; font-weight: 700;
-  color: var(--color-primary, #163B6B);
-  margin-bottom: 16px;
-}
-.bk-flow-steps {
-  list-style: none; padding: 0; margin: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0;
-  position: relative;
-}
-.bk-flow-steps::before {
-  content: '';
-  position: absolute;
-  top: 18px; left: calc(10% + 18px); right: calc(10% + 18px);
-  height: 2px;
-  background: repeating-linear-gradient(to right,
-    #cbd5e1 0, #cbd5e1 6px,
-    transparent 6px, transparent 12px);
-  z-index: 0;
-}
-.bk-flow-steps li {
-  display: flex; flex-direction: column; align-items: center;
-  text-align: center; gap: 10px;
-  position: relative; z-index: 1;
-  padding: 0 8px;
-}
-.bk-step-num {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--color-primary, #163B6B);
-  color: #fff;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-family: Georgia, serif;
-  font-size: 16px; font-weight: 700;
-  box-shadow: 0 4px 12px rgba(22, 59, 107, 0.25);
-  flex-shrink: 0;
-}
-.bk-step-text {
-  font-size: 13px; color: #475569; line-height: 1.55;
-  letter-spacing: 0.3px;
-}
-
-/* Tablet (3 cols pillar grid breaks) */
+/* Tablet */
 @media (max-width: 1100px) {
   .bk-grid {
     grid-template-columns: 1fr 1fr;
@@ -573,22 +511,17 @@ onMounted(() => { load() })
 
 /* Mobile */
 @media (max-width: 768px) {
-  .bk-feature { padding: 24px 18px 22px; }
+  .bk-feature { padding: 22px 18px 20px; }
   .bk-h { font-size: 20px; letter-spacing: 2px; }
   .bk-eyebrow { font-size: 11px; letter-spacing: 3px; }
   .bk-grid {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  .bk-pillar { min-height: 140px; padding: 18px 16px; }
-  .bk-pillar-num { font-size: 24px; }
+  .bk-pillar { min-height: 132px; padding: 16px 14px; }
+  .bk-pillar-num { font-size: 22px; }
   .bk-rules {
     grid-template-columns: 1fr;
   }
-  .bk-flow-steps {
-    grid-template-columns: 1fr 1fr;
-    gap: 18px 6px;
-  }
-  .bk-flow-steps::before { display: none; }
 }
 </style>
