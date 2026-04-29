@@ -92,6 +92,11 @@ public class TutorRequirementExample {
         public Criteria andCityIdGreaterThan(Long value) { addCriterion("city_id >", value, "cityId"); return (Criteria) this; }
         public Criteria andCityIdLessThan(Long value) { addCriterion("city_id <", value, "cityId"); return (Criteria) this; }
         public Criteria andCityIdBetween(Long value1, Long value2) { addCriterion("city_id between", value1, value2, "cityId"); return (Criteria) this; }
+        public Criteria andDistrictIdIsNull() { addCriterion("district_id is null"); return (Criteria) this; }
+        public Criteria andDistrictIdIsNotNull() { addCriterion("district_id is not null"); return (Criteria) this; }
+        public Criteria andDistrictIdEqualTo(Long value) { addCriterion("district_id =", value, "districtId"); return (Criteria) this; }
+        public Criteria andDistrictIdNotEqualTo(Long value) { addCriterion("district_id <>", value, "districtId"); return (Criteria) this; }
+        public Criteria andDistrictIdIn(java.util.List<Long> values) { addCriterion("district_id in", values, "districtId"); return (Criteria) this; }
         public Criteria andTutorGenderIsNull() { addCriterion("tutor_gender is null"); return (Criteria) this; }
         public Criteria andTutorGenderIsNotNull() { addCriterion("tutor_gender is not null"); return (Criteria) this; }
         public Criteria andTutorGenderEqualTo(Integer value) { addCriterion("tutor_gender =", value, "tutorGender"); return (Criteria) this; }

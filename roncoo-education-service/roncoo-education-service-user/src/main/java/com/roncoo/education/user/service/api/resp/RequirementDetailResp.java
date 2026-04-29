@@ -93,7 +93,7 @@ public class RequirementDetailResp implements Serializable {
     @ApiModelProperty(value = "时间安排")
     private String schedule;
 
-    @ApiModelProperty(value = "需求详情")
+    @ApiModelProperty(value = "需求详情 (学员情况)")
     private String requirementDetail;
 
     @ApiModelProperty(value = "联系人")
@@ -110,4 +110,22 @@ public class RequirementDetailResp implements Serializable {
 
     @ApiModelProperty(value = "申请人数")
     private Integer applicationCount;
+
+    @ApiModelProperty(value = "区域 (脱敏后大致位置)")
+    private String displayLocation;
+
+    @ApiModelProperty(value = "交通线路")
+    private String transport;
+
+    @ApiModelProperty(value = "频次 (如 5次/周)")
+    private String frequency;
+
+    @ApiModelProperty(value = "求教性质 1提高型 2同步辅导 3竞赛 4冲刺 5陪学 6其他")
+    private Integer requirementType;
+
+    @ApiModelProperty(value = "其它要求 (对教员)")
+    private String otherRequirements;
+
+    @ApiModelProperty(value = "有无车贴 (自由文本)")
+    private String transportSubsidy;
 }

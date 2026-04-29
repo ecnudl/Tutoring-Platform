@@ -35,6 +35,12 @@ public class TutorRequirement implements Serializable {
     private String contactWechat;
     private Integer teachingMethod;
     private String displayNo;
+    private Integer studentGender;
+    private String transport;
+    private String frequency;
+    private Integer requirementType;
+    private String otherRequirements;
+    private String transportSubsidy;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -103,4 +109,17 @@ public class TutorRequirement implements Serializable {
     public void setMatchedTutorRemark(String matchedTutorRemark) { this.matchedTutorRemark = matchedTutorRemark == null ? null : matchedTutorRemark.trim(); }
     public Long getTargetTutorUserId() { return targetTutorUserId; }
     public void setTargetTutorUserId(Long targetTutorUserId) { this.targetTutorUserId = targetTutorUserId; }
+
+    public Integer getStudentGender() { return studentGender; }
+    public void setStudentGender(Integer studentGender) { this.studentGender = studentGender; }
+    public String getTransport() { return transport; }
+    public void setTransport(String transport) { this.transport = transport == null ? null : transport.trim(); }
+    public String getFrequency() { return frequency; }
+    public void setFrequency(String frequency) { this.frequency = frequency == null ? null : frequency.trim(); }
+    public Integer getRequirementType() { return requirementType; }
+    public void setRequirementType(Integer requirementType) { this.requirementType = requirementType; }
+    public String getOtherRequirements() { return otherRequirements; }
+    public void setOtherRequirements(String otherRequirements) { this.otherRequirements = otherRequirements == null ? null : otherRequirements.trim(); }
+    public String getTransportSubsidy() { return transportSubsidy; }
+    public void setTransportSubsidy(String transportSubsidy) { this.transportSubsidy = transportSubsidy == null ? null : transportSubsidy.trim(); }
 }

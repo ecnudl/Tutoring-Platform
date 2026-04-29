@@ -62,4 +62,11 @@ public class ApiRequirementController {
         return biz.quickSubmit(req);
     }
 
+    @ApiOperation(value = "相关订单", notes = "订单详情侧栏 - 同区域近期 5 条")
+    @GetMapping(value = "/related")
+    public Result<List<RequirementListResp>> related(@RequestParam String displayNo,
+                                                     @RequestParam(required = false, defaultValue = "5") Integer limit) {
+        return biz.related(displayNo, limit);
+    }
+
 }

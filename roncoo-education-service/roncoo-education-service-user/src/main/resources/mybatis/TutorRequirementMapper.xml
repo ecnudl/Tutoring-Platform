@@ -28,6 +28,12 @@
         <result column="display_no" jdbcType="VARCHAR" property="displayNo"/>        <result column="matched_at" jdbcType="TIMESTAMP" property="matchedAt"/>
       <result column="matched_tutor_remark" jdbcType="VARCHAR" property="matchedTutorRemark"/>
       <result column="target_tutor_user_id" jdbcType="BIGINT" property="targetTutorUserId"/>
+      <result column="student_gender" jdbcType="TINYINT" property="studentGender"/>
+      <result column="transport" jdbcType="VARCHAR" property="transport"/>
+      <result column="frequency" jdbcType="VARCHAR" property="frequency"/>
+      <result column="requirement_type" jdbcType="TINYINT" property="requirementType"/>
+      <result column="other_requirements" jdbcType="VARCHAR" property="otherRequirements"/>
+      <result column="transport_subsidy" jdbcType="VARCHAR" property="transportSubsidy"/>
   </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
         <result column="schedule" jdbcType="LONGVARCHAR" property="schedule"/>
@@ -69,7 +75,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id, student_gender, transport, frequency, requirement_type, other_requirements, transport_subsidy</sql>
     <sql id="Blob_Column_List">schedule, requirement_detail</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_requirement
@@ -119,6 +125,12 @@
             <if test="displayNo != null">display_no,</if>              <if test="matchedAt != null">matched_at,</if>
           <if test="matchedTutorRemark != null">matched_tutor_remark,</if>
           <if test="targetTutorUserId != null">target_tutor_user_id,</if>
+          <if test="studentGender != null">student_gender,</if>
+          <if test="transport != null">transport,</if>
+          <if test="frequency != null">frequency,</if>
+          <if test="requirementType != null">requirement_type,</if>
+          <if test="otherRequirements != null">other_requirements,</if>
+          <if test="transportSubsidy != null">transport_subsidy,</if>
     </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
@@ -149,6 +161,12 @@
             <if test="displayNo != null">#{displayNo,jdbcType=VARCHAR},</if>              <if test="matchedAt != null">#{matchedAt,jdbcType=TIMESTAMP},</if>
           <if test="matchedTutorRemark != null">#{matchedTutorRemark,jdbcType=VARCHAR},</if>
           <if test="targetTutorUserId != null">#{targetTutorUserId,jdbcType=BIGINT},</if>
+          <if test="studentGender != null">#{studentGender,jdbcType=TINYINT},</if>
+          <if test="transport != null">#{transport,jdbcType=VARCHAR},</if>
+          <if test="frequency != null">#{frequency,jdbcType=VARCHAR},</if>
+          <if test="requirementType != null">#{requirementType,jdbcType=TINYINT},</if>
+          <if test="otherRequirements != null">#{otherRequirements,jdbcType=VARCHAR},</if>
+          <if test="transportSubsidy != null">#{transportSubsidy,jdbcType=VARCHAR},</if>
     </trim>
     </insert>
     <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultType="java.lang.Integer">select count(*) from tutor_requirement <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
@@ -177,7 +195,17 @@
             <if test="record.requirementDetail != null">requirement_detail = #{record.requirementDetail,jdbcType=LONGVARCHAR},</if>
             <if test="record.contactWechat != null">contact_wechat = #{record.contactWechat,jdbcType=VARCHAR},</if>
             <if test="record.teachingMethod != null">teaching_method = #{record.teachingMethod,jdbcType=TINYINT},</if>
-            <if test="record.displayNo != null">display_no = #{record.displayNo,jdbcType=VARCHAR},</if>        </set>
+            <if test="record.displayNo != null">display_no = #{record.displayNo,jdbcType=VARCHAR},</if>
+            <if test="record.matchedAt != null">matched_at = #{record.matchedAt,jdbcType=TIMESTAMP},</if>
+            <if test="record.matchedTutorRemark != null">matched_tutor_remark = #{record.matchedTutorRemark,jdbcType=VARCHAR},</if>
+            <if test="record.targetTutorUserId != null">target_tutor_user_id = #{record.targetTutorUserId,jdbcType=BIGINT},</if>
+            <if test="record.studentGender != null">student_gender = #{record.studentGender,jdbcType=TINYINT},</if>
+            <if test="record.transport != null">transport = #{record.transport,jdbcType=VARCHAR},</if>
+            <if test="record.frequency != null">frequency = #{record.frequency,jdbcType=VARCHAR},</if>
+            <if test="record.requirementType != null">requirement_type = #{record.requirementType,jdbcType=TINYINT},</if>
+            <if test="record.otherRequirements != null">other_requirements = #{record.otherRequirements,jdbcType=VARCHAR},</if>
+            <if test="record.transportSubsidy != null">transport_subsidy = #{record.transportSubsidy,jdbcType=VARCHAR},</if>
+        </set>
         <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
     </update>
     <update id="updateByPrimaryKeySelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
@@ -208,6 +236,12 @@
             <if test="displayNo != null">display_no = #{displayNo,jdbcType=VARCHAR},</if>              <if test="matchedAt != null">matched_at = #{matchedAt,jdbcType=TIMESTAMP},</if>
           <if test="matchedTutorRemark != null">matched_tutor_remark = #{matchedTutorRemark,jdbcType=VARCHAR},</if>
           <if test="targetTutorUserId != null">target_tutor_user_id = #{targetTutorUserId,jdbcType=BIGINT},</if>
+          <if test="studentGender != null">student_gender = #{studentGender,jdbcType=TINYINT},</if>
+          <if test="transport != null">transport = #{transport,jdbcType=VARCHAR},</if>
+          <if test="frequency != null">frequency = #{frequency,jdbcType=VARCHAR},</if>
+          <if test="requirementType != null">requirement_type = #{requirementType,jdbcType=TINYINT},</if>
+          <if test="otherRequirements != null">other_requirements = #{otherRequirements,jdbcType=VARCHAR},</if>
+          <if test="transportSubsidy != null">transport_subsidy = #{transportSubsidy,jdbcType=VARCHAR},</if>
     </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
