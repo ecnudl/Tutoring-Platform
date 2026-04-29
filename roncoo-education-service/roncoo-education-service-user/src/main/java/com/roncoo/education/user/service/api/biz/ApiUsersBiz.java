@@ -420,8 +420,8 @@ public class ApiUsersBiz extends BaseBiz {
         }
         Users record = new Users();
         record.setId(user.getId());
-        record.setMobileSalt(IdUtil.simpleUUID());
-        record.setMobilePsw(DigestUtil.sha1Hex(record.getMobileSalt() + newPassword));
+        // 保持 mobile_salt 不变 (旋转会破坏 security_answer_hash, 安全上 salt 不需要旋转)
+        record.setMobilePsw(DigestUtil.sha1Hex(user.getMobileSalt() + newPassword));
         usersDao.updateById(record);
         return Result.success("密码重置成功");
     }
@@ -460,9 +460,9 @@ public class ApiUsersBiz extends BaseBiz {
     public Result<String> getSecurityQuestion(String mobile) {
         if (!StringUtils.hasText(mobile)) return Result.error("手机号不能为空");
         Users user = usersDao.getByMobile(mobile);
-        if (user == null) return Result.error("该手机号未注册");
-        if (!StringUtils.hasText(user.getSecurityQuestion())) {
-            return Result.error("您注册时未设置安全问题，请联系客服重置密码");
+        // 不区分"未注册"vs"未设安全问题", 统一提示, 防账号枚举
+        if (user == null || !StringUtils.hasText(user.getSecurityQuestion())) {
+            return Result.error("无法通过安全问题找回, 请联系客服");
         }
         return Result.success(user.getSecurityQuestion());
     }
@@ -474,11 +474,12 @@ public class ApiUsersBiz extends BaseBiz {
     public Result<String> resetPasswordByQuestion(String mobile, String answer, String newPassword) {
         if (!StringUtils.hasText(mobile)) return Result.error("手机号不能为空");
         if (!StringUtils.hasText(answer)) return Result.error("请填写安全答案");
-        if (!StringUtils.hasText(newPassword)) return Result.error("请填写新密码");
+        if (!StringUtils.hasText(newPassword) || newPassword.length() < 6) return Result.error("密码不能少于 6 位");
         Users user = usersDao.getByMobile(mobile);
-        if (user == null) return Result.error("该手机号未注册");
-        if (!StringUtils.hasText(user.getSecurityQuestion()) || !StringUtils.hasText(user.getSecurityAnswerHash())) {
-            return Result.error("您未设置安全问题，请联系客服重置密码");
+        if (user == null
+                || !StringUtils.hasText(user.getSecurityQuestion())
+                || !StringUtils.hasText(user.getSecurityAnswerHash())) {
+            return Result.error("无法通过安全问题找回, 请联系客服");
         }
         // 失败次数限制 (Redis): 5 次失败锁 30 分钟
         String failKey = "secq_fail:" + mobile;

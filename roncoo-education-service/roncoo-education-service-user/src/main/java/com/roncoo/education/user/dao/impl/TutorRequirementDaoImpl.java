@@ -46,6 +46,7 @@ public class TutorRequirementDaoImpl extends AbstractBaseJdbc implements TutorRe
         return this.tutorRequirementMapper.selectByPrimaryKey(id);
     }
 
+    /** 分页. selectByExample 不加载 BLOB (schedule/requirement_detail), 用主键回查一次 */
     @Override
     public Page<TutorRequirement> page(int pageCurrent, int pageSize, TutorRequirementExample example) {
         int count = this.tutorRequirementMapper.countByExample(example);
@@ -54,7 +55,13 @@ public class TutorRequirementDaoImpl extends AbstractBaseJdbc implements TutorRe
         int totalPage = PageUtil.countTotalPage(count, pageSize);
         example.setLimitStart(PageUtil.countOffset(pageCurrent, pageSize));
         example.setPageSize(pageSize);
-        return new Page<TutorRequirement>(count, totalPage, pageCurrent, pageSize, this.tutorRequirementMapper.selectByExample(example));
+        java.util.List<TutorRequirement> shallow = this.tutorRequirementMapper.selectByExample(example);
+        java.util.List<TutorRequirement> full = new java.util.ArrayList<>(shallow.size());
+        for (TutorRequirement r : shallow) {
+            TutorRequirement withBlobs = this.tutorRequirementMapper.selectByPrimaryKey(r.getId());
+            full.add(withBlobs != null ? withBlobs : r);
+        }
+        return new Page<TutorRequirement>(count, totalPage, pageCurrent, pageSize, full);
     }
 
     @Override

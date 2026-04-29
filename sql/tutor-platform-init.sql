@@ -315,11 +315,15 @@ CREATE TABLE `tutor_requirement` (
   `audit_remark`        VARCHAR(500)  DEFAULT NULL            COMMENT '审核备注',
   `view_count`          INT           NOT NULL DEFAULT 0      COMMENT '浏览次数',
   `application_count`   INT           NOT NULL DEFAULT 0      COMMENT '申请次数',
+  `matched_at`          DATETIME      DEFAULT NULL            COMMENT '匹配确认时间(admin标已接单)',
+  `matched_tutor_remark` VARCHAR(200) DEFAULT NULL            COMMENT '撮合后admin记录的接单教员信息(线下)',
+  `target_tutor_user_id` BIGINT       DEFAULT NULL            COMMENT 'Flow1预约时锁定的目标教员user_id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_display_no` (`display_no`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_city_district` (`city_id`, `district_id`),
-  KEY `idx_req_status` (`req_status`)
+  KEY `idx_req_status` (`req_status`),
+  KEY `idx_target_tutor` (`target_tutor_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学员找老师需求';
 
 -- 16. tutor_requirement_audit 需求审核记录
@@ -370,14 +374,20 @@ CREATE TABLE `tutor_reservation` (
   `tutor_user_id`     BIGINT        NOT NULL                COMMENT '教员user_id',
   `tutor_id`          BIGINT        DEFAULT NULL            COMMENT 'tutor_profile.id',
   `subject_id`        BIGINT        DEFAULT NULL            COMMENT '科目ID',
+  `contact_name`      VARCHAR(50)   DEFAULT NULL            COMMENT '称谓 (如 张女士)',
+  `contact_mobile`    VARCHAR(20)   DEFAULT NULL            COMMENT '联系手机号',
+  `contact_wechat`    VARCHAR(50)   DEFAULT NULL            COMMENT '联系微信',
   `schedule_time`     VARCHAR(200)  DEFAULT NULL            COMMENT '预约时间',
   `address`           VARCHAR(200)  DEFAULT NULL            COMMENT '上课地址',
   `remark`            TEXT                                  COMMENT '备注',
-  `res_status`        TINYINT       NOT NULL DEFAULT 0      COMMENT '0待确认 1已确认 2已完成 3已取消',
+  `res_status`        TINYINT       NOT NULL DEFAULT 0      COMMENT '0待处理 1已匹配 2已完成 3已驳回/取消',
   `cancel_reason`     VARCHAR(500)  DEFAULT NULL            COMMENT '取消原因',
+  `matched_at`        DATETIME      DEFAULT NULL            COMMENT '匹配确认时间',
+  `requirement_id`    BIGINT        DEFAULT NULL            COMMENT '关联的tutor_requirement.id (双写)',
   PRIMARY KEY (`id`),
   KEY `idx_student` (`student_user_id`),
-  KEY `idx_tutor` (`tutor_user_id`)
+  KEY `idx_tutor` (`tutor_user_id`),
+  KEY `idx_requirement` (`requirement_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学员预约教员';
 
 -- 19. tutor_shortlist 学员备选老师

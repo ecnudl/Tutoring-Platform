@@ -109,10 +109,10 @@ public class AdminReservationBiz extends BaseBiz {
             tutorRequirementDao.updateById(reqUp);
         }
 
-        // 给学员站内信
-        sendMsg(r.getStudentUserId(), "很抱歉, 您的需求未审核通过",
+        // 给学员站内信; 失败不阻塞主流程, 但响应文案如实反映
+        boolean msgOk = sendMsg(r.getStudentUserId(), "很抱歉, 您的需求未审核通过",
                 "我们暂时无法为您安排合适的教员" + (StringUtils.hasText(reason) ? "(原因: " + reason + ")" : "") + "。如有疑问可联系客服。");
-        return Result.success("已驳回, 已通知学员");
+        return Result.success(msgOk ? "已驳回, 已通知学员" : "已驳回 (站内信发送失败, 请人工电话告知学员)");
     }
 
     /** Admin: 目标教员不接, 把关联 requirement 推到 PUBLISHED, 让其他教员看到 */
@@ -121,9 +121,16 @@ public class AdminReservationBiz extends BaseBiz {
         Long id = Long.parseLong(req.get("id").toString());
         TutorReservation r = tutorReservationDao.getById(id);
         if (r == null) return Result.error("预约不存在");
+        if (!ReservationStatusEnum.PENDING.getCode().equals(r.getResStatus())) {
+            return Result.error("该预约已处理, 无法转入公开池");
+        }
         if (r.getRequirementId() == null) return Result.error("该预约未关联需求");
         TutorRequirement requirement = tutorRequirementDao.getById(r.getRequirementId());
         if (requirement == null) return Result.error("关联需求不存在");
+        // 关联需求必须仍是 PENDING (待审核) 才允许直接发布; 已处理过的不允许覆盖
+        if (!RequirementStatusEnum.PENDING.getCode().equals(requirement.getReqStatus())) {
+            return Result.error("关联需求当前状态不允许转入公开池");
+        }
 
         TutorRequirement reqUp = new TutorRequirement();
         reqUp.setId(requirement.getId());
@@ -138,7 +145,7 @@ public class AdminReservationBiz extends BaseBiz {
         return Result.success("已转入公开需求池");
     }
 
-    private void sendMsg(Long userId, String title, String content) {
+    private boolean sendMsg(Long userId, String title, String content) {
         try {
             Msg msg = new Msg();
             msg.setMsgType(1);
@@ -150,6 +157,9 @@ public class AdminReservationBiz extends BaseBiz {
             mu.setUserId(userId);
             mu.setIsRead(0);
             msgUserDao.save(mu);
-        } catch (Exception ignored) {}
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

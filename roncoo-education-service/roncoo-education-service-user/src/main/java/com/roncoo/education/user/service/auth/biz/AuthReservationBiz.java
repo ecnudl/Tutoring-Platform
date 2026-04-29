@@ -109,6 +109,16 @@ public class AuthReservationBiz extends BaseBiz {
         String contactWechat = req.get("contactWechat") != null ? req.get("contactWechat").toString() : null;
         String remark = req.get("remark") != null ? req.get("remark").toString()
                 : (req.get("message") != null ? req.get("message").toString() : "");
+        String scheduleTime = req.get("scheduleTime") != null ? req.get("scheduleTime").toString() : null;
+        String address = req.get("address") != null ? req.get("address").toString() : null;
+        Long subjectId = null;
+        if (req.get("subjectId") != null && !req.get("subjectId").toString().isEmpty()) {
+            try { subjectId = Long.parseLong(req.get("subjectId").toString()); } catch (Exception ignored) {}
+        }
+        // 学员手机号格式校验 (11 位 1 开头) — admin 后续电话联系靠它
+        if (contactMobile != null && !contactMobile.isEmpty() && !contactMobile.matches("^1[3-9]\\d{9}$")) {
+            return Result.error("联系手机号格式不正确");
+        }
 
         // 1) 双写 - 先建 requirement (PENDING 待审核, 锁定 target_tutor_user_id)
         TutorRequirement requirement = new TutorRequirement();
@@ -123,6 +133,9 @@ public class AuthReservationBiz extends BaseBiz {
         // 城市/区域跟着教员走 — 否则学员库 cityId 过滤会把它过滤掉
         requirement.setCityId(tutorProfile.getCityId());
         requirement.setDistrictId(tutorProfile.getDistrictId());
+        if (address != null) requirement.setAddress(address);
+        if (scheduleTime != null) requirement.setSchedule(scheduleTime);
+        if (subjectId != null) requirement.setSubjectIds(subjectId.toString());
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         tutorRequirementDao.save(requirement);
         // 落库后回填 display_no (公开详情页按 A + 6 位数字 查找)
@@ -138,6 +151,9 @@ public class AuthReservationBiz extends BaseBiz {
         reservation.setTutorUserId(tutorUserId);
         reservation.setTutorId(tutorProfile.getId());
         reservation.setRequirementId(requirement.getId());
+        reservation.setSubjectId(subjectId);
+        reservation.setScheduleTime(scheduleTime);
+        reservation.setAddress(address);
         reservation.setContactName(contactName);
         reservation.setContactMobile(contactMobile);
         reservation.setContactWechat(contactWechat);

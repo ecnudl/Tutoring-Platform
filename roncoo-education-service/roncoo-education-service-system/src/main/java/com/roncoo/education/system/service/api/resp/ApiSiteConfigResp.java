@@ -19,7 +19,6 @@ public class ApiSiteConfigResp implements Serializable {
 
     // 客服
     private String siteHotline;
-    private String tutorGroupQrUrl;     // 教员接单群二维码 URL
     private String siteCsEmail;
     private String siteCsWechat;
     private String siteWorkTime;

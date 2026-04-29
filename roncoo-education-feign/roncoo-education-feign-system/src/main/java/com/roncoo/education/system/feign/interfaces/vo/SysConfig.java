@@ -26,4 +26,7 @@ public class SysConfig implements Serializable {
      */
     private Integer storagePlatform;
 
+    /** 教员接单群二维码 URL (auth-only, 仅教员可读) */
+    private String tutorGroupQrUrl;
+
 }

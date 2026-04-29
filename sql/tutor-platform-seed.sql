@@ -170,18 +170,18 @@ INSERT INTO `sys_menu` (`id`, `gmt_create`, `gmt_modified`, `status_id`, `parent
 (800000, NOW(), NOW(), 1, 0, '家教管理', '', 'el-icon-s-custom', 1, 50)
 ON DUPLICATE KEY UPDATE `menu_name`=VALUES(`menu_name`);
 
--- 二级菜单: 教员/需求/预约/申请/学员/反馈/VIP
-INSERT INTO `sys_menu` (`id`, `gmt_create`, `gmt_modified`, `status_id`, `parent_id`, `menu_name`, `path`, `menu_icon`, `menu_type`, `sort`) VALUES
-(800100, NOW(), NOW(), 1, 800000, '教员审核',   '/tutor/audit',         '', 1, 1),
-(800101, NOW(), NOW(), 1, 800000, '教员列表',   '/tutor/list',          '', 1, 2),
-(800102, NOW(), NOW(), 1, 800000, '需求审核',   '/requirement/audit',   '', 1, 3),
-(800103, NOW(), NOW(), 1, 800000, '需求列表',   '/requirement/list',    '', 1, 4),
-(800104, NOW(), NOW(), 1, 800000, '预约管理',   '/reservation/list',    '', 1, 5),
-(800105, NOW(), NOW(), 1, 800000, '申请管理',   '/application/list',    '', 1, 6),
-(800106, NOW(), NOW(), 1, 800000, '学员列表',   '/student/list',        '', 1, 7),
-(800107, NOW(), NOW(), 1, 800000, '反馈管理',   '/feedback/list',       '', 1, 8),
-(800108, NOW(), NOW(), 1, 800000, 'VIP管理',    '/vip/list',            '', 1, 9)
-ON DUPLICATE KEY UPDATE `menu_name`=VALUES(`menu_name`);
+-- 二级菜单: 教员/需求/预约/申请/学员/反馈/VIP (含 apis 用于 RBAC 网关白名单)
+INSERT INTO `sys_menu` (`id`, `gmt_create`, `gmt_modified`, `status_id`, `parent_id`, `menu_name`, `path`, `menu_icon`, `menu_type`, `sort`, `apis`) VALUES
+(800100, NOW(), NOW(), 1, 800000, '教员审核',   '/tutor/audit',         '', 1, 1, '/user/admin/tutor-audit/page,/user/admin/tutor-audit/view,/user/admin/tutor-audit/audit,/user/admin/tutor-audit/pending-count'),
+(800101, NOW(), NOW(), 1, 800000, '教员列表',   '/tutor/list',          '', 1, 2, '/user/admin/tutor/page,/user/admin/tutor/view,/user/admin/tutor/save,/user/admin/tutor/edit,/user/admin/tutor/delete'),
+(800102, NOW(), NOW(), 1, 800000, '需求审核',   '/requirement/audit',   '', 1, 3, '/user/admin/requirement-audit/page,/user/admin/requirement-audit/view,/user/admin/requirement-audit/approve,/user/admin/requirement-audit/reject,/user/admin/requirement-audit/match,/user/admin/requirement-audit/pending-count'),
+(800103, NOW(), NOW(), 1, 800000, '需求列表',   '/requirement/list',    '', 1, 4, '/user/admin/requirement/page,/user/admin/requirement/view,/user/admin/requirement/edit,/user/admin/requirement/delete'),
+(800104, NOW(), NOW(), 1, 800000, '预约管理',   '/reservation/list',    '', 1, 5, '/user/admin/reservation/page,/user/admin/reservation/view,/user/admin/reservation/match,/user/admin/reservation/reject,/user/admin/reservation/publish-requirement,/user/admin/reservation/pending-count'),
+(800105, NOW(), NOW(), 1, 800000, '申请管理',   '/application/list',    '', 1, 6, '/user/admin/application/page,/user/admin/application/view'),
+(800106, NOW(), NOW(), 1, 800000, '学员列表',   '/student/list',        '', 1, 7, '/user/admin/student/page,/user/admin/student/view'),
+(800107, NOW(), NOW(), 1, 800000, '反馈管理',   '/feedback/list',       '', 1, 8, '/user/admin/feedback/page,/user/admin/feedback/view,/user/admin/feedback/audit-pass,/user/admin/feedback/audit-reject'),
+(800108, NOW(), NOW(), 1, 800000, 'VIP管理',    '/vip/list',            '', 1, 9, '/user/admin/vip/page,/user/admin/vip/view,/user/admin/vip/save,/user/admin/vip/edit')
+ON DUPLICATE KEY UPDATE `menu_name`=VALUES(`menu_name`), `apis`=VALUES(`apis`);
 
 -- 一级菜单: 地理配置
 INSERT INTO `sys_menu` (`id`, `gmt_create`, `gmt_modified`, `status_id`, `parent_id`, `menu_name`, `path`, `menu_icon`, `menu_type`, `sort`) VALUES

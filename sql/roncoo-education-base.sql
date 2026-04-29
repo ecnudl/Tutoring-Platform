@@ -176,6 +176,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `country` varchar(50) DEFAULT NULL,
   `register_source` tinyint DEFAULT 1,
   `user_type` tinyint NOT NULL DEFAULT 0 COMMENT '用户类型 0未设置 1教员 2学员',
+  `security_question` varchar(200) DEFAULT NULL COMMENT '安全问题(找回密码用)',
+  `security_answer_hash` varchar(100) DEFAULT NULL COMMENT '安全问题答案 SHA1(mobile_salt + answer.lower().trim())',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_mobile` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户';
@@ -284,6 +286,11 @@ CREATE TABLE IF NOT EXISTS `msg` (
   `sort` int NOT NULL DEFAULT 0,
   `msg_type` tinyint DEFAULT 1,
   `msg_title` varchar(200) DEFAULT NULL,
+  `is_time_send` tinyint DEFAULT 0 COMMENT '是否定时发送',
+  `send_time` datetime DEFAULT NULL COMMENT '发送时间',
+  `is_send` tinyint DEFAULT 0 COMMENT '是否已发送',
+  `is_top` tinyint DEFAULT 0 COMMENT '是否置顶',
+  `remark` varchar(500) DEFAULT NULL,
   `msg_text` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息';
@@ -293,9 +300,11 @@ CREATE TABLE IF NOT EXISTS `msg_user` (
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `status_id` tinyint NOT NULL DEFAULT 1,
+  `sort` int NOT NULL DEFAULT 0,
   `msg_id` bigint NOT NULL,
   `user_id` bigint NOT NULL,
   `is_read` tinyint DEFAULT 0,
+  `is_top` tinyint DEFAULT 0 COMMENT '是否置顶',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息用户';
