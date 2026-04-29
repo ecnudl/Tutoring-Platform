@@ -47,6 +47,16 @@
 
     <!-- 编辑 / 新增 弹窗 -->
     <el-dialog v-model="editVisible" :title="formId ? '编辑需求' : '新建需求'" width="780px">
+      <!-- 编辑时: 修改前的城市/区域快照, 防止 admin 边改边忘 -->
+      <div v-if="formId && originalSnapshot" class="snap-row">
+        <span class="snap-label">当前位置</span>
+        <span class="snap-val">
+          <strong>{{ originalSnapshot.city || '未设置' }}</strong>
+          <span v-if="originalSnapshot.districts" class="snap-sep">·</span>
+          <span v-if="originalSnapshot.districts">{{ originalSnapshot.districts }}</span>
+        </span>
+        <span class="snap-no">{{ originalSnapshot.displayNo }}</span>
+      </div>
       <el-form :model="form" label-width="100px" label-position="right">
         <el-row :gutter="16">
           <el-col :span="24">
@@ -252,6 +262,7 @@ const subjectSel = ref<string[]>([])
 const tutorTypeSel = ref<string[]>([])
 const cityOptions = ref<any[]>([])
 const districtOptions = ref<any[]>([])
+const originalSnapshot = ref<{ city: string; districts: string; displayNo: string } | null>(null)
 
 function emptyForm() {
   return {
@@ -324,6 +335,7 @@ const openCreate = async () => {
   subjectSel.value = []
   tutorTypeSel.value = []
   districtOptions.value = []
+  originalSnapshot.value = null
   editVisible.value = true
 }
 
@@ -357,6 +369,17 @@ const openEdit = async (row: any) => {
       districtSel.value = splitCsv(d.districtNames)
       subjectSel.value = splitCsv(d.subjectIds)
       tutorTypeSel.value = splitCsv(d.tutorTypePref)
+
+      // 保存修改前的快照, 在弹窗顶部展示
+      const cityNameSnap = cityIdNum != null
+        ? (cityOptions.value.find((c: any) => Number(c.id) === cityIdNum)?.cityName || '')
+        : ''
+      originalSnapshot.value = {
+        city: cityNameSnap,
+        districts: (d.districtNames || '').split(',').map((s: string) => s.trim()).filter(Boolean).join(', '),
+        displayNo: d.displayNo || ''
+      }
+
       editVisible.value = true
     }
   } catch (e) { console.error(e) }
@@ -435,4 +458,27 @@ onMounted(() => { search() })
 .chip-group { display: flex; flex-wrap: wrap; gap: 6px 8px; }
 .chip-group :deep(.el-checkbox.is-bordered) { margin: 0; padding: 4px 12px; height: 30px; line-height: 22px; border-radius: 14px; }
 .chip-group :deep(.el-checkbox__label) { font-size: 13px; }
+
+.snap-row {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 14px; margin: 0 0 18px;
+  background: linear-gradient(to right, #f0f6fd, #fffbeb);
+  border-left: 3px solid #d97706;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.snap-label {
+  font-weight: 600; color: #b45309;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.snap-val { color: #111827; flex: 1; }
+.snap-val strong { color: #163B6B; font-weight: 600; }
+.snap-sep { margin: 0 6px; color: #cbd5e1; }
+.snap-no {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
 </style>
