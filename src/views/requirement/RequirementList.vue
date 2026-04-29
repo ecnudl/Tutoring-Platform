@@ -89,10 +89,19 @@
           </el-col>
 
           <el-col :span="24">
+            <el-form-item label="城市">
+              <el-select v-model="form.cityId" placeholder="选择城市" style="width:240px" @change="onCityChange">
+                <el-option v-for="c in cityOptions" :key="c.id" :label="c.cityName" :value="Number(c.id)" />
+              </el-select>
+              <span v-if="!cityOptions.length" style="margin-left:12px;color:#94a3b8;font-size:12px">加载中...</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
             <el-form-item label="区域 (多选)">
-              <el-checkbox-group v-model="districtSel" class="chip-group">
-                <el-checkbox v-for="d in DISTRICT_OPTIONS" :key="d" :value="d" :label="d" border size="small" />
+              <el-checkbox-group v-model="districtSel" class="chip-group" v-if="districtOptions.length">
+                <el-checkbox v-for="d in districtOptions" :key="d.id" :value="d.districtName" :label="d.districtName" border size="small" />
               </el-checkbox-group>
+              <span v-else style="color:#94a3b8;font-size:12px">{{ form.cityId ? '该城市暂无区数据 (请先在 dict_district 录入)' : '请先选择城市' }}</span>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -223,11 +232,6 @@ const matchVisible = ref(false)
 const matchTarget = ref<any>(null)
 const matchForm = ref<any>({ tutorUserId: 0, remark: '' })
 
-const DISTRICT_OPTIONS = [
-  '浦东新区', '徐汇区', '长宁区', '闵行区', '黄浦区', '静安区',
-  '虹口区', '杨浦区', '普陀区', '嘉定区', '金山区', '青浦区',
-  '宝山区', '松江区', '奉贤区', '崇明区'
-]
 const SUBJECT_OPTIONS = [
   '幼儿学前', '小学全科', '初中理科', '初中文科', '高中理科', '高中文科',
   '语文', '英语', '数学', '奥数', '物理', '化学', '生物',
@@ -242,11 +246,14 @@ const TUTOR_TYPE_OPTIONS = ['大学生', '专职教员', '在职教师']
 const districtSel = ref<string[]>([])
 const subjectSel = ref<string[]>([])
 const tutorTypeSel = ref<string[]>([])
+const cityOptions = ref<any[]>([])
+const districtOptions = ref<any[]>([])
 
 function emptyForm() {
   return {
     title: '', contactName: '', contactMobile: '', contactWechat: '',
     studentGender: 0, gradeName: '', requirementType: null,
+    cityId: null as number | null,
     address: '', transport: '',
     requirementDetail: '',
     frequency: '', schedule: '',
@@ -254,6 +261,34 @@ function emptyForm() {
     otherRequirements: '', teachingMethod: 1, transportSubsidy: '',
     reqStatus: 2
   }
+}
+
+const loadCities = async () => {
+  if (cityOptions.value.length) return
+  try {
+    const res = await get('/user/api/dict/city/list')
+    if (res.code === 200 && Array.isArray(res.data)) {
+      cityOptions.value = res.data
+    }
+  } catch (e) { console.error(e) }
+}
+
+const loadDistricts = async (cityId: number | null) => {
+  if (!cityId) { districtOptions.value = []; return }
+  try {
+    const res = await get('/user/api/dict/district/list', { cityId })
+    if (res.code === 200 && Array.isArray(res.data)) {
+      districtOptions.value = res.data
+    } else {
+      districtOptions.value = []
+    }
+  } catch (e) { console.error(e); districtOptions.value = [] }
+}
+
+const onCityChange = (newCityId: number | null) => {
+  // 切换城市时, 已选区与新城市无关 -> 清空
+  districtSel.value = []
+  loadDistricts(newCityId)
 }
 
 const statusLabel = (s: number) => ({ 0: '草稿', 1: '审核中', 2: '已发布', 3: '已匹配', 4: '已完成', 5: '已关闭', 6: '已驳回' }[s] || '未知')
@@ -277,26 +312,31 @@ const search = async () => {
 const splitCsv = (s: string | null | undefined): string[] =>
   s ? s.split(',').map(x => x.trim()).filter(Boolean) : []
 
-const openCreate = () => {
+const openCreate = async () => {
+  await loadCities()
   formId.value = null
   form.value = emptyForm()
   districtSel.value = []
   subjectSel.value = []
   tutorTypeSel.value = []
+  districtOptions.value = []
   editVisible.value = true
 }
 
 const openEdit = async (row: any) => {
+  await loadCities()
   try {
     const res = await get('/user/admin/requirement/view', { id: row.id })
     if (res.code === 200 && res.data) {
       const d = res.data
       formId.value = d.id
+      const cityIdNum = d.cityId ? Number(d.cityId) : null
       form.value = {
         title: d.title || '',
         contactName: d.contactName || '', contactMobile: d.contactMobile || '', contactWechat: d.contactWechat || '',
         studentGender: d.studentGender ?? 0,
         gradeName: d.gradeName || '', requirementType: d.requirementType,
+        cityId: cityIdNum,
         address: d.address || '', transport: d.transport || '',
         requirementDetail: d.requirementDetail || '',
         frequency: d.frequency || '', schedule: d.schedule || '',
@@ -304,6 +344,8 @@ const openEdit = async (row: any) => {
         otherRequirements: d.otherRequirements || '', teachingMethod: d.teachingMethod ?? 1, transportSubsidy: d.transportSubsidy || '',
         reqStatus: d.reqStatus ?? 2
       }
+      // 先把当前城市的区列表拉好, 再根据已存的区名打勾
+      await loadDistricts(cityIdNum)
       districtSel.value = splitCsv(d.districtNames)
       subjectSel.value = splitCsv(d.subjectIds)
       tutorTypeSel.value = splitCsv(d.tutorTypePref)
@@ -318,6 +360,7 @@ const submitForm = async () => {
   try {
     const payload: any = {
       ...form.value,
+      cityId: form.value.cityId ?? '',
       districtNames: districtSel.value.join(','),
       subjectIds: subjectSel.value.join(','),
       tutorTypePref: tutorTypeSel.value.join(',')
