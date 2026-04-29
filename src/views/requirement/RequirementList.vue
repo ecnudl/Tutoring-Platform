@@ -73,7 +73,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="年级 ID"><el-input-number v-model="form.gradeId" :min="0" controls-position="right" style="width:100%" /></el-form-item>
+            <el-form-item label="年级"><el-input v-model="form.gradeName" maxlength="100" placeholder="如: 一年级 / 高三 / 大学一年级" /></el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="求教性质">
@@ -88,15 +88,30 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="8">
-            <el-form-item label="城市 ID"><el-input-number v-model="form.cityId" :min="0" controls-position="right" style="width:100%" /></el-form-item>
+          <el-col :span="24">
+            <el-form-item label="区域 (多选)">
+              <el-checkbox-group v-model="districtSel" class="chip-group">
+                <el-checkbox v-for="d in DISTRICT_OPTIONS" :key="d" :value="d" :label="d" border size="small" />
+              </el-checkbox-group>
+            </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="区县 ID"><el-input-number v-model="form.districtId" :min="0" controls-position="right" style="width:100%" /></el-form-item>
+          <el-col :span="24">
+            <el-form-item label="科目 (多选)">
+              <el-checkbox-group v-model="subjectSel" class="chip-group">
+                <el-checkbox v-for="s in SUBJECT_OPTIONS" :key="s" :value="s" :label="s" border size="small" />
+              </el-checkbox-group>
+            </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="24">
+            <el-form-item label="教员类型 (多选)">
+              <el-checkbox-group v-model="tutorTypeSel" class="chip-group">
+                <el-checkbox v-for="t in TUTOR_TYPE_OPTIONS" :key="t" :value="t" :label="t" border size="small" />
+              </el-checkbox-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
             <el-form-item label="教学方式">
-              <el-select v-model="form.teachingMethod" placeholder="选择" style="width:100%">
+              <el-select v-model="form.teachingMethod" placeholder="选择" style="width:240px">
                 <el-option label="教师上门" :value="1" />
                 <el-option label="学员上门" :value="2" />
                 <el-option label="在线辅导" :value="3" />
@@ -110,12 +125,6 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="交通线路"><el-input v-model="form.transport" maxlength="200" placeholder="如: 公交方便 / 地铁2号线步行5分钟" /></el-form-item>
-          </el-col>
-
-          <el-col :span="24">
-            <el-form-item label="科目">
-              <el-input v-model="form.subjectIds" placeholder="科目 (多个用逗号分隔, 如: 数学,英语 或全科)" />
-            </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="学员情况">
@@ -214,12 +223,32 @@ const matchVisible = ref(false)
 const matchTarget = ref<any>(null)
 const matchForm = ref<any>({ tutorUserId: 0, remark: '' })
 
+const DISTRICT_OPTIONS = [
+  '浦东新区', '徐汇区', '长宁区', '闵行区', '黄浦区', '静安区',
+  '虹口区', '杨浦区', '普陀区', '嘉定区', '金山区', '青浦区',
+  '宝山区', '松江区', '奉贤区', '崇明区'
+]
+const SUBJECT_OPTIONS = [
+  '幼儿学前', '小学全科', '初中理科', '初中文科', '高中理科', '高中文科',
+  '语文', '英语', '数学', '奥数', '物理', '化学', '生物',
+  '历史', '地理', '政治',
+  '钢琴', '小提琴', '古筝', '跳绳', '篮球', '游泳', '围棋', '书法', '美术',
+  '英语口语', '四级', '托福', '雅思', 'SAT', 'AP', 'A-level', 'IB', 'IGCSE',
+  '日语', '德语', '高数', '计算机',
+  '初中', '高中', '大学考研', '高考志愿填报', '生涯规划', '心理辅导'
+]
+const TUTOR_TYPE_OPTIONS = ['大学生', '专职教员', '在职教师']
+
+const districtSel = ref<string[]>([])
+const subjectSel = ref<string[]>([])
+const tutorTypeSel = ref<string[]>([])
+
 function emptyForm() {
   return {
     title: '', contactName: '', contactMobile: '', contactWechat: '',
-    studentGender: 0, gradeId: null, requirementType: null,
-    cityId: null, districtId: null, address: '', transport: '',
-    subjectIds: '', requirementDetail: '',
+    studentGender: 0, gradeName: '', requirementType: null,
+    address: '', transport: '',
+    requirementDetail: '',
     frequency: '', schedule: '',
     tutorGender: 0, budgetMin: 0, budgetMax: 0,
     otherRequirements: '', teachingMethod: 1, transportSubsidy: '',
@@ -245,9 +274,15 @@ const search = async () => {
   finally { loading.value = false }
 }
 
+const splitCsv = (s: string | null | undefined): string[] =>
+  s ? s.split(',').map(x => x.trim()).filter(Boolean) : []
+
 const openCreate = () => {
   formId.value = null
   form.value = emptyForm()
+  districtSel.value = []
+  subjectSel.value = []
+  tutorTypeSel.value = []
   editVisible.value = true
 }
 
@@ -261,14 +296,17 @@ const openEdit = async (row: any) => {
         title: d.title || '',
         contactName: d.contactName || '', contactMobile: d.contactMobile || '', contactWechat: d.contactWechat || '',
         studentGender: d.studentGender ?? 0,
-        gradeId: d.gradeId, requirementType: d.requirementType,
-        cityId: d.cityId, districtId: d.districtId, address: d.address || '', transport: d.transport || '',
-        subjectIds: d.subjectIds || '', requirementDetail: d.requirementDetail || '',
+        gradeName: d.gradeName || '', requirementType: d.requirementType,
+        address: d.address || '', transport: d.transport || '',
+        requirementDetail: d.requirementDetail || '',
         frequency: d.frequency || '', schedule: d.schedule || '',
         tutorGender: d.tutorGender ?? 0, budgetMin: d.budgetMin ?? 0, budgetMax: d.budgetMax ?? 0,
         otherRequirements: d.otherRequirements || '', teachingMethod: d.teachingMethod ?? 1, transportSubsidy: d.transportSubsidy || '',
         reqStatus: d.reqStatus ?? 2
       }
+      districtSel.value = splitCsv(d.districtNames)
+      subjectSel.value = splitCsv(d.subjectIds)
+      tutorTypeSel.value = splitCsv(d.tutorTypePref)
       editVisible.value = true
     }
   } catch (e) { console.error(e) }
@@ -278,7 +316,12 @@ const submitForm = async () => {
   if (!form.value.title) { ElMessage.warning('请填写标题'); return }
   submitting.value = true
   try {
-    const payload: any = { ...form.value }
+    const payload: any = {
+      ...form.value,
+      districtNames: districtSel.value.join(','),
+      subjectIds: subjectSel.value.join(','),
+      tutorTypePref: tutorTypeSel.value.join(',')
+    }
     if (formId.value) {
       payload.id = formId.value
       const res = await put('/user/admin/requirement/edit', payload)
@@ -338,4 +381,7 @@ onMounted(() => { search() })
 
 <style scoped>
 .filter-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.chip-group :deep(.el-checkbox.is-bordered) { margin: 0; padding: 4px 12px; height: 30px; line-height: 22px; border-radius: 14px; }
+.chip-group :deep(.el-checkbox__label) { font-size: 13px; }
 </style>
