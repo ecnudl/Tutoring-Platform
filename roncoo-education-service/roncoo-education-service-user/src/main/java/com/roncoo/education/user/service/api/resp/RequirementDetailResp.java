@@ -128,4 +128,7 @@ public class RequirementDetailResp implements Serializable {
 
     @ApiModelProperty(value = "有无车贴 (自由文本)")
     private String transportSubsidy;
+
+    @ApiModelProperty(value = "区域名 (多选 逗号分隔)")
+    private String districtNames;
 }

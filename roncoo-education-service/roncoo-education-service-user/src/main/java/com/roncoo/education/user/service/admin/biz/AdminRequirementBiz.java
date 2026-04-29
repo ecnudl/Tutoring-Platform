@@ -197,12 +197,10 @@ public class AdminRequirementBiz extends BaseBiz {
 
         // 学员
         if (req.containsKey("studentGender")) r.setStudentGender(intOrNull(req.get("studentGender")));
-        if (req.containsKey("gradeId")) r.setGradeId(longOrNull(req.get("gradeId")));
+        if (req.containsKey("gradeName")) r.setGradeName(strOrNull(req.get("gradeName")));
 
         // 地理
-        if (req.containsKey("provinceId")) r.setProvinceId(longOrNull(req.get("provinceId")));
-        if (req.containsKey("cityId")) r.setCityId(longOrNull(req.get("cityId")));
-        if (req.containsKey("districtId")) r.setDistrictId(longOrNull(req.get("districtId")));
+        if (req.containsKey("districtNames")) r.setDistrictNames(strOrNull(req.get("districtNames")));
         if (req.containsKey("address")) r.setAddress(strOrNull(req.get("address")));
         if (req.containsKey("transport")) r.setTransport(strOrNull(req.get("transport")));
 

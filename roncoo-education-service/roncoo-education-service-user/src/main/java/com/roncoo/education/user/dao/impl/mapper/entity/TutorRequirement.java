@@ -41,6 +41,8 @@ public class TutorRequirement implements Serializable {
     private Integer requirementType;
     private String otherRequirements;
     private String transportSubsidy;
+    private String districtNames;
+    private String gradeName;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -122,4 +124,8 @@ public class TutorRequirement implements Serializable {
     public void setOtherRequirements(String otherRequirements) { this.otherRequirements = otherRequirements == null ? null : otherRequirements.trim(); }
     public String getTransportSubsidy() { return transportSubsidy; }
     public void setTransportSubsidy(String transportSubsidy) { this.transportSubsidy = transportSubsidy == null ? null : transportSubsidy.trim(); }
+    public String getDistrictNames() { return districtNames; }
+    public void setDistrictNames(String districtNames) { this.districtNames = districtNames == null ? null : districtNames.trim(); }
+    public String getGradeName() { return gradeName; }
+    public void setGradeName(String gradeName) { this.gradeName = gradeName == null ? null : gradeName.trim(); }
 }

@@ -34,6 +34,8 @@
       <result column="requirement_type" jdbcType="TINYINT" property="requirementType"/>
       <result column="other_requirements" jdbcType="VARCHAR" property="otherRequirements"/>
       <result column="transport_subsidy" jdbcType="VARCHAR" property="transportSubsidy"/>
+      <result column="district_names" jdbcType="VARCHAR" property="districtNames"/>
+      <result column="grade_name" jdbcType="VARCHAR" property="gradeName"/>
   </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement">
         <result column="schedule" jdbcType="LONGVARCHAR" property="schedule"/>
@@ -75,7 +77,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id, student_gender, transport, frequency, requirement_type, other_requirements, transport_subsidy</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id, student_gender, transport, frequency, requirement_type, other_requirements, transport_subsidy, district_names, grade_name</sql>
     <sql id="Blob_Column_List">schedule, requirement_detail</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_requirement
@@ -131,6 +133,8 @@
           <if test="requirementType != null">requirement_type,</if>
           <if test="otherRequirements != null">other_requirements,</if>
           <if test="transportSubsidy != null">transport_subsidy,</if>
+          <if test="districtNames != null">district_names,</if>
+          <if test="gradeName != null">grade_name,</if>
     </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
@@ -167,6 +171,8 @@
           <if test="requirementType != null">#{requirementType,jdbcType=TINYINT},</if>
           <if test="otherRequirements != null">#{otherRequirements,jdbcType=VARCHAR},</if>
           <if test="transportSubsidy != null">#{transportSubsidy,jdbcType=VARCHAR},</if>
+          <if test="districtNames != null">#{districtNames,jdbcType=VARCHAR},</if>
+          <if test="gradeName != null">#{gradeName,jdbcType=VARCHAR},</if>
     </trim>
     </insert>
     <select id="countByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultType="java.lang.Integer">select count(*) from tutor_requirement <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></select>
@@ -205,6 +211,8 @@
             <if test="record.requirementType != null">requirement_type = #{record.requirementType,jdbcType=TINYINT},</if>
             <if test="record.otherRequirements != null">other_requirements = #{record.otherRequirements,jdbcType=VARCHAR},</if>
             <if test="record.transportSubsidy != null">transport_subsidy = #{record.transportSubsidy,jdbcType=VARCHAR},</if>
+            <if test="record.districtNames != null">district_names = #{record.districtNames,jdbcType=VARCHAR},</if>
+            <if test="record.gradeName != null">grade_name = #{record.gradeName,jdbcType=VARCHAR},</if>
         </set>
         <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
     </update>
@@ -242,6 +250,8 @@
           <if test="requirementType != null">requirement_type = #{requirementType,jdbcType=TINYINT},</if>
           <if test="otherRequirements != null">other_requirements = #{otherRequirements,jdbcType=VARCHAR},</if>
           <if test="transportSubsidy != null">transport_subsidy = #{transportSubsidy,jdbcType=VARCHAR},</if>
+          <if test="districtNames != null">district_names = #{districtNames,jdbcType=VARCHAR},</if>
+          <if test="gradeName != null">grade_name = #{gradeName,jdbcType=VARCHAR},</if>
     </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
