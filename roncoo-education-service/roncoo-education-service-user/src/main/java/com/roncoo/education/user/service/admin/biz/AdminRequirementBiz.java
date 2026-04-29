@@ -200,6 +200,7 @@ public class AdminRequirementBiz extends BaseBiz {
         if (req.containsKey("gradeName")) r.setGradeName(strOrNull(req.get("gradeName")));
 
         // 地理
+        if (req.containsKey("cityId")) r.setCityId(longOrNull(req.get("cityId")));
         if (req.containsKey("districtNames")) r.setDistrictNames(strOrNull(req.get("districtNames")));
         if (req.containsKey("address")) r.setAddress(strOrNull(req.get("address")));
         if (req.containsKey("transport")) r.setTransport(strOrNull(req.get("transport")));
