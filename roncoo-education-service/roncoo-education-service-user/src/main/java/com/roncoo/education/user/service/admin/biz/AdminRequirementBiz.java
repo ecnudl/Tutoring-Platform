@@ -40,6 +40,10 @@ public class AdminRequirementBiz extends BaseBiz {
     @NotNull
     private final TutorApplicationDao applicationDao;
     @NotNull
+    private final com.roncoo.education.user.dao.TutorReservationDao reservationDao;
+    @NotNull
+    private final com.roncoo.education.user.dao.UsersDao usersDao;
+    @NotNull
     private final MsgDao msgDao;
     @NotNull
     private final MsgUserDao msgUserDao;
@@ -144,16 +148,24 @@ public class AdminRequirementBiz extends BaseBiz {
         Long tutorUserId = Long.parseLong(req.get("tutorUserId").toString());
         String remark = req.get("remark") != null ? req.get("remark").toString() : null;
 
+        // 校验目标教员存在且类型 = TUTOR
+        com.roncoo.education.user.dao.impl.mapper.entity.Users tutor = usersDao.getById(tutorUserId);
+        if (tutor == null) return Result.error("教员账号不存在");
+        if (!com.roncoo.education.common.core.enums.UserTypeEnum.TUTOR.getCode().equals(tutor.getUserType())) {
+            return Result.error("目标用户不是教员账号 (user_type ≠ 1)");
+        }
+
         TutorRequirement r = requirementDao.getById(reqId);
         if (r == null) return Result.error("需求不存在");
         if (RequirementStatusEnum.MATCHED.getCode().equals(r.getReqStatus())) {
             return Result.error("该需求已接单");
         }
 
+        LocalDateTime now = LocalDateTime.now();
         TutorRequirement update = new TutorRequirement();
         update.setId(reqId);
         update.setReqStatus(RequirementStatusEnum.MATCHED.getCode());
-        update.setMatchedAt(LocalDateTime.now());
+        update.setMatchedAt(now);
         update.setTargetTutorUserId(tutorUserId);
         if (remark != null) update.setMatchedTutorRemark(remark);
         requirementDao.updateById(update);
@@ -174,6 +186,24 @@ public class AdminRequirementBiz extends BaseBiz {
                     appUp.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());
                     applicationDao.updateById(appUp);
                 }
+            }
+        }
+
+        // 同步关联的 reservation (如果存在): 学员从 /reserve 走过来的请求, requirement.id 就是 reservation.requirement_id
+        com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample resExample =
+                new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample();
+        resExample.createCriteria().andRequirementIdEqualTo(reqId);
+        com.roncoo.education.common.base.page.Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> resPage =
+                reservationDao.page(1, 10, resExample);
+        if (resPage != null && resPage.getList() != null) {
+            for (com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation res : resPage.getList()) {
+                com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation resUp =
+                        new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
+                resUp.setId(res.getId());
+                // res_status: 2 = COMPLETED (per ReservationStatusEnum, 已完成)
+                resUp.setResStatus(2);
+                resUp.setMatchedAt(now);
+                reservationDao.updateById(resUp);
             }
         }
 
@@ -219,8 +249,14 @@ public class AdminRequirementBiz extends BaseBiz {
         if (req.containsKey("teachingMethod")) r.setTeachingMethod(intOrNull(req.get("teachingMethod")));
         if (req.containsKey("transportSubsidy")) r.setTransportSubsidy(strOrNull(req.get("transportSubsidy")));
 
-        // 状态
-        if (req.containsKey("reqStatus")) r.setReqStatus(intOrNull(req.get("reqStatus")));
+        // 状态: 仅允许 草稿(0) / 审核中(1) / 已发布(2) / 已关闭(5);
+        // 已匹配(3) 必须走 confirmMatch, 已驳回(6) 走 audit/reject
+        if (req.containsKey("reqStatus")) {
+            Integer st = intOrNull(req.get("reqStatus"));
+            if (st != null && (st == 0 || st == 1 || st == 2 || st == 5)) {
+                r.setReqStatus(st);
+            }
+        }
         // 加急标记
         if (req.containsKey("isUrgent")) r.setIsUrgent(intOrNull(req.get("isUrgent")));
     }

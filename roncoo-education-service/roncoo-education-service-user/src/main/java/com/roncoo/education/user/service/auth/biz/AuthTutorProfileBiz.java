@@ -217,6 +217,8 @@ public class AuthTutorProfileBiz extends BaseBiz {
             update.setAuditStatus(0); // 重新上传后重置为待审核
             update.setAuditRemark(null);
             tutorCertificationDao.updateById(update);
+            // 重置认证状态: 已审核过的证件被替换 -> 必须重审才能恢复认证标
+            refreshTutorVerified(profile.getId());
             return Result.success("证书已更新，等待重新审核");
         }
 
@@ -228,6 +230,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         cert.setCertNo(req.getCertNo());
         cert.setAuditStatus(0); // 待审核
         tutorCertificationDao.save(cert);
+        refreshTutorVerified(profile.getId());
         return Result.success("证书保存成功");
     }
 
@@ -249,7 +252,23 @@ public class AuthTutorProfileBiz extends BaseBiz {
             return Result.error("证书不存在或无权操作");
         }
         tutorCertificationDao.deleteById(id);
+        // 删了已审核通过的身份证 -> 必须收回认证标
+        refreshTutorVerified(profile.getId());
         return Result.success("删除成功");
+    }
+
+    /**
+     * 与 AdminTutorAuditBiz.refreshTutorVerified 同步逻辑:
+     * 身份证正面(certType=1) + 反面(certType=2) 都已审核通过(auditStatus=1) 才视为认证.
+     */
+    private void refreshTutorVerified(Long tutorId) {
+        java.util.List<TutorCertification> list = tutorCertificationDao.listByTutorId(tutorId);
+        boolean idFrontOk = list.stream().anyMatch(c -> Integer.valueOf(1).equals(c.getCertType()) && Integer.valueOf(1).equals(c.getAuditStatus()));
+        boolean idBackOk = list.stream().anyMatch(c -> Integer.valueOf(2).equals(c.getCertType()) && Integer.valueOf(1).equals(c.getAuditStatus()));
+        TutorProfile update = new TutorProfile();
+        update.setId(tutorId);
+        update.setIsVerified(idFrontOk && idBackOk ? 1 : 0);
+        tutorProfileDao.updateById(update);
     }
 
     /**

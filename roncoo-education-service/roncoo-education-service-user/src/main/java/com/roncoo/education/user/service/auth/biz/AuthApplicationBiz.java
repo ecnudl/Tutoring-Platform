@@ -188,7 +188,11 @@ public class AuthApplicationBiz extends BaseBiz {
         if (!ApplicationStatusEnum.APPLIED.getCode().equals(application.getAppStatus())) {
             return Result.error("当前状态不允许取消");
         }
-        tutorApplicationDao.deleteById(id);
+        // 软取消: 用 status_id=0 标记 (保留行用于 daily-limit 计数, 防止 cancel-then-reapply 绕过)
+        TutorApplication update = new TutorApplication();
+        update.setId(id);
+        update.setStatusId(0);
+        tutorApplicationDao.updateById(update);
         return Result.success("取消成功");
     }
 

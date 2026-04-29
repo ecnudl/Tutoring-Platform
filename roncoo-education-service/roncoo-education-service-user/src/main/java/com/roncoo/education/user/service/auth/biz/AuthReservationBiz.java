@@ -124,7 +124,8 @@ public class AuthReservationBiz extends BaseBiz {
         TutorRequirement requirement = new TutorRequirement();
         requirement.setUserId(userId);
         requirement.setTargetTutorUserId(tutorUserId);
-        String tutorName = tutorProfile.getRealName() != null ? tutorProfile.getRealName() : "教员";
+        String tutorName = (tutorProfile.getRealName() != null && !tutorProfile.getRealName().isEmpty())
+                ? tutorProfile.getRealName() : "教";
         requirement.setTitle("定向预约 " + tutorName.charAt(0) + "教员 (" + (tutorProfile.getDisplayNo() == null ? "" : tutorProfile.getDisplayNo()) + ")");
         requirement.setRequirementDetail(remark);
         requirement.setContactName(contactName);
@@ -193,11 +194,11 @@ public class AuthReservationBiz extends BaseBiz {
         update.setCancelReason(reason);
         tutorReservationDao.updateById(update);
 
-        // 关联的 requirement 也置为驳回(REJECTED)
+        // 关联的 requirement 也置为关闭 (用户主动取消, 不应进入审核驳回历史)
         if (reservation.getRequirementId() != null) {
             TutorRequirement reqUpdate = new TutorRequirement();
             reqUpdate.setId(reservation.getRequirementId());
-            reqUpdate.setReqStatus(RequirementStatusEnum.REJECTED.getCode());
+            reqUpdate.setReqStatus(RequirementStatusEnum.CLOSED.getCode());
             tutorRequirementDao.updateById(reqUpdate);
         }
         return Result.success("已取消");

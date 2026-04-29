@@ -73,9 +73,6 @@ public class RequirementSearchResp implements Serializable {
     @ApiModelProperty(value = "区域 CSV (如 浦东新区,徐汇区)")
     private String districtNames;
 
-    @ApiModelProperty(value = "大致位置")
-    private String address;
-
     @ApiModelProperty(value = "教员类型 CSV (如 大学生,专职教员)")
     private String tutorTypePref;
 

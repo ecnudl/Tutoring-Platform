@@ -94,6 +94,9 @@ public class TutorReservationExample {
         public Criteria andResStatusGreaterThan(Integer value) { addCriterion("res_status >", value, "resStatus"); return (Criteria) this; }
         public Criteria andResStatusLessThan(Integer value) { addCriterion("res_status <", value, "resStatus"); return (Criteria) this; }
         public Criteria andResStatusBetween(Integer value1, Integer value2) { addCriterion("res_status between", value1, value2, "resStatus"); return (Criteria) this; }
+        public Criteria andRequirementIdIsNull() { addCriterion("requirement_id is null"); return (Criteria) this; }
+        public Criteria andRequirementIdIsNotNull() { addCriterion("requirement_id is not null"); return (Criteria) this; }
+        public Criteria andRequirementIdEqualTo(Long value) { addCriterion("requirement_id =", value, "requirementId"); return (Criteria) this; }
     }
 
     public static class Criteria extends GeneratedCriteria { protected Criteria() { super(); } }

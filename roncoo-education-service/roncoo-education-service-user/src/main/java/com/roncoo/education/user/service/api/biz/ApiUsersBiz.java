@@ -563,11 +563,10 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("该手机号没注册，请先注册");
         }
 
-        // 重置密码
+        // 重置密码 (保持 mobile_salt 不变, 否则 security_answer_hash 会失效, 用户无法用安全问题找回)
         Users recorde = new Users();
         recorde.setId(user.getId());
-        recorde.setMobileSalt(IdUtil.simpleUUID());
-        recorde.setMobilePsw(DigestUtil.sha1Hex(recorde.getMobileSalt() + mobilePsw));
+        recorde.setMobilePsw(DigestUtil.sha1Hex(user.getMobileSalt() + mobilePsw));
         usersDao.updateById(recorde);
 
         return Result.success("重置成功");
