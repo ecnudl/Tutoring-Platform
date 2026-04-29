@@ -262,7 +262,8 @@
             :class="{ 'is-matched': order.isMatched }"
           >
             <div class="order-left">
-              <span class="order-tag" :class="order.isMatched ? 'tag-done' : order.tagClass">{{ order.isMatched ? '已接' : order.tag }}</span>
+              <span v-if="order.isMatched" class="order-tag tag-done">已接</span>
+              <span v-else-if="order.isUrgent" class="order-tag tag-urgent">急</span>
               <span class="order-title">{{ order.title }}</span>
             </div>
             <div class="order-right">
@@ -412,7 +413,7 @@ const loadLatestOrders = async () => {
   try {
     const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
     if (res?.code === 200 && Array.isArray(res.data)) {
-      latestOrdersData.value = res.data.map((r, i) => {
+      latestOrdersData.value = res.data.map((r) => {
         // 标题: 优先 admin 标题; 否则取 subjectIds CSV 第一项; 兜底 "暂无科目要求"
         const subjectFirst = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean)[0] : ''
         const title = r.title || subjectFirst || '暂无科目要求'
@@ -428,8 +429,7 @@ const loadLatestOrders = async () => {
         return {
           id: r.id,
           displayNo: r.displayNo,
-          tag: i < 2 ? '急' : '新',
-          tagClass: i < 2 ? 'tag-urgent' : 'tag-new',
+          isUrgent: r.isUrgent === 1,
           title,
           area,
           time: r.gmtCreate ? timeAgo(r.gmtCreate) : '',
