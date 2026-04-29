@@ -253,18 +253,25 @@
           <h2>{{ cityStore.cityName }}家教最新订单</h2>
           <NuxtLink to="/xy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
-        <div class="order-list">
-          <div v-for="(order, idx) in latestOrders" :key="idx" class="order-item">
+        <div class="order-list" v-if="latestOrders.length">
+          <NuxtLink
+            v-for="order in latestOrders"
+            :key="order.id"
+            :to="order.isMatched ? '/xy' : ('/xy/a' + (order.displayNo ? order.displayNo.replace(/^A/i, '') : order.id))"
+            class="order-item"
+            :class="{ 'is-matched': order.isMatched }"
+          >
             <div class="order-left">
-              <span class="order-tag" :class="order.tagClass">{{ order.tag }}</span>
+              <span class="order-tag" :class="order.isMatched ? 'tag-done' : order.tagClass">{{ order.isMatched ? '已接' : order.tag }}</span>
               <span class="order-title">{{ order.title }}</span>
             </div>
             <div class="order-right">
               <span class="order-area">{{ order.area }}</span>
               <span class="order-time">{{ order.time }}</span>
             </div>
-          </div>
+          </NuxtLink>
         </div>
+        <div v-else class="order-empty">暂无最新订单 — 可前往 <NuxtLink to="/xy">学员库</NuxtLink> 浏览全部需求</div>
       </div>
 
       <!-- ========== 家教感言 ========== -->
@@ -333,16 +340,8 @@ function getTutorDisplayName(t) {
 }
 const activeNoticeTab = ref(0)
 
-const DEFAULT_ORDERS = [
-  { tag: '急', tagClass: 'tag-urgent', title: '高二数学，每周两次上门辅导', area: '浦东新区', time: '1小时前' },
-  { tag: '新', tagClass: 'tag-new', title: '小学三年级英语，启蒙阶段', area: '徐汇区', time: '2小时前' },
-  { tag: '新', tagClass: 'tag-new', title: '初三物理化学，冲刺中考', area: '闵行区', time: '3小时前' },
-  { tag: '急', tagClass: 'tag-urgent', title: '钢琴陪练，5岁女孩入门', area: '长宁区', time: '4小时前' },
-  { tag: '新', tagClass: 'tag-new', title: '高一语文作文专项提升', area: '杨浦区', time: '5小时前' },
-  { tag: '新', tagClass: 'tag-new', title: '雅思口语7分冲刺辅导', area: '静安区', time: '6小时前' },
-]
 const latestOrdersData = ref([])
-const latestOrders = computed(() => latestOrdersData.value.length ? latestOrdersData.value : DEFAULT_ORDERS)
+const latestOrders = computed(() => latestOrdersData.value)
 
 const DEFAULT_TESTIMONIALS = [
   { name: '张女士', role: '学生家长', content: '老师非常耐心，孩子数学从70分提到了95分，非常感谢平台推荐的教员！' },
@@ -412,16 +411,33 @@ const handleLogout = () => { userStore.logout(); router.push('/') }
 const loadLatestOrders = async () => {
   try {
     const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
-    if (res?.code === 200 && Array.isArray(res.data) && res.data.length) {
-      latestOrdersData.value = res.data.map((r, i) => ({
-        tag: i < 2 ? '急' : '新',
-        tagClass: i < 2 ? 'tag-urgent' : 'tag-new',
-        title: `${r.grade || ''}${r.subject || '家教需求'}`,
-        area: r.districtName || r.cityName || '',
-        time: r.gmtCreate ? timeAgo(r.gmtCreate) : ''
-      }))
+    if (res?.code === 200 && Array.isArray(res.data)) {
+      latestOrdersData.value = res.data.map((r, i) => {
+        // 标题: 优先 admin 标题; 否则取 subjectIds CSV 第一项; 兜底 "暂无科目要求"
+        const subjectFirst = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean)[0] : ''
+        const title = r.title || subjectFirst || '暂无科目要求'
+        // 区域: 在线 → 网络授课; 否则 districtNames 第一项 / address / 区域待确认
+        let area
+        if (Number(r.teachingMethod) === 3) {
+          area = '网络授课'
+        } else if (r.districtNames) {
+          area = String(r.districtNames).split(',').map(s => s.trim()).filter(Boolean)[0] || '区域待确认'
+        } else {
+          area = '区域待确认'
+        }
+        return {
+          id: r.id,
+          displayNo: r.displayNo,
+          tag: i < 2 ? '急' : '新',
+          tagClass: i < 2 ? 'tag-urgent' : 'tag-new',
+          title,
+          area,
+          time: r.gmtCreate ? timeAgo(r.gmtCreate) : '',
+          isMatched: r.reqStatus === 3
+        }
+      })
     }
-  } catch (e) { /* keep default */ }
+  } catch (e) { /* leave empty */ }
 }
 
 const loadTestimonials = async () => {
@@ -1223,10 +1239,34 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--color-border-light);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+  border-radius: 4px;
 }
+.order-item:hover { background: #f8fafc; }
 .order-item:last-child { border-bottom: none; }
+.order-item.is-matched { opacity: 0.55; }
+.order-item.is-matched:hover { background: #f1f5f9; }
+
+.tag-done {
+  background: #e2e8f0;
+  color: #64748b;
+}
+
+.order-empty {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+.order-empty a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  margin: 0 4px;
+}
 
 .order-left {
   display: flex;
