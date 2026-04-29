@@ -91,7 +91,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 709, name: '莱芜区', pinyin: 'laiwu' },
     { id: 710, name: '高新区', pinyin: 'gaoxin' }
   ],
-  9: [ // 北京
+  10: [ // 北京
     { id: 901, name: "东城区", pinyin: "dongcheng" },
     { id: 902, name: "西城区", pinyin: "xicheng" },
     { id: 903, name: "朝阳区", pinyin: "chaoyang" },
@@ -109,7 +109,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 915, name: "密云区", pinyin: "miyun" },
     { id: 916, name: "延庆区", pinyin: "yanqing" }
   ],
-  10: [ // 天津
+  12: [ // 天津
     { id: 1001, name: "和平区", pinyin: "heping" },
     { id: 1002, name: "河东区", pinyin: "hedong" },
     { id: 1003, name: "河西区", pinyin: "hexi" },
@@ -140,7 +140,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 1110, name: "从化区", pinyin: "conghua" },
     { id: 1111, name: "增城区", pinyin: "zengcheng" }
   ],
-  12: [ // 武汉
+  13: [ // 武汉
     { id: 1201, name: "江岸区", pinyin: "jiangan" },
     { id: 1202, name: "江汉区", pinyin: "jianghan" },
     { id: 1203, name: "硚口区", pinyin: "qiaokou" },
@@ -167,7 +167,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 808, name: '安义县', pinyin: 'anyi' },
     { id: 809, name: '进贤县', pinyin: 'jinxian' }
   ],
-  13: [ // 郑州
+  14: [ // 郑州
     { id: 1301, name: '中原区', pinyin: 'zhongyuan' },
     { id: 1302, name: '二七区', pinyin: 'erqi' },
     { id: 1303, name: '管城回族区', pinyin: 'guancheng' },
@@ -184,7 +184,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 1314, name: '经开区', pinyin: 'jingkai' },
     { id: 1315, name: '郑东新区', pinyin: 'zhengdong' }
   ],
-  14: [ // 重庆
+  15: [ // 重庆
     { id: 1401, name: '渝中区', pinyin: 'yuzhong' },
     { id: 1402, name: '江北区', pinyin: 'jiangbei' },
     { id: 1403, name: '南岸区', pinyin: 'nanan' },
@@ -198,7 +198,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 1411, name: '璧山区', pinyin: 'bishan' },
     { id: 1412, name: '永川区', pinyin: 'yongchuan' }
   ],
-  15: [ // 西安
+  16: [ // 西安
     { id: 1501, name: '新城区', pinyin: 'xincheng' },
     { id: 1502, name: '碑林区', pinyin: 'beilin' },
     { id: 1503, name: '莲湖区', pinyin: 'lianhu' },
@@ -213,7 +213,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 1512, name: '高新区', pinyin: 'gaoxin' },
     { id: 1513, name: '曲江新区', pinyin: 'qujiang' }
   ],
-  16: [ // 成都
+  17: [ // 成都
     { id: 1601, name: '锦江区', pinyin: 'jinjiang' },
     { id: 1602, name: '青羊区', pinyin: 'qingyang' },
     { id: 1603, name: '金牛区', pinyin: 'jinniu' },
@@ -228,7 +228,7 @@ const cityDistricts: Record<number, { id: number; name: string; pinyin: string }
     { id: 1612, name: '天府新区', pinyin: 'tianfu' },
     { id: 1613, name: '高新区', pinyin: 'gaoxin' }
   ],
-  17: [ // 长沙
+  18: [ // 长沙
     { id: 1701, name: '芙蓉区', pinyin: 'furong' },
     { id: 1702, name: '天心区', pinyin: 'tianxin' },
     { id: 1703, name: '岳麓区', pinyin: 'yuelu' },
@@ -291,7 +291,7 @@ const cityUniversities: Record<number, string[]> = {
     '山东艺术学院', '山东体育学院', '山东女子学院', '山东交通学院',
     '齐鲁师范学院', '山东英才学院'
   ],
-  9: [
+  10: [
     "北京大学", "清华大学", "中国人民大学", "北京师范大学",
     "北京航空航天大学", "北京理工大学", "中国农业大学", "北京林业大学",
     "北京中医药大学", "中央财经大学", "对外经济贸易大学", "北京外国语大学",
@@ -301,7 +301,7 @@ const cityUniversities: Record<number, string[]> = {
     "中央美术学院", "北京体育大学", "北京第二外国语学院", "中国科学院大学",
     "北京协和医学院", "中国音乐学院"
   ],
-  10: [
+  12: [
     "南开大学", "天津大学", "天津师范大学", "天津医科大学",
     "天津工业大学", "天津理工大学", "天津财经大学", "天津外国语大学",
     "天津体育学院", "天津音乐学院", "天津美术学院", "天津中医药大学",
@@ -314,7 +314,7 @@ const cityUniversities: Record<number, string[]> = {
     "星海音乐学院", "广东财经大学", "广州体育学院", "广州航海学院",
     "广东技术师范大学", "仲恺农业工程学院"
   ],
-  12: [
+  13: [
     "武汉大学", "华中科技大学", "武汉理工大学", "华中师范大学",
     "华中农业大学", "中国地质大学(武汉)", "中南财经政法大学", "武汉科技大学",
     "湖北大学", "武汉工程大学", "武汉纺织大学", "湖北工业大学",
@@ -327,32 +327,32 @@ const cityUniversities: Record<number, string[]> = {
     '江西科技师范大学', '南昌工程学院', '江西警察学院', '豫章师范学院',
     '南昌理工学院', '江西应用科技学院'
   ],
-  13: [
+  14: [
     '郑州大学', '河南大学(郑州校区)', '河南农业大学', '河南工业大学',
     '河南财经政法大学', '华北水利水电大学', '河南中医药大学', '郑州轻工业大学',
     '中原工学院', '河南牧业经济学院', '郑州航空工业管理学院', '河南工程学院',
     '郑州师范学院', '河南警察学院', '郑州大学体育学院', '河南财政金融学院'
   ],
-  14: [
+  15: [
     '重庆大学', '西南大学', '西南政法大学', '重庆医科大学',
     '重庆邮电大学', '重庆交通大学', '重庆师范大学', '重庆工商大学',
     '重庆理工大学', '四川外国语大学', '重庆科技大学', '重庆文理学院',
     '长江师范学院', '重庆第二师范学院', '四川美术学院', '重庆三峡学院'
   ],
-  15: [
+  16: [
     '西安交通大学', '西北工业大学', '西安电子科技大学', '西北大学',
     '长安大学', '陕西师范大学', '西安建筑科技大学', '西安理工大学',
     '西安科技大学', '西安石油大学', '陕西科技大学', '西安工程大学',
     '西安外国语大学', '西北政法大学', '西安邮电大学', '西安财经大学',
     '西安音乐学院', '西安美术学院', '西安体育学院', '空军军医大学'
   ],
-  16: [
+  17: [
     '四川大学', '电子科技大学', '西南交通大学', '西南财经大学',
     '成都理工大学', '西南民族大学', '成都中医药大学', '四川师范大学',
     '西华大学', '成都信息工程大学', '成都大学', '成都体育学院',
     '四川音乐学院', '成都工业学院', '成都师范学院', '四川旅游学院'
   ],
-  17: [
+  18: [
     '中南大学', '湖南大学', '湖南师范大学', '湖南农业大学',
     '中南林业科技大学', '长沙理工大学', '湖南中医药大学', '湖南工商大学',
     '长沙学院', '湖南第一师范学院', '湖南财政经济学院', '湖南警察学院',

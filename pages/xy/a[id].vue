@@ -276,18 +276,18 @@ const genderLabel = (g, defaultLbl = '不限') => {
 
 const subjectsLabel = computed(() => {
   const v = req.value?.subjectNames || req.value?.subjectIds || ''
-  return Array.isArray(v) ? v.join(' · ') : String(v).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
+  return Array.isArray(v) ? v.join(' · ') : String(v).split(',').map((x) => x.trim()).filter(Boolean).join(' · ')
 })
 const locationLabel = computed(() => {
   if (!req.value) return ''
   const dn = req.value.districtNames
-  if (dn) return String(dn).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
+  if (dn) return String(dn).split(',').map((x) => x.trim()).filter(Boolean).join(' · ')
   return req.value.districtName || ''
 })
 const tutorTypeLabel = computed(() => {
   const v = req.value?.tutorTypePref
   if (!v) return ''
-  return String(v).split(',').map((x: string) => x.trim()).filter(Boolean).join(' · ')
+  return String(v).split(',').map((x) => x.trim()).filter(Boolean).join(' · ')
 })
 
 const shortDate = (s) => {
