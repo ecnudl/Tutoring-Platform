@@ -56,7 +56,7 @@ public class ApiRequirementBiz extends BaseBiz {
         // SQL 排序: MATCHED 沉底, 同状态 id desc
         example.setOrderByClause(
                 "CASE WHEN req_status = " + RequirementStatusEnum.MATCHED.getCode()
-                        + " THEN 1 ELSE 0 END ASC, id DESC");
+                        + " THEN 1 ELSE 0 END ASC, is_urgent DESC, id DESC");
         // 一次性拉全部 (PUBLISHED + MATCHED). 当前规模可接受.
         Page<TutorRequirement> rawPage = tutorRequirementDao.page(1, 5000, example);
         java.util.List<TutorRequirement> all = rawPage.getList() != null ? rawPage.getList() : java.util.Collections.emptyList();
@@ -222,7 +222,7 @@ public class ApiRequirementBiz extends BaseBiz {
 
         example.setOrderByClause(
                 "CASE WHEN req_status = " + RequirementStatusEnum.MATCHED.getCode()
-                        + " THEN 1 ELSE 0 END ASC, id DESC");
+                        + " THEN 1 ELSE 0 END ASC, is_urgent DESC, id DESC");
         // 多取一些以备 24h 过滤
         Page<TutorRequirement> page = tutorRequirementDao.page(1, limit * 2, example);
         applyMatchedCutoff(page);
@@ -247,7 +247,7 @@ public class ApiRequirementBiz extends BaseBiz {
 
         example.setOrderByClause(
                 "CASE WHEN req_status = " + RequirementStatusEnum.MATCHED.getCode()
-                        + " THEN 1 ELSE 0 END ASC, id DESC");
+                        + " THEN 1 ELSE 0 END ASC, is_urgent DESC, id DESC");
         Page<TutorRequirement> page = tutorRequirementDao.page(1, limit, example);
         applyMatchedCutoff(page);
         return Result.success(BeanUtil.copyProperties(page.getList(), RequirementListResp.class));
@@ -276,7 +276,7 @@ public class ApiRequirementBiz extends BaseBiz {
         requirement.setTeachingMethod(req.getTeachingMethod() != null ? req.getTeachingMethod() : 0);
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         // 生成展示编号
-        requirement.setDisplayNo("A" + (100000 + requirement.getId() % 900000));
+        requirement.setDisplayNo("S" + (100000 + requirement.getId() % 900000));
         requirement.setTitle(req.getRequirementDetail() != null && req.getRequirementDetail().length() > 20
                 ? req.getRequirementDetail().substring(0, 20) : req.getRequirementDetail());
         tutorRequirementDao.save(requirement);

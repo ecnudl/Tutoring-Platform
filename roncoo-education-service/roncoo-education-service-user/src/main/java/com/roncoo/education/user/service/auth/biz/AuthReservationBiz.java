@@ -138,10 +138,10 @@ public class AuthReservationBiz extends BaseBiz {
         if (subjectId != null) requirement.setSubjectIds(subjectId.toString());
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         tutorRequirementDao.save(requirement);
-        // 落库后回填 display_no (公开详情页按 A + 6 位数字 查找)
+        // 落库后回填 display_no (公开详情页按 S + 6 位数字 查找)
         TutorRequirement upDisplay = new TutorRequirement();
         upDisplay.setId(requirement.getId());
-        upDisplay.setDisplayNo("A" + (100000 + requirement.getId() % 900000));
+        upDisplay.setDisplayNo("S" + (100000 + requirement.getId() % 900000));
         tutorRequirementDao.updateById(upDisplay);
         requirement.setDisplayNo(upDisplay.getDisplayNo());
 

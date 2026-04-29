@@ -246,7 +246,7 @@ public class AdminRequirementBiz extends BaseBiz {
     private static String generateDisplayNo(Long id) {
         // A + 6 位数字, 取雪花 id 后 6 位再做 padding
         long abs = Math.abs(id);
-        return "A" + (100000 + abs % 900000);
+        return "S" + (100000 + abs % 900000);
     }
 
     private void sendMsg(Long userId, String title, String content) {
