@@ -124,9 +124,7 @@ public class AuthReservationBiz extends BaseBiz {
         TutorRequirement requirement = new TutorRequirement();
         requirement.setUserId(userId);
         requirement.setTargetTutorUserId(tutorUserId);
-        String tutorName = (tutorProfile.getRealName() != null && !tutorProfile.getRealName().isEmpty())
-                ? tutorProfile.getRealName() : "教";
-        requirement.setTitle("定向预约 " + tutorName.charAt(0) + "教员 (" + (tutorProfile.getDisplayNo() == null ? "" : tutorProfile.getDisplayNo()) + ")");
+        // title 不再自动写 "定向预约 X 教员" — 由 admin 后续编辑时手填. 列表/详情页前端 fallback 到科目.
         requirement.setRequirementDetail(remark);
         requirement.setContactName(contactName);
         requirement.setContactMobile(contactMobile);
