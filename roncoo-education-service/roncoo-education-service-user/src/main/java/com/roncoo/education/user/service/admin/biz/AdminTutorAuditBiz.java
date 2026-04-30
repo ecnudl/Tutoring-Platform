@@ -220,6 +220,25 @@ public class AdminTutorAuditBiz extends BaseBiz {
     }
 
     /**
+     * 近期被编辑的教员资料: 已审核通过 (audit_status=3 PUBLISHED 或 4 APPROVED) 的 profile 中,
+     * 按 gmt_modified 倒序, 默认返回最近 30 天的最多 50 条. 用于运营周期性巡检教员是否擅自修改了已审核内容.
+     */
+    public Result<?> recentEditedProfiles(Map<String, Object> req) {
+        int days = req.get("days") != null ? Integer.parseInt(req.get("days").toString()) : 30;
+        int limit = req.get("limit") != null ? Integer.parseInt(req.get("limit").toString()) : 50;
+
+        TutorProfileExample example = new TutorProfileExample();
+        TutorProfileExample.Criteria c = example.createCriteria();
+        c.andAuditStatusIn(java.util.Arrays.asList(3, 4));
+        c.andGmtModifiedGreaterThanOrEqualTo(java.time.LocalDateTime.now().minusDays(days));
+        example.setOrderByClause("gmt_modified desc");
+
+        com.roncoo.education.common.base.page.Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile> page =
+                tutorProfileDao.page(1, limit, example);
+        return Result.success(page);
+    }
+
+    /**
      * 分页查询所有教员的证件（连带教员姓名、手机号），供 admin 证件审核页使用
      */
     public Result<?> certPage(Map<String, Object> req) {

@@ -50,6 +50,8 @@ public final class Constants {
          * 微信用户信息
          */
         String WX_USER = "wx:user:";
+        /** 公开端点 IP 限流: rl:ip:{endpoint}:{ip} */
+        String RATE_LIMIT_IP = "rl:ip:";
     }
 
 }

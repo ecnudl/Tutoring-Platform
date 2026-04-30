@@ -152,6 +152,11 @@ public class AuthApplicationBiz extends BaseBiz {
         if (req == null || !req.getUserId().equals(userId)) {
             return Result.error("无权操作此申请");
         }
+        // 需求必须仍在 PUBLISHED 状态才允许 accept/reject 申请;
+        // admin 通过 confirmMatch 已锁定后, 家长不能再切换其他申请的状态
+        if (!RequirementStatusEnum.PUBLISHED.getCode().equals(req.getReqStatus())) {
+            return Result.error("此需求已不再接受新决策 (已匹配 / 已关闭)");
+        }
         if (requiredFrom != null && !requiredFrom.getCode().equals(app.getAppStatus())) {
             return Result.error("当前状态不允许此操作");
         }

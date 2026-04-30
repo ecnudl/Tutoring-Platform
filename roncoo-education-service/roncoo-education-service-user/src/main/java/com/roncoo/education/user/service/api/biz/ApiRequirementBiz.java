@@ -3,10 +3,13 @@ package com.roncoo.education.user.service.api.biz;
 import com.roncoo.education.common.base.BaseBiz;
 import com.roncoo.education.common.base.page.Page;
 import com.roncoo.education.common.base.page.PageUtil;
+import com.roncoo.education.common.cache.CacheRedis;
+import com.roncoo.education.common.core.base.Constants;
 import com.roncoo.education.common.core.base.Result;
 import com.roncoo.education.common.core.enums.RequirementStatusEnum;
 import com.roncoo.education.common.tools.BeanUtil;
 import com.roncoo.education.common.tools.IdWorker;
+import com.roncoo.education.common.tools.IpUtil;
 import com.roncoo.education.user.dao.TutorRequirementDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample;
@@ -15,6 +18,7 @@ import com.roncoo.education.user.service.api.req.RequirementSearchReq;
 import com.roncoo.education.user.service.api.resp.RequirementDetailResp;
 import com.roncoo.education.user.service.api.resp.RequirementListResp;
 import com.roncoo.education.user.service.api.resp.RequirementSearchResp;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +27,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * API-需求列表
@@ -35,6 +40,10 @@ public class ApiRequirementBiz extends BaseBiz {
 
     @NotNull
     private final TutorRequirementDao tutorRequirementDao;
+    @NotNull
+    private final CacheRedis cacheRedis;
+    @NotNull
+    private final HttpServletRequest request;
 
     /**
      * 需求搜索（分页+多条件）
@@ -263,6 +272,26 @@ public class ApiRequirementBiz extends BaseBiz {
         if (!StringUtils.hasText(req.getContactMobile())) {
             return Result.error("联系电话不能为空");
         }
+        // 手机号格式校验, 拦掉明显的假数据
+        if (!req.getContactMobile().matches("^1[3-9]\\d{9}$")) {
+            return Result.error("手机号格式不正确");
+        }
+        // 字段长度上限, 防巨大文本撑爆审核队列
+        if (req.getContactName().length() > 50
+                || (req.getContactWechat() != null && req.getContactWechat().length() > 50)
+                || (req.getRequirementDetail() != null && req.getRequirementDetail().length() > 500)) {
+            return Result.error("提交内容超过长度限制");
+        }
+        // IP 维度限流: 每 IP 每小时最多 3 次, 防游客接口被刷
+        String ip = IpUtil.getIpAddress(request);
+        String rateKey = Constants.RedisPre.RATE_LIMIT_IP + "qjj:" + ip;
+        String cnt = cacheRedis.get(rateKey);
+        int n = StringUtils.hasText(cnt) ? Integer.parseInt(cnt) : 0;
+        if (n >= 3) {
+            return Result.error("您的提交过于频繁, 请稍后再试");
+        }
+        cacheRedis.set(rateKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
+
         TutorRequirement requirement = new TutorRequirement();
         requirement.setId(IdWorker.getId());
         requirement.setUserId(0L); // 游客

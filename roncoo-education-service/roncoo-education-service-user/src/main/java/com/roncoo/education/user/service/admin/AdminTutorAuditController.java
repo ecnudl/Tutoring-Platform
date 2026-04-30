@@ -33,4 +33,7 @@ public class AdminTutorAuditController {
     public Result<String> certReject(@RequestBody java.util.Map<String, Object> req) { return biz.certReject(req); }
     @SysLog(value = "设置/取消明星教员") @ApiOperation(value = "设置/取消明星教员") @PutMapping("/star")
     public Result<String> setStar(@RequestBody java.util.Map<String, Object> req) { return biz.setStar(req); }
+
+    @ApiOperation(value = "近期被编辑的教员资料") @PostMapping("/recent-edited")
+    public Result<?> recentEdited(@RequestBody java.util.Map<String, Object> req) { return biz.recentEditedProfiles(req); }
 }

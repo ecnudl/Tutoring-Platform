@@ -70,4 +70,11 @@ public class LoginConfig implements Serializable {
      * 小程序App Secret
      */
     private String wxMaLoginAppSecret;
+
+    /**
+     * SMS 短信强校验开关. "1" = 强校验 (Redis 必须有码) / 其他 (含 null) = 软放行
+     * 临时上线没接 SMS 时为软放行; 接入 SMS 后通过 sys_config 改成 "1" 即可
+     * sys_config 字段名: smsEnabled
+     */
+    private String smsEnabled;
 }

@@ -138,6 +138,10 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("账号或者密码不正确");
         }
 
+        // 状态校验 (RSA login 不区分角色, 仅校验账号是否被禁用)
+        Result<UsersLoginResp> denied = validateLoginUser(user, null);
+        if (denied != null) return denied;
+
         // 解密
         String mobilePsw = decrypt(req.getMobilePwdEncrypt());
         if (!StringUtils.hasText(mobilePsw)) {
@@ -459,6 +463,17 @@ public class ApiUsersBiz extends BaseBiz {
      */
     public Result<String> getSecurityQuestion(String mobile) {
         if (!StringUtils.hasText(mobile)) return Result.error("手机号不能为空");
+
+        // IP 维度限流: 每 IP 每分钟最多 5 次, 防枚举哪些手机有安全问题
+        String ip = IpUtil.getIpAddress(request);
+        String rateKey = Constants.RedisPre.RATE_LIMIT_IP + "secq:" + ip;
+        String cnt = cacheRedis.get(rateKey);
+        int n = StringUtils.hasText(cnt) ? Integer.parseInt(cnt) : 0;
+        if (n >= 5) {
+            return Result.error("操作过于频繁, 请稍后再试");
+        }
+        cacheRedis.set(rateKey, String.valueOf(n + 1), 60, java.util.concurrent.TimeUnit.SECONDS);
+
         Users user = usersDao.getByMobile(mobile);
         // 不区分"未注册"vs"未设安全问题", 统一提示, 防账号枚举
         if (user == null || !StringUtils.hasText(user.getSecurityQuestion())) {
@@ -657,6 +672,9 @@ public class ApiUsersBiz extends BaseBiz {
         // 手机号重复校验
         Users user = usersDao.getByMobile(req.getMobile());
         if (ObjectUtil.isNotNull(user)) {
+            // 状态校验: 被禁用账号不允许微信绑定登录
+            Result<UsersLoginResp> denied = validateLoginUser(user, null);
+            if (denied != null) return denied;
             if (StringUtils.hasText(user.getUnionId()) || StringUtils.hasText(user.getOpenId())) {
                 return Result.error("该手机号已绑定，请更换其他手机号");
             }
@@ -757,5 +775,19 @@ public class ApiUsersBiz extends BaseBiz {
             return "该手机号是家长账号，请切换到家长登录页面";
         }
         return "账号类型不匹配当前登录入口";
+    }
+
+    /**
+     * 登录前置校验: 账号状态 + 期望角色. 任一不通过返回 Result.error, 通过返回 null.
+     * 所有登录入口 (login / loginSimple / loginBySms / wxBinding / wxCode / loginByMobileOnly) 都过此 helper.
+     */
+    private Result<UsersLoginResp> validateLoginUser(Users user, Integer expectedUserType) {
+        if (user.getStatusId() != null && user.getStatusId() != 1) {
+            return Result.error("账号状态异常，请联系管理员");
+        }
+        if (expectedUserType != null && user.getUserType() != null && !expectedUserType.equals(user.getUserType())) {
+            return Result.error(roleMismatchMsg(user.getUserType()));
+        }
+        return null;
     }
 }
