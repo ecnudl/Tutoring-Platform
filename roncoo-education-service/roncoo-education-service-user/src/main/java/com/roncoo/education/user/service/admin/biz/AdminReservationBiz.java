@@ -127,14 +127,20 @@ public class AdminReservationBiz extends BaseBiz {
         if (r.getRequirementId() == null) return Result.error("该预约未关联需求");
         TutorRequirement requirement = tutorRequirementDao.getById(r.getRequirementId());
         if (requirement == null) return Result.error("关联需求不存在");
-        // 关联需求必须仍是 PENDING (待审核) 才允许直接发布; 已处理过的不允许覆盖
-        if (!RequirementStatusEnum.PENDING.getCode().equals(requirement.getReqStatus())) {
-            return Result.error("关联需求当前状态不允许转入公开池");
+        // 允许从 PENDING (待审核) 或 PUBLISHED (含 target_tutor_user_id 的定向状态) 转公开池;
+        // MATCHED/CLOSED/REJECTED/DRAFT 不允许 (已锁定教员或已下架)
+        Integer st = requirement.getReqStatus();
+        boolean canPublish = RequirementStatusEnum.PENDING.getCode().equals(st)
+                || RequirementStatusEnum.PUBLISHED.getCode().equals(st);
+        if (!canPublish) {
+            return Result.error("关联需求当前状态不允许转入公开池 (状态: " + st + ")");
         }
 
         TutorRequirement reqUp = new TutorRequirement();
         reqUp.setId(requirement.getId());
         reqUp.setReqStatus(RequirementStatusEnum.PUBLISHED.getCode());
+        // 清除目标教员锁定: 让所有教员都看到, 不再仅定向给原教员
+        reqUp.setTargetTutorUserId(0L);
         tutorRequirementDao.updateById(reqUp);
         // reservation 也置为 cancelled (因为目标教员不接), 学员可被告知已转入公开池
         TutorReservation upd = new TutorReservation();
