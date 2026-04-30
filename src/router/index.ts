@@ -7,6 +7,7 @@ const routes = [
     { path: 'tutor/audit', component: () => import('@/views/tutor/TutorAudit.vue') },
     { path: 'cert/audit', component: () => import('@/views/cert/CertAudit.vue') },
     { path: 'tutor/list', component: () => import('@/views/tutor/TutorList.vue') },
+    { path: 'tutor/recent-edited', component: () => import('@/views/tutor/RecentEdited.vue') },
     { path: 'tutor/detail/:id', component: () => import('@/views/tutor/TutorDetail.vue') },
     { path: 'requirement/audit', component: () => import('@/views/requirement/RequirementAudit.vue') },
     { path: 'requirement/list', component: () => import('@/views/requirement/RequirementList.vue') },
