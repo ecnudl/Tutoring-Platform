@@ -71,7 +71,7 @@ INSERT IGNORE INTO `sys_config` (`id`, `config_type`, `content_type`, `config_na
 '[{"group":"找家教","items":[{"label":"教员库","href":"/jy"},{"label":"学员库","href":"/xy"},{"label":"请家教","href":"/qjj"},{"label":"价格参考","href":"/zf"}]},{"group":"教员入口","items":[{"label":"教员注册","href":"/register/teacher"},{"label":"教员登录","href":"/login"},{"label":"个人中心","href":"/center"}]},{"group":"帮助与支持","items":[{"label":"帮助中心","href":"/help"},{"label":"用户协议","href":"/agreement/user"},{"label":"隐私政策","href":"/agreement/privacy"},{"label":"免责声明","href":"/agreement/disclaimer"}]},{"group":"关于我们","items":[{"label":"联系我们","href":"/about/contact"},{"label":"服务号","href":"/about/wechat"},{"label":"公司简介","href":"/about/intro"},{"label":"隐私保护","href":"/agreement/privacy"}]}]',
 1, 41),
 (117, 6, 1, '价格说明列表 JSON',     'sitePriceNotesJson',
-'["以上价格为上门一对一辅导参考价格，在线辅导一般可享 8-9折 优惠。","艺术类（钢琴、美术、书法等）价格另议，通常高于文化课 20%-50%。","小语种（日语、法语、德语等）价格参考大学/成人栏目。","首次上课可安排免费试讲30分钟（需与教员协商）。","平台不收取中介费，教员课时费由教员自定，家长与教员直接结算。","以上价格仅供参考，具体价格请与教员沟通确认。"]',
+'["以上价格为上门一对一辅导参考价格，在线辅导一般可享 8-9折 优惠。","艺术类（钢琴、美术、书法等）价格另议，通常高于文化课 20%-50%。","小语种（日语、法语、德语等）价格参考大学/成人栏目。","首次上课可安排免费试讲30分钟（需与教员协商）。","<strong>课时费由教员自定</strong>。续单课时费由家长直接结算给教员（不经平台）；首单课时费会作为教员侧中介费上缴客服，详见上方中介费政策。","以上价格仅供参考，具体价格请与教员沟通确认。"]',
 1, 42);
 
 -- ========== 4. 公告种子数据 ==========
