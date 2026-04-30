@@ -151,7 +151,7 @@ ON DUPLICATE KEY UPDATE `price_min`=VALUES(`price_min`);
 -- ===========================================================
 INSERT INTO `homepage_config` (`id`, `city_id`, `config_key`, `config_value`) VALUES
 (7301, 5, 'hotline',       '400-000-0000'),
-(7302, 5, 'hotline_hours', '周一至周日 9:00-20:00'),
+(7302, 5, 'hotline_hours', '周一至周日 9:00-21:00'),
 (7303, 5, 'seo_title',     '南京家教_南京家教网_南京找家教老师'),
 (7304, 5, 'seo_desc',      '南京家教平台为您提供优质南京家教老师，覆盖南京11区，涵盖小学、初中、高中全科及艺术特长辅导，大学生家教、专职教师、在职教师任您选择。'),
 (7305, 5, 'seo_keywords',  '南京家教,南京家教网,南京找家教,南京家教老师,南京一对一家教'),

@@ -204,7 +204,7 @@ ON DUPLICATE KEY UPDATE `price_min`=VALUES(`price_min`);
 -- ===========================================================
 INSERT INTO `homepage_config` (`id`, `city_id`, `config_key`, `config_value`) VALUES
 (7001, 1, 'hotline',       '400-000-0000'),
-(7002, 1, 'hotline_hours', '周一至周日 9:00-20:00'),
+(7002, 1, 'hotline_hours', '周一至周日 9:00-21:00'),
 (7003, 1, 'seo_title',     '上海家教_上海家教网_上海找家教老师'),
 (7004, 1, 'seo_desc',      '上海家教平台为您提供优质上海家教老师，覆盖上海16区，涵盖小学、初中、高中全科及艺术特长辅导，大学生家教、专职教师、在职教师任您选择。'),
 (7005, 1, 'seo_keywords',  '上海家教,上海家教网,上海找家教,上海家教老师,上海一对一家教'),

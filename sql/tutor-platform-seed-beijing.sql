@@ -180,7 +180,7 @@ ON DUPLICATE KEY UPDATE `price_min`=VALUES(`price_min`);
 -- ===========================================================
 INSERT INTO `homepage_config` (`id`, `city_id`, `config_key`, `config_value`) VALUES
 (7401, 6, 'hotline',       '400-000-0000'),
-(7402, 6, 'hotline_hours', '周一至周日 9:00-20:00'),
+(7402, 6, 'hotline_hours', '周一至周日 9:00-21:00'),
 (7403, 6, 'seo_title',     '北京家教_北京家教网_北京找家教老师'),
 (7404, 6, 'seo_desc',      '北京家教平台为您提供优质北京家教老师，覆盖北京16区，涵盖小学、初中、高中全科及艺术特长辅导，大学生家教、专职教师、在职教师任您选择。'),
 (7405, 6, 'seo_keywords',  '北京家教,北京家教网,北京找家教,北京家教老师,北京一对一家教'),
