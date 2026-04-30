@@ -176,7 +176,7 @@
               <div>
                 <div class="cs-lbl">客服热线</div>
                 <a :href="`tel:${csHotline}`" class="cs-val">{{ csHotline }}</a>
-                <div class="cs-fine">9:00 — 20:00</div>
+                <div class="cs-fine">周一至周日 9:00-21:00</div>
               </div>
             </li>
             <li>

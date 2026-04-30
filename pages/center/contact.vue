@@ -16,7 +16,7 @@
           <div>
             <h4>客服电话</h4>
             <p class="contact-value">400-888-0000</p>
-            <p class="contact-note">工作日 9:00 - 18:00</p>
+            <p class="contact-note">周一至周日 9:00 - 21:00</p>
           </div>
         </div>
 
