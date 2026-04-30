@@ -65,7 +65,12 @@
       <el-form :model="form" label-width="100px" label-position="right">
         <el-row :gutter="16">
           <el-col :span="24">
-            <el-form-item label="标题"><el-input v-model="form.title" maxlength="100" placeholder="如: 浦东新区·一年级·全科" /></el-form-item>
+            <el-form-item label="标题">
+              <el-input v-model="form.title" maxlength="100" placeholder="如: 浦东·初二·英语数学双科" />
+              <div style="font-size:12px;color:#94a3b8;margin-top:4px;line-height:1.5">
+                前台首页/学员库/详情页都用这个标题; 留空则展示科目列表 (如 "数学、英语"), 都没有时显示 "暂无科目要求"
+              </div>
+            </el-form-item>
           </el-col>
 
           <el-col :span="8">
