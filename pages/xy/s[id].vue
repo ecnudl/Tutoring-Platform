@@ -70,7 +70,7 @@
             <span class="pill pill-mode" v-if="req.teachingMethod">{{ teachingMethodMap[req.teachingMethod] }}</span>
           </div>
 
-          <h1 class="xa-title">{{ req.title || '家教需求' }}</h1>
+          <h1 class="xa-title">{{ pageTitle }}</h1>
 
           <div class="xa-meta-row">
             <div class="xa-no-stamp">
@@ -149,7 +149,7 @@
           <h3 class="xa-h"><span class="bullet"></span>相关订单</h3>
           <NuxtLink v-for="r in related" :key="r.id" :to="'/xy/s' + (r.displayNo || '').replace(/^S/i, '')" class="xa-rel-item">
             <div class="rel-head">
-              <span class="rel-title">{{ r.title || '家教需求' }}</span>
+              <span class="rel-title">{{ buildRelTitle(r) }}</span>
               <span class="rel-no mono">{{ r.displayNo }}</span>
             </div>
             <div class="rel-meta">
@@ -289,6 +289,21 @@ const tutorTypeLabel = computed(() => {
   if (!v) return ''
   return String(v).split(',').map((x) => x.trim()).filter(Boolean).join(' · ')
 })
+// 大标题: admin 填的 title > 科目 CSV > "暂无科目要求"
+const pageTitle = computed(() => {
+  const t = req.value?.title
+  if (t && String(t).trim()) return t
+  return subjectsLabel.value || '暂无科目要求'
+})
+// 相关订单标题同样降级
+const buildRelTitle = (r) => {
+  if (r && r.title && String(r.title).trim()) return r.title
+  if (r && r.subjectIds) {
+    const subs = String(r.subjectIds).split(',').map((x) => x.trim()).filter(Boolean).join('、')
+    if (subs) return subs
+  }
+  return '暂无科目要求'
+}
 
 const shortDate = (s) => {
   if (!s) return ''

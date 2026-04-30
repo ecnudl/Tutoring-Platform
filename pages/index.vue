@@ -414,9 +414,9 @@ const loadLatestOrders = async () => {
     const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
     if (res?.code === 200 && Array.isArray(res.data)) {
       latestOrdersData.value = res.data.map((r) => {
-        // 标题: 只用 subjectIds CSV 拼接 (用 "、"); 不显示 admin 标题; 兜底 "暂无科目要求"
+        // 标题优先级: admin 手填 title > subjectIds CSV 拼接 > "暂无科目要求"
         const subjects = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean).join('、') : ''
-        const title = subjects || '暂无科目要求'
+        const title = (r.title && r.title.trim()) || subjects || '暂无科目要求'
         // 区域: 在线 → 网络授课; 否则 districtNames 第一项 / address / 区域待确认
         let area
         if (Number(r.teachingMethod) === 3) {

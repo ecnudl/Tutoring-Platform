@@ -180,6 +180,8 @@ const csvJoin = (s) => {
   return String(s).split(',').map(x => x.trim()).filter(Boolean).join('、')
 }
 const buildCardTitle = (r) => {
+  // 标题优先级: admin 手填 title > subjectIds 拼接 > "暂无科目要求"
+  if (r && r.title && String(r.title).trim()) return r.title
   const subjects = csvJoin(r.subjectIds)
   return subjects || '暂无科目要求'
 }
