@@ -254,10 +254,9 @@
           <NuxtLink to="/xy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
         <div class="order-list" v-if="latestOrders.length">
-          <NuxtLink
+          <div
             v-for="order in latestOrders"
             :key="order.id"
-            :to="order.isMatched ? '/xy' : ('/xy/s' + (order.displayNo ? order.displayNo.replace(/^S/i, '') : order.id))"
             class="order-item"
             :class="{ 'is-matched': order.isMatched }"
           >
@@ -269,8 +268,14 @@
             <div class="order-right">
               <span class="order-area">{{ order.area }}</span>
               <span class="order-time">{{ order.time }}</span>
+              <span v-if="order.isMatched" class="order-btn order-btn-done" aria-disabled="true">已接单</span>
+              <NuxtLink
+                v-else
+                class="order-btn"
+                :to="'/xy/s' + (order.displayNo ? order.displayNo.replace(/^S/i, '') : order.id)"
+              >详情 →</NuxtLink>
             </div>
-          </NuxtLink>
+          </div>
         </div>
         <div v-else class="order-empty">暂无最新订单 — 可前往 <NuxtLink to="/xy">学员库</NuxtLink> 浏览全部需求</div>
       </div>
@@ -279,6 +284,7 @@
       <div class="section-box">
         <div class="section-header">
           <h2>{{ cityStore.cityName }}家教感言</h2>
+          <NuxtLink to="/center/feedback" class="share-link">分享您的感言 →</NuxtLink>
         </div>
         <div class="testimonial-grid">
           <div v-for="(t, idx) in testimonials" :key="idx" class="testimonial-card">
@@ -1164,6 +1170,24 @@ onMounted(async () => {
   font-weight: var(--font-weight-semibold);
 }
 
+/* "分享您的感言" CTA — 琥珀色描边, hover 填充, 跟首页强调色一致 */
+.share-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent-dark);
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.share-link:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
 .tutor-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -1246,14 +1270,41 @@ onMounted(async () => {
   transition: background 0.15s;
   border-radius: 4px;
 }
-.order-item:hover { background: #f8fafc; }
 .order-item:last-child { border-bottom: none; }
 .order-item.is-matched { opacity: 0.55; }
-.order-item.is-matched:hover { background: #f1f5f9; }
 
 .tag-done {
   background: #e2e8f0;
   color: #64748b;
+}
+
+/* "详情 →" 按钮: 海军蓝描边, hover 填充. 已接单灰色禁用. */
+.order-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-light);
+  border-radius: 4px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  margin-left: var(--space-sm);
+}
+.order-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.order-btn-done {
+  color: #94a3b8;
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .order-empty {

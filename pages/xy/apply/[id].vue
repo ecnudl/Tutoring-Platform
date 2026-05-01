@@ -88,11 +88,13 @@ const displayNo = route.params.id || route.params.displayNo
 const displayNoNum = computed(() => String(displayNo || '').replace(/^S/i, ''))
 
 const text = ref('')
+const mobile = ref('')
 const wx = ref('')
 const submitting = ref(false)
 const requirementId = ref(null)
 
-const canSubmit = computed(() => text.value.trim().length >= 10)
+const isValidMobile = computed(() => /^1[3-9]\d{9}$/.test(mobile.value.trim()))
+const canSubmit = computed(() => text.value.trim().length >= 10 && isValidMobile.value)
 
 // 教员鉴权
 if (process.client) {
@@ -120,7 +122,15 @@ const loadReqId = async () => {
 }
 
 const submit = async () => {
-  if (!canSubmit.value || submitting.value) return
+  if (!text.value.trim() || text.value.trim().length < 10) {
+    ElMessage.warning('请填写至少 10 字的优势说明')
+    return
+  }
+  if (!isValidMobile.value) {
+    ElMessage.warning('请填写正确的 11 位手机号')
+    return
+  }
+  if (submitting.value) return
   if (!requirementId.value) {
     ElMessage.warning('需求加载中，请稍候')
     return
@@ -135,7 +145,8 @@ const submit = async () => {
   try {
     const r = await post('/user/auth/application/apply', {
       requirementId: requirementId.value,
-      applyMessage: message
+      applyMessage: message,
+      mobile: mobile.value.trim()
     })
     if (r.code === 200) {
       await ElMessageBox.alert(

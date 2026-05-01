@@ -112,13 +112,21 @@
             </el-tab-pane>
 
             <el-tab-pane label="成功记录" name="records">
-              <div v-if="tutor.successRecords && tutor.successRecords.length">
-                <div v-for="(r, i) in tutor.successRecords" :key="i" class="record-item">
-                  <div class="record-title">{{ r.subject }} - {{ r.grade }}</div>
-                  <div class="record-meta">{{ r.district }} | {{ r.time }}</div>
+              <div v-if="tutor.showSuccessRecord === 0" class="record-empty">教员暂未公开成功记录</div>
+              <div v-else-if="tutor.successRecords && tutor.successRecords.length" class="record-list">
+                <div v-for="(r, i) in tutor.successRecords" :key="i" class="record-row">
+                  <div class="record-main">
+                    <div class="record-title">
+                      <span v-if="r.grade">{{ r.grade }}</span>
+                      <span v-if="r.subjects">{{ formatSubjects(r.subjects) }}</span>
+                      <span v-if="r.location" class="record-location">{{ r.location }}</span>
+                    </div>
+                    <div v-if="r.detail" class="record-detail">{{ r.detail }}</div>
+                  </div>
+                  <div class="record-date">{{ r.date }}</div>
                 </div>
               </div>
-              <div v-else style="padding:24px;text-align:center;color:#999">暂无成功记录</div>
+              <div v-else class="record-empty">暂无成功记录</div>
             </el-tab-pane>
           </el-tabs>
 
@@ -213,6 +221,11 @@ const handleBooking = () => {
     }
   } catch (_) {}
   router.push('/jy/booking')
+}
+
+const formatSubjects = (csv) => {
+  if (!csv) return ''
+  return String(csv).split(',').map(s => s.trim()).filter(Boolean).join(' ')
 }
 
 onMounted(() => { loadTutor() })
@@ -342,9 +355,51 @@ onMounted(() => { loadTutor() })
 .info-text { font-size: 14px; color: #666; line-height: 1.6; white-space: pre-wrap; }
 .info-text.price { color: #e6a23c; font-size: 18px; font-weight: 600; }
 
-.record-item { padding: 12px; border-bottom: 1px solid #f5f5f5; }
-.record-title { font-weight: 500; }
-.record-meta { font-size: 13px; color: #999; margin-top: 4px; }
+/* 成功记录: 跟 ttgood 风格一致 — 一行 + 日期, 下面摘要, 中间分隔线 */
+.record-list { padding: 4px 0; }
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 4px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+.record-row:last-child { border-bottom: none; }
+.record-main { flex: 1; min-width: 0; }
+.record-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+.record-location {
+  font-weight: 400;
+  color: #6b7280;
+  font-size: 13px;
+}
+.record-detail {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+.record-date {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.record-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
 
 .action-bar { margin-top: 24px; display: flex; gap: 12px; }
 

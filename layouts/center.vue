@@ -24,9 +24,8 @@
             <NuxtLink to="/center/orders">我的订单</NuxtLink>
           </div>
 
-          <div class="nav-group" v-if="userStore.isTutor">
+          <div class="nav-group">
             <NuxtLink to="/center/head-photo">形象照片</NuxtLink>
-            <NuxtLink to="/center/photos">我的相册</NuxtLink>
           </div>
 
           <div class="nav-group" v-if="userStore.isTutor">
@@ -44,7 +43,7 @@
 
           <div class="nav-group">
             <NuxtLink to="/center/credit" v-if="userStore.isTutor">信誉记录</NuxtLink>
-            <NuxtLink to="/center/feedback">{{ userStore.isTutor ? '家教感言' : '意见反馈' }}</NuxtLink>
+            <NuxtLink to="/center/feedback">家教感言</NuxtLink>
             <a href="javascript:;" @click="openPush">推送控制</a>
           </div>
 

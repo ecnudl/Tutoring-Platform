@@ -12,8 +12,8 @@
         </Head>
         <h1 class="notice-title">{{ notice.title }}</h1>
         <div class="notice-meta">
-          <span>{{ notice.date }}</span>
-          <el-tag size="small" :type="notice.tagType">{{ notice.tag }}</el-tag>
+          <span v-if="notice.date">{{ notice.date }}</span>
+          <el-tag v-if="notice.tag" size="small" :type="notice.tagType">{{ notice.tag }}</el-tag>
         </div>
         <el-divider />
         <div class="notice-content" v-html="notice.content"></div>
@@ -33,6 +33,7 @@
 const route = useRoute()
 const id = route.params.id
 
+// 硬编码 slug 公告 (向后兼容老链接, 例如 /notice/brokerage-policy)
 const noticeMap = {
   'service-upgrade': {
     title: '平台服务升级维护通知',
@@ -285,7 +286,46 @@ const noticeMap = {
 
 }
 
-const notice = noticeMap[id] || null
+const notice = ref(null)
+
+// 工具: 把 \n 当成段落, 简单 escape, 用 <p> 包. v-html 渲染时只用作段落分割.
+const escapeHtml = (s) => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+const plainTextToHtml = (text) => {
+  if (!text) return ''
+  // 已经像 HTML (含 <p>/<ul>/<h3> 等) 就直接用; 否则按行包 <p>.
+  if (/<[a-z][\s\S]*?>/i.test(text)) return text
+  return text.split(/\r?\n/).filter(Boolean).map(line => `<p>${escapeHtml(line)}</p>`).join('')
+}
+const formatDate = (raw) => {
+  if (!raw) return ''
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return String(raw).slice(0, 10)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+// 数字 id → 调后端 /system/api/announcement/view 拉数据库公告; 字符串 slug → 走 noticeMap 兜底
+if (/^\d+$/.test(String(id))) {
+  const { get } = useApi()
+  try {
+    const res = await get('/system/api/announcement/view', { id })
+    if (res?.code === 200 && res.data) {
+      const a = res.data
+      notice.value = {
+        title: a.title || '公告',
+        date: formatDate(a.gmtCreate),
+        tag: a.category === 'edu' ? '教育资讯' : (a.category === 'notify' ? '教/学员须知' : '网站公告'),
+        tagType: a.category === 'edu' ? 'success' : (a.category === 'notify' ? 'warning' : ''),
+        content: plainTextToHtml(a.content)
+      }
+    }
+  } catch (e) {
+    console.warn('[notice] fetch failed', e)
+  }
+} else {
+  notice.value = noticeMap[id] || null
+}
 </script>
 
 <style scoped>

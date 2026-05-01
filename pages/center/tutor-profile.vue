@@ -66,6 +66,12 @@
     <el-form-item label="自我介绍">
       <el-input v-model="form.selfIntroduction" type="textarea" :rows="4" placeholder="介绍您的教学经验和风格" :disabled="isLocked" />
     </el-form-item>
+    <el-form-item label="成功记录">
+      <el-switch v-model="form.showSuccessRecord" :active-value="1" :inactive-value="0" active-text="在主页展示" inactive-text="暂不展示" />
+      <div style="font-size:12px;color:#94a3b8;margin-top:4px">
+        开启后, 已撮合的订单 (脱敏) 会展示在您的教员主页, 家长更倾向选择有成功记录的教员。
+      </div>
+    </el-form-item>
     <el-form-item>
       <el-button type="primary" :loading="saving" :disabled="isLocked" @click="handleSave">保存资料</el-button>
       <el-button type="success" :loading="submitting" :disabled="!canSubmit" @click="handleSubmitAudit">提交审核</el-button>
@@ -91,7 +97,7 @@ const profile = ref({})
 const form = ref({
   avatar: '', realName: '', gender: 1, tutorType: null, degree: null,
   university: '', major: '', selfIntroduction: '',
-  priceMin: 0, priceMax: 0
+  priceMin: 0, priceMax: 0, showSuccessRecord: 1
 })
 const subjectList = ref([])
 const saving = ref(false)
@@ -138,6 +144,7 @@ const loadProfile = async () => {
       form.value.selfIntroduction = res.data.selfIntroduction || ''
       form.value.priceMin = res.data.priceMin || 0
       form.value.priceMax = res.data.priceMax || 0
+      form.value.showSuccessRecord = (res.data.showSuccessRecord === 0 || res.data.showSuccessRecord === '0') ? 0 : 1
       try {
         subjectList.value = JSON.parse(res.data.subjects || '[]').map(String)
       } catch { subjectList.value = [] }

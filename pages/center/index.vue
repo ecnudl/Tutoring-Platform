@@ -4,8 +4,8 @@
   <div class="info-card">
     <div class="info-left">
       <NuxtLink :to="isTutor ? '/center/head-photo' : '/center/profile'" class="avatar-wrap">
-        <el-avatar :size="96" :src="userStore.avatar" shape="square" class="avatar" />
-        <span v-if="!userStore.avatar" class="avatar-badge">{{ isTutor ? '头像未上传' : '暂无头像' }}</span>
+        <el-avatar :size="96" :src="avatarUrl" shape="square" class="avatar" />
+        <span v-if="!avatarUrl" class="avatar-badge">{{ isTutor ? '头像未上传' : '暂无头像' }}</span>
       </NuxtLink>
       <div class="completeness">
         <div class="comp-row">
@@ -154,6 +154,11 @@ const stats = ref({
   completeness: 0
 })
 const profile = ref(null)
+const userHead = ref('')
+const avatarUrl = computed(() => {
+  if (isTutor.value) return profile.value?.avatar || ''
+  return userHead.value || ''
+})
 
 const statusText = computed(() => {
   const s = profile.value?.auditStatus
@@ -223,6 +228,9 @@ onMounted(async () => {
     } else {
       const res = await get('/user/auth/student-profile/view').catch(() => null)
       if (res?.code === 200 && res.data) profile.value = res.data
+      // 家长头像在 users.user_head
+      const u = await get('/user/auth/users/view').catch(() => null)
+      if (u?.code === 200 && u.data?.userHead) userHead.value = u.data.userHead
     }
   } catch (e) { /* silent */ }
 
