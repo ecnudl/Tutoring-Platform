@@ -69,7 +69,10 @@
           <el-input v-model="form.content" type="textarea" :rows="6" placeholder="公告正文（浮球公告会显示，列表公告可留空）" />
         </el-form-item>
         <el-form-item label="跳转链接">
-          <el-input v-model="form.linkUrl" placeholder="如 /notice/xxx 或 https://..." />
+          <el-input v-model="form.linkUrl" placeholder="留空 = 自动跳到公告详情页（展示上面的「正文」内容）；填写 = 跳到此链接（如 /zf 或 https://...）" />
+          <div style="font-size:12px;color:#909399;line-height:1.5;margin-top:4px">
+            可以留空：用户点击该公告会自动进入"公告详情页"，页面内容就是上方填写的正文。
+          </div>
         </el-form-item>
         <el-form-item label="置顶">
           <el-switch v-model="form.isTop" :active-value="1" :inactive-value="0" />

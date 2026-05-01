@@ -15,6 +15,7 @@
       <el-table-column prop="id" label="ID" width="180" />
       <el-table-column prop="requirementId" label="需求ID" width="180" />
       <el-table-column prop="tutorId" label="教员ID" width="180" />
+      <el-table-column prop="mobile" label="联系电话" width="130" />
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="statusType(row.appStatus)" size="small">{{ statusLabel(row.appStatus) }}</el-tag>
@@ -22,9 +23,29 @@
       </el-table-column>
       <el-table-column prop="applyMessage" label="自荐语" show-overflow-tooltip />
       <el-table-column prop="gmtCreate" label="申请时间" width="170" />
-      <el-table-column label="操作" width="80">
+      <el-table-column label="操作" width="220">
         <template #default="{ row }">
           <el-button size="small" @click="viewDetail(row)">查看</el-button>
+          <el-popconfirm
+            v-if="row.appStatus === 0 || row.appStatus === 1"
+            title="确认匹配该申请? 此需求会变为已接单, 同需求其他申请自动驳回"
+            confirm-button-text="匹配"
+            cancel-button-text="取消"
+            @confirm="handleMatch(row)">
+            <template #reference>
+              <el-button size="small" type="primary">匹配</el-button>
+            </template>
+          </el-popconfirm>
+          <el-popconfirm
+            v-if="row.appStatus === 0 || row.appStatus === 1"
+            title="确认驳回该申请? 教员会收到通知, 需求继续 PUBLISHED"
+            confirm-button-text="驳回"
+            cancel-button-text="取消"
+            @confirm="handleReject(row)">
+            <template #reference>
+              <el-button size="small" type="danger" plain>驳回</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -36,6 +57,7 @@
       <el-descriptions :column="1" border v-if="detail">
         <el-descriptions-item label="需求ID">{{ detail.requirementId }}</el-descriptions-item>
         <el-descriptions-item label="教员ID">{{ detail.tutorId }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ detail.mobile || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(detail.appStatus)">{{ statusLabel(detail.appStatus) }}</el-tag>
         </el-descriptions-item>
@@ -47,7 +69,8 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { post, get } from '@/api/index'
+import { ElMessage } from 'element-plus'
+import { post, get, put } from '@/api/index'
 
 const appStatus = ref<number | null>(null)
 const list = ref<any[]>([])
@@ -79,6 +102,30 @@ const viewDetail = async (row: any) => {
     const res = await get('/user/admin/application/view', { id: row.id })
     if (res.code === 200) { detail.value = res.data; detailVisible.value = true }
   } catch (e) { console.error(e) }
+}
+
+const handleMatch = async (row: any) => {
+  try {
+    const res = await put(`/user/admin/application/match?id=${row.id}`)
+    if (res.code === 200) {
+      ElMessage.success(res.data || '已匹配')
+      await search()
+    } else {
+      ElMessage.error(res.msg || '匹配失败')
+    }
+  } catch (e) { ElMessage.error('网络错误') }
+}
+
+const handleReject = async (row: any) => {
+  try {
+    const res = await put(`/user/admin/application/reject?id=${row.id}`)
+    if (res.code === 200) {
+      ElMessage.success(res.data || '已驳回')
+      await search()
+    } else {
+      ElMessage.error(res.msg || '驳回失败')
+    }
+  } catch (e) { ElMessage.error('网络错误') }
 }
 
 onMounted(() => { search() })

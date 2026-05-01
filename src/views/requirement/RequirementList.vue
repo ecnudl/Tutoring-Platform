@@ -34,10 +34,19 @@
       <el-table-column prop="viewCount" label="浏览" width="70" />
       <el-table-column prop="applicationCount" label="申请" width="70" />
       <el-table-column prop="gmtCreate" label="创建时间" width="160" />
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="290" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click="openEdit(row)">编辑</el-button>
           <el-button size="small" type="warning" @click="openMatch(row)" v-if="row.reqStatus !== 3 && row.reqStatus !== 5">接单确认</el-button>
+          <el-popconfirm
+            v-if="row.reqStatus === 3"
+            title="撤销匹配后, 该订单回到公开池, 关联预约会被标 CANCELLED, 已录用的教员会收到通知. 确认?"
+            confirm-button-text="撤销" cancel-button-text="取消"
+            @confirm="unmatchOne(row)">
+            <template #reference>
+              <el-button size="small" type="info">撤销匹配</el-button>
+            </template>
+          </el-popconfirm>
           <el-popconfirm title="关闭后不再展示, 确认?" @confirm="closeOne(row)">
             <template #reference>
               <el-button size="small" type="danger" v-if="row.reqStatus !== 5">关闭</el-button>
@@ -227,9 +236,13 @@
         </el-form-item>
         <el-form-item label="教员 user_id">
           <el-input-number v-model="matchForm.tutorUserId" :min="0" controls-position="right" style="width:100%" />
+          <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-top:4px">
+            选填: 已知接单教员的账号则填, 系统会自动同步该教员申请状态 + 发送站内信。<br>
+            留空 (= 0) 表示已通过电话协商, 不绑定具体账号 — 仅把订单标为已接单。
+          </div>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input v-model="matchForm.remark" type="textarea" :rows="3" maxlength="500" placeholder="可填: 哪位教员接的, 双方同意时间等" />
+          <el-input v-model="matchForm.remark" type="textarea" :rows="3" maxlength="500" placeholder="可填: 哪位教员接的 / 双方同意的时间地点 / 联系结果" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -444,6 +457,16 @@ const closeOne = async (row: any) => {
   } catch (e) { console.error(e) }
 }
 
+const unmatchOne = async (row: any) => {
+  try {
+    const res = await put(`/user/admin/requirement/unmatch?id=${row.id}`)
+    if (res.code === 200) {
+      ElMessage.success(res.data || '已撤销匹配')
+      search()
+    } else { ElMessage.error(res.msg || '操作失败') }
+  } catch (e) { ElMessage.error('网络错误') }
+}
+
 const openMatch = (row: any) => {
   matchTarget.value = row
   matchForm.value = { tutorUserId: 0, remark: '' }
@@ -451,12 +474,11 @@ const openMatch = (row: any) => {
 }
 
 const submitMatch = async () => {
-  if (!matchForm.value.tutorUserId) { ElMessage.warning('请填写教员 user_id'); return }
   submitting.value = true
   try {
     const res = await put('/user/admin/requirement/confirm-match', {
       requirementId: matchTarget.value.id,
-      tutorUserId: matchForm.value.tutorUserId,
+      tutorUserId: matchForm.value.tutorUserId || 0,
       remark: matchForm.value.remark
     })
     if (res.code === 200) {
