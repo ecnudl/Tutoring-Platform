@@ -104,7 +104,17 @@ public class TutorProfile implements Serializable {
 
     private LocalDateTime lastLoginTime;
 
+    private Integer showSuccessRecord;
+
     private static final long serialVersionUID = 1L;
+
+    public Integer getShowSuccessRecord() {
+        return showSuccessRecord;
+    }
+
+    public void setShowSuccessRecord(Integer showSuccessRecord) {
+        this.showSuccessRecord = showSuccessRecord;
+    }
 
     public Long getId() {
         return id;

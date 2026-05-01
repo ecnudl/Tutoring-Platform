@@ -32,4 +32,13 @@ public class ApiAnnouncementController extends BaseBiz {
         List<SysAnnouncement> list = dao.listByCategory(category, limit == null ? 20 : limit);
         return Result.success(BeanUtil.copyProperties(list, AdminAnnouncementResp.class));
     }
+
+    @GetMapping(value = "/view")
+    public Result<AdminAnnouncementResp> view(@RequestParam Long id) {
+        SysAnnouncement a = dao.getById(id);
+        if (a == null || a.getStatusId() == null || a.getStatusId() != 1) {
+            return Result.error("公告不存在");
+        }
+        return Result.success(BeanUtil.copyProperties(a, AdminAnnouncementResp.class));
+    }
 }

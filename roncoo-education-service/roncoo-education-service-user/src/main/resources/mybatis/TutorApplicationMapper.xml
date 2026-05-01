@@ -9,6 +9,7 @@
         <result column="requirement_id" jdbcType="BIGINT" property="requirementId"/>
         <result column="tutor_id" jdbcType="BIGINT" property="tutorId"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
         <result column="app_status" jdbcType="TINYINT" property="appStatus"/>    </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication">
         <result column="apply_message" jdbcType="LONGVARCHAR" property="applyMessage"/>
@@ -49,7 +50,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, requirement_id, tutor_id, user_id, app_status</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, requirement_id, tutor_id, user_id, mobile, app_status</sql>
     <sql id="Blob_Column_List">apply_message</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplicationExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_application
@@ -67,7 +68,7 @@
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from tutor_application where id = #{id,jdbcType=BIGINT}</delete>
     <delete id="deleteByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplicationExample">delete from tutor_application <if test="_parameter != null"><include refid="Example_Where_Clause"/></if></delete>
-    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication">insert into tutor_application (id, gmt_create, gmt_modified, status_id, requirement_id, tutor_id, user_id, app_status, apply_message) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{requirementId,jdbcType=BIGINT}, #{tutorId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{appStatus,jdbcType=TINYINT}, #{applyMessage,jdbcType=LONGVARCHAR})</insert>
+    <insert id="insert" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication">insert into tutor_application (id, gmt_create, gmt_modified, status_id, requirement_id, tutor_id, user_id, mobile, app_status, apply_message) values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, #{statusId,jdbcType=TINYINT}, #{requirementId,jdbcType=BIGINT}, #{tutorId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{mobile,jdbcType=VARCHAR}, #{appStatus,jdbcType=TINYINT}, #{applyMessage,jdbcType=LONGVARCHAR})</insert>
     <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication">
         insert into tutor_application
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -78,6 +79,7 @@
             <if test="requirementId != null">requirement_id,</if>
             <if test="tutorId != null">tutor_id,</if>
             <if test="userId != null">user_id,</if>
+            <if test="mobile != null">mobile,</if>
             <if test="appStatus != null">app_status,</if>
             <if test="applyMessage != null">apply_message,</if>        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -88,6 +90,7 @@
             <if test="requirementId != null">#{requirementId,jdbcType=BIGINT},</if>
             <if test="tutorId != null">#{tutorId,jdbcType=BIGINT},</if>
             <if test="userId != null">#{userId,jdbcType=BIGINT},</if>
+            <if test="mobile != null">#{mobile,jdbcType=VARCHAR},</if>
             <if test="appStatus != null">#{appStatus,jdbcType=TINYINT},</if>
             <if test="applyMessage != null">#{applyMessage,jdbcType=LONGVARCHAR},</if>        </trim>
     </insert>
@@ -100,6 +103,7 @@
             <if test="record.requirementId != null">requirement_id = #{record.requirementId,jdbcType=BIGINT},</if>
             <if test="record.tutorId != null">tutor_id = #{record.tutorId,jdbcType=BIGINT},</if>
             <if test="record.userId != null">user_id = #{record.userId,jdbcType=BIGINT},</if>
+            <if test="record.mobile != null">mobile = #{record.mobile,jdbcType=VARCHAR},</if>
             <if test="record.appStatus != null">app_status = #{record.appStatus,jdbcType=TINYINT},</if>
             <if test="record.applyMessage != null">apply_message = #{record.applyMessage,jdbcType=LONGVARCHAR},</if>        </set>
         <if test="_parameter != null"><include refid="Update_By_Example_Where_Clause"/></if>
@@ -112,6 +116,7 @@
             <if test="requirementId != null">requirement_id = #{requirementId,jdbcType=BIGINT},</if>
             <if test="tutorId != null">tutor_id = #{tutorId,jdbcType=BIGINT},</if>
             <if test="userId != null">user_id = #{userId,jdbcType=BIGINT},</if>
+            <if test="mobile != null">mobile = #{mobile,jdbcType=VARCHAR},</if>
             <if test="appStatus != null">app_status = #{appStatus,jdbcType=TINYINT},</if>
             <if test="applyMessage != null">apply_message = #{applyMessage,jdbcType=LONGVARCHAR},</if>        </set>
         where id = #{id,jdbcType=BIGINT}
@@ -124,6 +129,7 @@
             requirement_id = #{requirementId,jdbcType=BIGINT}
             tutor_id = #{tutorId,jdbcType=BIGINT}
             user_id = #{userId,jdbcType=BIGINT}
+            mobile = #{mobile,jdbcType=VARCHAR}
             app_status = #{appStatus,jdbcType=TINYINT}        where id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

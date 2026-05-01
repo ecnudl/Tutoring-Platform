@@ -41,4 +41,5 @@ public class AuthTutorProfileSaveReq implements Serializable {
     private java.math.BigDecimal priceMax;
     private String salaryRemark;
     private Integer freeTrial;
+    private Integer showSuccessRecord;
 }

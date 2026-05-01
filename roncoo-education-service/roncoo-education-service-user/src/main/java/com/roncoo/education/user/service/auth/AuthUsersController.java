@@ -45,6 +45,14 @@ public class AuthUsersController {
         return biz.update(req);
     }
 
+    @ApiOperation(value = "更新头像", notes = "仅更新 userHead 字段")
+    @PostMapping(value = "/avatar")
+    public Result<String> updateAvatar(@RequestBody java.util.Map<String, Object> req) {
+        Object url = req.get("userHead");
+        if (url == null || url.toString().isEmpty()) return Result.error("头像 URL 不能为空");
+        return biz.updateAvatar(url.toString());
+    }
+
     @ApiOperation(value = "绑定接口", notes = "绑定微信")
     @PostMapping(value = "/binding")
     public Result<String> binding(@RequestBody AuthBindingReq req) throws WxErrorException {

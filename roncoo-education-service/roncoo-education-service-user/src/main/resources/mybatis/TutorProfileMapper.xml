@@ -46,6 +46,7 @@
         <result column="is_verified" jdbcType="TINYINT" property="isVerified"/>
         <result column="login_count" jdbcType="INTEGER" property="loginCount"/>
         <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="show_success_record" jdbcType="TINYINT" property="showSuccessRecord"/>
         <result column="subjects" jdbcType="VARCHAR" property="subjects"/>
         <result column="grades" jdbcType="VARCHAR" property="grades"/>
     </resultMap>
@@ -121,7 +122,7 @@
         teaching_method, price_min, price_max, salary_remark, free_trial,
         audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
         subjects, grades,
-        login_count, last_login_time
+        login_count, last_login_time, show_success_record
     </sql>
     <sql id="Blob_Column_List">
         teaching_experience, self_introduction
@@ -196,7 +197,7 @@
                                    display_no, teaching_method, university_id,
                                    high_school, hometown_province, certificates_desc,
                                    salary_remark, is_star, is_verified,
-                                   login_count, last_login_time,
+                                   login_count, last_login_time, show_success_record,
                                    teaching_experience, self_introduction)
         values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP},
                 #{statusId,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}, #{realName,jdbcType=VARCHAR},
@@ -212,7 +213,7 @@
                 #{displayNo,jdbcType=VARCHAR}, #{teachingMethod,jdbcType=TINYINT}, #{universityId,jdbcType=BIGINT},
                 #{highSchool,jdbcType=VARCHAR}, #{hometownProvince,jdbcType=VARCHAR}, #{certificatesDesc,jdbcType=VARCHAR},
                 #{salaryRemark,jdbcType=VARCHAR}, #{isStar,jdbcType=TINYINT}, #{isVerified,jdbcType=TINYINT},
-                #{loginCount,jdbcType=INTEGER}, #{lastLoginTime,jdbcType=TIMESTAMP},
+                #{loginCount,jdbcType=INTEGER}, #{lastLoginTime,jdbcType=TIMESTAMP}, #{showSuccessRecord,jdbcType=TINYINT},
                 #{teachingExperience,jdbcType=LONGVARCHAR}, #{selfIntroduction,jdbcType=LONGVARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -356,6 +357,9 @@
             <if test="lastLoginTime != null">
                 last_login_time,
             </if>
+            <if test="showSuccessRecord != null">
+                show_success_record,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -495,6 +499,9 @@
             </if>
             <if test="lastLoginTime != null">
                 #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="showSuccessRecord != null">
+                #{showSuccessRecord,jdbcType=TINYINT},
             </if>
         </trim>
     </insert>
@@ -643,6 +650,9 @@
             <if test="record.lastLoginTime != null">
                 last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="record.showSuccessRecord != null">
+                show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -692,7 +702,8 @@
         is_star = #{record.isStar,jdbcType=TINYINT},
         is_verified = #{record.isVerified,jdbcType=TINYINT},
         login_count = #{record.loginCount,jdbcType=INTEGER},
-        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP}
+        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
+        show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -739,7 +750,8 @@
         is_star = #{record.isStar,jdbcType=TINYINT},
         is_verified = #{record.isVerified,jdbcType=TINYINT},
         login_count = #{record.loginCount,jdbcType=INTEGER},
-        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP}
+        last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
+        show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -888,6 +900,9 @@
             <if test="lastLoginTime != null">
                 last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="showSuccessRecord != null">
+                show_success_record = #{showSuccessRecord,jdbcType=TINYINT},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -934,7 +949,8 @@
             is_star = #{isStar,jdbcType=TINYINT},
             is_verified = #{isVerified,jdbcType=TINYINT},
             login_count = #{loginCount,jdbcType=INTEGER},
-            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}
+            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            show_success_record = #{showSuccessRecord,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile">
@@ -978,7 +994,8 @@
             is_star = #{isStar,jdbcType=TINYINT},
             is_verified = #{isVerified,jdbcType=TINYINT},
             login_count = #{loginCount,jdbcType=INTEGER},
-            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}
+            last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            show_success_record = #{showSuccessRecord,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

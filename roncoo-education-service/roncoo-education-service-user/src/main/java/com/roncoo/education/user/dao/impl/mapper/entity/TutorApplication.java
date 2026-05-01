@@ -12,8 +12,12 @@ public class TutorApplication implements Serializable {
     private Long tutorId;
     private Long userId;
     private String applyMessage;
+    private String mobile;
     private Integer appStatus;
     private static final long serialVersionUID = 1L;
+
+    public String getMobile() { return mobile; }
+    public void setMobile(String mobile) { this.mobile = mobile; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

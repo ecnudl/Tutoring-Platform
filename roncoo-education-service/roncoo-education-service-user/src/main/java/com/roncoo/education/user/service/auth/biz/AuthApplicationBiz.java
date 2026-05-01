@@ -83,8 +83,15 @@ public class AuthApplicationBiz extends BaseBiz {
         }
         Long requirementId = req.get("requirementId") != null ? Long.parseLong(req.get("requirementId").toString()) : null;
         String applyMessage = req.get("applyMessage") != null ? req.get("applyMessage").toString() : "";
+        String mobile = req.get("mobile") != null ? req.get("mobile").toString().trim() : "";
         if (requirementId == null) {
             return Result.error("需求ID不能为空");
+        }
+        if (mobile.isEmpty()) {
+            return Result.error("联系电话不能为空");
+        }
+        if (!mobile.matches("^1[3-9]\\d{9}$")) {
+            return Result.error("联系电话格式不正确");
         }
         TutorRequirement requirement = tutorRequirementDao.getById(requirementId);
         if (requirement == null) {
@@ -118,6 +125,7 @@ public class AuthApplicationBiz extends BaseBiz {
         application.setTutorId(profile.getId());
         application.setUserId(userId);
         application.setApplyMessage(applyMessage);
+        application.setMobile(mobile);
         application.setAppStatus(ApplicationStatusEnum.APPLIED.getCode());
         tutorApplicationDao.save(application);
 

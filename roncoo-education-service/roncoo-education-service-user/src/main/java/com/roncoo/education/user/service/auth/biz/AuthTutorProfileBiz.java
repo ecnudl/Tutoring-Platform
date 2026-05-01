@@ -102,6 +102,9 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setPriceMax(req.getPriceMax());
         update.setSalaryRemark(req.getSalaryRemark());
         update.setFreeTrial(req.getFreeTrial());
+        if (req.getShowSuccessRecord() != null) {
+            update.setShowSuccessRecord(req.getShowSuccessRecord());
+        }
 
         // 如果之前被驳回，修改后回到草稿状态
         if (TutorAuditStatusEnum.REJECTED.getCode().equals(profile.getAuditStatus())) {

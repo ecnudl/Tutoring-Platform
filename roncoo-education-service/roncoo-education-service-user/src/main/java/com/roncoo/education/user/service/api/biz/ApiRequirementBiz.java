@@ -70,10 +70,8 @@ public class ApiRequirementBiz extends BaseBiz {
         Page<TutorRequirement> rawPage = tutorRequirementDao.page(1, 5000, example);
         java.util.List<TutorRequirement> all = rawPage.getList() != null ? rawPage.getList() : java.util.Collections.emptyList();
 
-        // Java 后过滤
-        LocalDateTime matchedCutoff = LocalDateTime.now().minusHours(24);
+        // Java 后过滤. /xy 学员库不做 24h cutoff (保留 MATCHED 作为社会证明), 仅首页 latest 才过滤.
         java.util.List<TutorRequirement> filtered = all.stream()
-                .filter(r -> notExpiredMatched(r, matchedCutoff))
                 .filter(r -> matchTeachingMethod(r, req))
                 .filter(r -> matchCity(r, req))
                 .filter(r -> matchDistrict(r, req))

@@ -6,15 +6,26 @@ import com.roncoo.education.common.base.page.PageUtil;
 import com.roncoo.education.common.core.base.Result;
 import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
 import com.roncoo.education.common.tools.BeanUtil;
+import com.roncoo.education.common.core.enums.ReservationStatusEnum;
+import com.roncoo.education.user.dao.DictCityDao;
+import com.roncoo.education.user.dao.DictDistrictDao;
 import com.roncoo.education.user.dao.TutorCertificationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
+import com.roncoo.education.user.dao.TutorRequirementDao;
+import com.roncoo.education.user.dao.TutorReservationDao;
 import com.roncoo.education.user.dao.TutorSubjectDao;
 import com.roncoo.education.user.dao.TutorTeachingAreaDao;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictCity;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictDistrict;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorCertification;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfileExample;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirement;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorSubject;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorTeachingArea;
+import java.time.format.DateTimeFormatter;
 import com.roncoo.education.user.service.api.req.TutorSearchReq;
 import com.roncoo.education.user.service.api.resp.TutorDetailResp;
 import com.roncoo.education.user.service.api.resp.TutorListResp;
@@ -50,6 +61,18 @@ public class ApiTutorBiz extends BaseBiz {
 
     @NotNull
     private final TutorCertificationDao tutorCertificationDao;
+
+    @NotNull
+    private final TutorReservationDao tutorReservationDao;
+
+    @NotNull
+    private final TutorRequirementDao tutorRequirementDao;
+
+    @NotNull
+    private final DictCityDao dictCityDao;
+
+    @NotNull
+    private final DictDistrictDao dictDistrictDao;
 
     /**
      * 教员搜索（分页+多条件）
@@ -135,7 +158,67 @@ public class ApiTutorBiz extends BaseBiz {
         // 查询资质证书
         List<TutorCertification> certs = tutorCertificationDao.listByTutorId(profile.getId());
         resp.setCertifications(BeanUtil.copyProperties(certs, TutorDetailResp.CertificationItem.class));
+
+        // 成功记录板块: 教员可在 /center/tutor-profile 关闭, 默认开
+        Integer showFlag = profile.getShowSuccessRecord() == null ? 1 : profile.getShowSuccessRecord();
+        resp.setShowSuccessRecord(showFlag);
+        if (showFlag != null && showFlag == 1 && profile.getUserId() != null) {
+            resp.setSuccessRecords(loadSuccessRecords(profile.getUserId(), 50));
+        } else {
+            resp.setSuccessRecords(java.util.Collections.emptyList());
+        }
         return Result.success(resp);
+    }
+
+    /**
+     * 拉取该教员所有 res_status=CONFIRMED|COMPLETED 的撮合记录, 关联 requirement 拿脱敏字段.
+     * 字段: grade / subjects / location (区+地点) / detail / date.
+     */
+    private List<TutorDetailResp.SuccessRecordItem> loadSuccessRecords(Long tutorUserId, int limit) {
+        TutorReservationExample ex = new TutorReservationExample();
+        ex.createCriteria().andTutorUserIdEqualTo(tutorUserId)
+                .andResStatusIn(java.util.Arrays.asList(
+                        ReservationStatusEnum.CONFIRMED.getCode(),
+                        ReservationStatusEnum.COMPLETED.getCode()));
+        ex.setOrderByClause("matched_at desc, gmt_create desc");
+        // page 接口拿前 N 条; pageSize=limit, pageCurrent=1
+        Page<TutorReservation> page = tutorReservationDao.page(1, limit, ex);
+        List<TutorReservation> rows = page == null ? java.util.Collections.emptyList() : page.getList();
+        List<TutorDetailResp.SuccessRecordItem> out = new java.util.ArrayList<>(rows.size());
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (TutorReservation r : rows) {
+            TutorDetailResp.SuccessRecordItem item = new TutorDetailResp.SuccessRecordItem();
+            if (r.getRequirementId() != null) {
+                TutorRequirement req = tutorRequirementDao.getById(r.getRequirementId());
+                if (req != null) {
+                    item.setGrade(req.getGradeName());
+                    item.setSubjects(req.getSubjectIds());
+                    item.setDetail(req.getRequirementDetail());
+                    item.setLocation(buildLocation(req.getCityId(), req.getDistrictId(), req.getAddress()));
+                }
+            }
+            java.time.LocalDateTime dt = r.getMatchedAt() != null ? r.getMatchedAt() : r.getGmtCreate();
+            if (dt != null) item.setDate(dt.format(df));
+            out.add(item);
+        }
+        return out;
+    }
+
+    private String buildLocation(Long cityId, Long districtId, String address) {
+        StringBuilder sb = new StringBuilder();
+        if (cityId != null) {
+            DictCity c = dictCityDao.getById(cityId);
+            if (c != null && c.getCityName() != null) sb.append(c.getCityName());
+        }
+        if (districtId != null) {
+            DictDistrict d = dictDistrictDao.getById(districtId);
+            if (d != null && d.getDistrictName() != null) sb.append(d.getDistrictName());
+        }
+        if (address != null && !address.isEmpty()) {
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(address);
+        }
+        return sb.toString();
     }
 
     /**

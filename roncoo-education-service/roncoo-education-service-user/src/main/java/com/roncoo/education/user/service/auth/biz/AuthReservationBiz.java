@@ -7,16 +7,24 @@ import com.roncoo.education.common.core.enums.RequirementStatusEnum;
 import com.roncoo.education.common.core.enums.ReservationStatusEnum;
 import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
 import com.roncoo.education.common.core.enums.UserTypeEnum;
+import com.roncoo.education.user.dao.DictCityDao;
+import com.roncoo.education.user.dao.DictDistrictDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
 import com.roncoo.education.user.dao.TutorRequirementDao;
 import com.roncoo.education.user.dao.TutorReservationDao;
 import com.roncoo.education.user.dao.UsersDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.*;
+import com.roncoo.education.user.service.auth.resp.AuthOrderItemResp;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,30 +48,98 @@ public class AuthReservationBiz extends BaseBiz {
     private final TutorRequirementDao tutorRequirementDao;
     @NotNull
     private final UsersDao usersDao;
+    @NotNull
+    private final DictCityDao dictCityDao;
+    @NotNull
+    private final DictDistrictDao dictDistrictDao;
 
-    /** 列表: 学员看自己发起的; 教员一律返回空 (匹配信息只 admin 可见) */
+    /**
+     * "我的订单" 列表 (双方都返回, 一致脱敏字段):
+     *   学员: WHERE student_user_id=me, 全部状态
+     *   教员: WHERE tutor_user_id=me, 仅 res_status=CONFIRMED|COMPLETED (避免泄漏待审核中的家长信息)
+     */
     public Result<?> page(Map<String, Object> req) {
         Long userId = ThreadContext.userId();
         Users user = usersDao.getById(userId);
         if (user == null) return Result.error("用户不存在");
 
-        if (UserTypeEnum.TUTOR.getCode().equals(user.getUserType())) {
-            // 教员看不到自己被预约的信息 (含学员手机/微信)
-            com.roncoo.education.common.base.page.Page<TutorReservation> empty =
-                new com.roncoo.education.common.base.page.Page<>(0, 0, 1, 20, java.util.Collections.emptyList());
-            return Result.success(empty);
-        }
-
         int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
         int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
+
         TutorReservationExample example = new TutorReservationExample();
         if (UserTypeEnum.STUDENT.getCode().equals(user.getUserType())) {
             example.createCriteria().andStudentUserIdEqualTo(userId);
+        } else if (UserTypeEnum.TUTOR.getCode().equals(user.getUserType())) {
+            example.createCriteria()
+                    .andTutorUserIdEqualTo(userId)
+                    .andResStatusIn(Arrays.asList(
+                            ReservationStatusEnum.CONFIRMED.getCode(),
+                            ReservationStatusEnum.COMPLETED.getCode()));
         } else {
             return Result.error("用户类型不支持此操作");
         }
         example.setOrderByClause("gmt_create desc");
-        return Result.success(tutorReservationDao.page(pageCurrent, pageSize, example));
+
+        com.roncoo.education.common.base.page.Page<TutorReservation> page =
+                tutorReservationDao.page(pageCurrent, pageSize, example);
+        List<TutorReservation> rows = page == null ? Collections.emptyList() : page.getList();
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<AuthOrderItemResp> items = new ArrayList<>(rows.size());
+        for (TutorReservation r : rows) {
+            AuthOrderItemResp item = new AuthOrderItemResp();
+            item.setId(r.getId());
+            item.setResStatus(r.getResStatus());
+            item.setStatusText(statusText(r.getResStatus()));
+            item.setCancelReason(r.getResStatus() != null
+                    && ReservationStatusEnum.CANCELLED.getCode().equals(r.getResStatus())
+                    ? r.getCancelReason() : null);
+            // 关联 requirement 拿脱敏字段
+            if (r.getRequirementId() != null) {
+                TutorRequirement reqEntity = tutorRequirementDao.getById(r.getRequirementId());
+                if (reqEntity != null) {
+                    item.setGrade(reqEntity.getGradeName());
+                    item.setSubjects(reqEntity.getSubjectIds());
+                    item.setDetail(reqEntity.getRequirementDetail());
+                    item.setLocation(buildLocation(reqEntity.getCityId(), reqEntity.getDistrictId(), reqEntity.getAddress()));
+                }
+            }
+            LocalDateTime dt = r.getMatchedAt() != null ? r.getMatchedAt() : r.getGmtCreate();
+            if (dt != null) item.setDate(dt.format(df));
+            items.add(item);
+        }
+        com.roncoo.education.common.base.page.Page<AuthOrderItemResp> respPage =
+                new com.roncoo.education.common.base.page.Page<>(
+                        page == null ? 0 : page.getTotalCount(),
+                        page == null ? 0 : page.getTotalPage(),
+                        pageCurrent, pageSize, items);
+        return Result.success(respPage);
+    }
+
+    private String statusText(Integer code) {
+        if (code == null) return "";
+        if (ReservationStatusEnum.PENDING.getCode().equals(code)) return "待匹配";
+        if (ReservationStatusEnum.CONFIRMED.getCode().equals(code)) return "已撮合";
+        if (ReservationStatusEnum.COMPLETED.getCode().equals(code)) return "已完成";
+        if (ReservationStatusEnum.CANCELLED.getCode().equals(code)) return "已取消";
+        return "";
+    }
+
+    private String buildLocation(Long cityId, Long districtId, String address) {
+        StringBuilder sb = new StringBuilder();
+        if (cityId != null) {
+            DictCity c = dictCityDao.getById(cityId);
+            if (c != null && c.getCityName() != null) sb.append(c.getCityName());
+        }
+        if (districtId != null) {
+            DictDistrict d = dictDistrictDao.getById(districtId);
+            if (d != null && d.getDistrictName() != null) sb.append(d.getDistrictName());
+        }
+        if (address != null && !address.isEmpty()) {
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(address);
+        }
+        return sb.toString();
     }
 
     /** 学员: 发起定向预约. 双写 reservation + requirement(待审核) */

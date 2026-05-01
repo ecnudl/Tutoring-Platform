@@ -66,6 +66,15 @@ public class AuthUsersBiz extends BaseBiz {
         return Result.error("操作失败");
     }
 
+    /** 仅更新当前用户的头像 (userHead 字段), 不触发完整资料校验. */
+    public Result<String> updateAvatar(String url) {
+        Users update = new Users();
+        update.setId(ThreadContext.userId());
+        update.setUserHead(url);
+        int result = dao.updateById(update);
+        return result > 0 ? Result.success("头像已更新") : Result.error("更新失败");
+    }
+
     public Result<String> binding(AuthBindingReq req) throws WxErrorException {
         Users users = dao.getById(ThreadContext.userId());
         if (StringUtils.hasText(users.getUnionId()) || StringUtils.hasText(users.getOpenId())) {

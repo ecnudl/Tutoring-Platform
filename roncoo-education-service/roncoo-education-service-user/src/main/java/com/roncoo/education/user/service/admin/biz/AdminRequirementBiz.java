@@ -143,16 +143,22 @@ public class AdminRequirementBiz extends BaseBiz {
     @Transactional(rollbackFor = Exception.class)
     public Result<?> confirmMatch(Map<String, Object> req) {
         if (req.get("requirementId") == null) return Result.error("缺少 requirementId");
-        if (req.get("tutorUserId") == null) return Result.error("缺少 tutorUserId");
         Long reqId = Long.parseLong(req.get("requirementId").toString());
-        Long tutorUserId = Long.parseLong(req.get("tutorUserId").toString());
+        // tutorUserId 可选: 留空表示 admin 已电话协商, 不绑定具体教员账号 (例如教员还没注册)
+        Long tutorUserId = null;
+        Object tu = req.get("tutorUserId");
+        if (tu != null && !tu.toString().isEmpty() && !"0".equals(tu.toString())) {
+            tutorUserId = Long.parseLong(tu.toString());
+        }
         String remark = req.get("remark") != null ? req.get("remark").toString() : null;
 
-        // 校验目标教员存在且类型 = TUTOR
-        com.roncoo.education.user.dao.impl.mapper.entity.Users tutor = usersDao.getById(tutorUserId);
-        if (tutor == null) return Result.error("教员账号不存在");
-        if (!com.roncoo.education.common.core.enums.UserTypeEnum.TUTOR.getCode().equals(tutor.getUserType())) {
-            return Result.error("目标用户不是教员账号 (user_type ≠ 1)");
+        // 仅当 tutorUserId 传了, 才校验账号存在 + 类型
+        if (tutorUserId != null) {
+            com.roncoo.education.user.dao.impl.mapper.entity.Users tutor = usersDao.getById(tutorUserId);
+            if (tutor == null) return Result.error("教员账号不存在");
+            if (!com.roncoo.education.common.core.enums.UserTypeEnum.TUTOR.getCode().equals(tutor.getUserType())) {
+                return Result.error("目标用户不是教员账号 (user_type ≠ 1)");
+            }
         }
 
         TutorRequirement r = requirementDao.getById(reqId);
@@ -166,25 +172,27 @@ public class AdminRequirementBiz extends BaseBiz {
         update.setId(reqId);
         update.setReqStatus(RequirementStatusEnum.MATCHED.getCode());
         update.setMatchedAt(now);
-        update.setTargetTutorUserId(tutorUserId);
+        if (tutorUserId != null) update.setTargetTutorUserId(tutorUserId);
         if (remark != null) update.setMatchedTutorRemark(remark);
         requirementDao.updateById(update);
 
-        // 把这个教员对该需求的 application 置成 ACCEPTED (如果存在)
-        List<TutorApplication> apps = applicationDao.listByRequirementId(reqId);
-        if (apps != null) {
-            for (TutorApplication app : apps) {
-                if (tutorUserId.equals(app.getUserId())) {
-                    TutorApplication appUp = new TutorApplication();
-                    appUp.setId(app.getId());
-                    appUp.setAppStatus(ApplicationStatusEnum.ACCEPTED.getCode());
-                    applicationDao.updateById(appUp);
-                } else if (ApplicationStatusEnum.APPLIED.getCode().equals(app.getAppStatus())) {
-                    // 其他申请者置为已拒绝
-                    TutorApplication appUp = new TutorApplication();
-                    appUp.setId(app.getId());
-                    appUp.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());
-                    applicationDao.updateById(appUp);
+        // 仅当指定 tutorUserId 时同步 application 状态; 否则保留 application 原样 (admin 已电话协商, 申请池由 admin 自主管理)
+        if (tutorUserId != null) {
+            List<TutorApplication> apps = applicationDao.listByRequirementId(reqId);
+            if (apps != null) {
+                for (TutorApplication app : apps) {
+                    if (tutorUserId.equals(app.getUserId())) {
+                        TutorApplication appUp = new TutorApplication();
+                        appUp.setId(app.getId());
+                        appUp.setAppStatus(ApplicationStatusEnum.ACCEPTED.getCode());
+                        applicationDao.updateById(appUp);
+                    } else if (ApplicationStatusEnum.APPLIED.getCode().equals(app.getAppStatus())) {
+                        // 其他申请者置为已拒绝
+                        TutorApplication appUp = new TutorApplication();
+                        appUp.setId(app.getId());
+                        appUp.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());
+                        applicationDao.updateById(appUp);
+                    }
                 }
             }
         }
@@ -207,12 +215,14 @@ public class AdminRequirementBiz extends BaseBiz {
             }
         }
 
-        // 通知接单教员
-        String reqTitle = r.getTitle() != null ? r.getTitle() : "需求";
-        sendMsg(tutorUserId, "接单确认",
-                "您已成功接单《" + reqTitle + "》。请联系客服 或 等候客服将家长联系方式发给您。");
+        // 通知接单教员 (仅当指定了 tutorUserId)
+        if (tutorUserId != null) {
+            String reqTitle = r.getTitle() != null ? r.getTitle() : "需求";
+            sendMsg(tutorUserId, "接单确认",
+                    "您已成功接单《" + reqTitle + "》。请联系客服 或 等候客服将家长联系方式发给您。");
+        }
 
-        return Result.success("已确认接单");
+        return Result.success(tutorUserId != null ? "已确认接单 (已通知教员)" : "已确认接单 (未绑定教员账号)");
     }
 
     /**
@@ -283,6 +293,64 @@ public class AdminRequirementBiz extends BaseBiz {
         // A + 6 位数字, 取雪花 id 后 6 位再做 padding
         long abs = Math.abs(id);
         return "S" + (100000 + abs % 900000);
+    }
+
+    /**
+     * 撤销匹配: admin 把已撮合的需求从 MATCHED 反向到 PUBLISHED, 重回学员库等待其他申请.
+     * 同步处理:
+     *   - requirement.reqStatus = PUBLISHED, matched_at = NULL
+     *   - 关联 reservation 标 CANCELLED + cancel_reason
+     *   - 之前 ACCEPTED 的 application 改回 APPLIED, 通知该教员
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> unmatch(Long id) {
+        TutorRequirement requirement = requirementDao.getById(id);
+        if (requirement == null) return Result.error("需求不存在");
+        if (!RequirementStatusEnum.MATCHED.getCode().equals(requirement.getReqStatus())) {
+            return Result.error("仅已撮合状态的需求可撤销匹配");
+        }
+
+        // 1. requirement -> PUBLISHED
+        TutorRequirement reqUp = new TutorRequirement();
+        reqUp.setId(id);
+        reqUp.setReqStatus(RequirementStatusEnum.PUBLISHED.getCode());
+        reqUp.setMatchedAt(null);
+        requirementDao.updateById(reqUp);
+
+        // 2. 关联 reservation 全部 CANCELLED
+        com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample resEx =
+                new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample();
+        resEx.createCriteria()
+                .andRequirementIdEqualTo(id)
+                .andResStatusEqualTo(com.roncoo.education.common.core.enums.ReservationStatusEnum.CONFIRMED.getCode());
+        Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> rPage =
+                reservationDao.page(1, 100, resEx);
+        List<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> reservations =
+                rPage == null ? java.util.Collections.emptyList() : rPage.getList();
+        for (com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation r : reservations) {
+            com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation upd =
+                    new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
+            upd.setId(r.getId());
+            upd.setResStatus(com.roncoo.education.common.core.enums.ReservationStatusEnum.CANCELLED.getCode());
+            upd.setCancelReason("admin 撤销匹配, 订单已转回公开池");
+            reservationDao.updateById(upd);
+        }
+
+        // 3. 之前 ACCEPTED 的 application 改回 APPLIED, 通知教员
+        List<TutorApplication> apps = applicationDao.listByRequirementId(id);
+        for (TutorApplication a : apps) {
+            if (!ApplicationStatusEnum.ACCEPTED.getCode().equals(a.getAppStatus())) continue;
+            TutorApplication appUp = new TutorApplication();
+            appUp.setId(a.getId());
+            appUp.setAppStatus(ApplicationStatusEnum.APPLIED.getCode());
+            applicationDao.updateById(appUp);
+            if (a.getUserId() != null && a.getUserId() > 0) {
+                sendMsg(a.getUserId(),
+                        "撮合已被撤销",
+                        "很抱歉, admin 已撤销之前的撮合。该需求已转回公开池, 您可继续等待审核, 或申请其他需求。");
+            }
+        }
+        return Result.success("已撤销匹配, 需求转回公开池");
     }
 
     private void sendMsg(Long userId, String title, String content) {

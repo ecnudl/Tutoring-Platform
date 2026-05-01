@@ -129,6 +129,24 @@ public class TutorDetailResp implements Serializable {
     @ApiModelProperty(value = "资质认证列表")
     private List<CertificationItem> certifications;
 
+    @ApiModelProperty(value = "是否在主页展示成功记录(1=是, 0=否)")
+    private Integer showSuccessRecord;
+
+    @ApiModelProperty(value = "成功记录列表 (脱敏)")
+    private List<SuccessRecordItem> successRecords;
+
+    @Data
+    @Accessors(chain = true)
+    @ApiModel(description = "成功记录(脱敏)")
+    public static class SuccessRecordItem implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @ApiModelProperty(value = "年级") private String grade;
+        @ApiModelProperty(value = "科目 (CSV)") private String subjects;
+        @ApiModelProperty(value = "区+地点") private String location;
+        @ApiModelProperty(value = "需求摘要") private String detail;
+        @ApiModelProperty(value = "撮合日期 yyyy-MM-dd") private String date;
+    }
+
     @Data
     @Accessors(chain = true)
     @ApiModel(description = "授课区域")

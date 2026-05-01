@@ -21,4 +21,8 @@ public class AdminApplicationController {
     public Result<?> page(@RequestBody java.util.Map<String, Object> req) { return biz.page(req); }
     @ApiOperation(value = "查看") @GetMapping("/view")
     public Result<?> view(@RequestParam Long id) { return biz.view(id); }
+    @SysLog(value = "申请-匹配") @ApiOperation(value = "匹配申请 (撮合)") @PutMapping("/match")
+    public Result<String> match(@RequestParam Long id) { return biz.match(id); }
+    @SysLog(value = "申请-驳回") @ApiOperation(value = "驳回申请") @PutMapping("/reject")
+    public Result<String> reject(@RequestParam Long id) { return biz.reject(id); }
 }

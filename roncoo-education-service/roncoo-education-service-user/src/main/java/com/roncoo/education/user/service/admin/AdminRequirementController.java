@@ -44,4 +44,8 @@ public class AdminRequirementController {
     @SysLog(value = "确认接单") @ApiOperation(value = "确认接单 (admin 双方电话沟通后)")
     @PutMapping("/confirm-match")
     public Result<?> confirmMatch(@RequestBody Map<String, Object> req) { return biz.confirmMatch(req); }
+
+    @SysLog(value = "撤销匹配") @ApiOperation(value = "撤销已匹配的需求, 转回公开池")
+    @PutMapping("/unmatch")
+    public Result<String> unmatch(@RequestParam Long id) { return biz.unmatch(id); }
 }
