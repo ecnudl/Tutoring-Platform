@@ -85,9 +85,9 @@ const onPicked = async (e) => {
       return
     }
     const url = upRes.data
-    // 教员: 改 tutor_profile.avatar (教员库展示用); 家长: 改 users.user_head (个人中心展示用)
+    // 教员: 改 tutor_profile.avatar (走专用 /avatar 端点, 不重置审核状态); 家长: 改 users.user_head
     const saveRes = userStore.isTutor
-      ? await post('/user/auth/tutor-profile/save', { avatar: url })
+      ? await post('/user/auth/tutor-profile/avatar', { avatar: url })
       : await post('/user/auth/users/avatar', { userHead: url })
     if (saveRes?.code !== 200) {
       ElMessage.error(saveRes?.msg || '保存失败')

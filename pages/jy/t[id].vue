@@ -69,11 +69,17 @@
             <el-tab-pane label="基本信息" name="basic">
               <el-descriptions :column="2" border>
                 <el-descriptions-item label="教员类型">{{ tutorTypeMap[tutor.tutorType] || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="详细身份">{{ tutor.identityDetail || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="学历">{{ degreeMap[tutor.degree] || '-' }}</el-descriptions-item>
                 <el-descriptions-item label="年级/年份">{{ tutor.gradeYear || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="籍贯">{{ tutor.hometown || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="民族">{{ tutor.ethnicity || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="注册时间">{{ tutor.gmtCreate || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="最近登录">{{ tutor.lastLoginTime || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="出生年龄" v-if="tutor.birthDate">{{ ageFromBirth(tutor.birthDate) }}</el-descriptions-item>
+                <el-descriptions-item label="籍贯">{{ tutor.hometownProvince || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="高中母校" v-if="tutor.highSchool">{{ tutor.highSchool }}</el-descriptions-item>
+                <el-descriptions-item label="所在大学">{{ tutor.university || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="专业">{{ tutor.major || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="所在地区">{{ buildLocation(tutor) }}</el-descriptions-item>
+                <el-descriptions-item label="注册时间">{{ formatDate(tutor.gmtCreate) || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="最近登录">{{ formatLastLogin(tutor.lastLoginTime) || '-' }}</el-descriptions-item>
               </el-descriptions>
             </el-tab-pane>
 
@@ -83,31 +89,36 @@
                 <p class="info-text">{{ tutor.selfIntroduction || '暂无' }}</p>
               </div>
               <div class="info-section">
-                <h3>证书资质</h3>
-                <p class="info-text">{{ tutor.certificates || '暂无' }}</p>
+                <h3>所获证书</h3>
+                <p class="info-text">{{ tutor.certificatesDesc || '暂无' }}</p>
               </div>
               <div class="info-section">
                 <h3>可教授科目</h3>
-                <div v-if="tutor.subjects">
-                  <el-tag v-for="sub in (Array.isArray(tutor.subjects) ? tutor.subjects : String(tutor.subjects || '').split(',').filter(Boolean))" :key="sub" style="margin:2px 4px">{{ sub }}</el-tag>
+                <div v-if="subjectNamesList.length">
+                  <el-tag v-for="(sub,i) in subjectNamesList" :key="i" style="margin:2px 4px">{{ sub }}</el-tag>
                 </div>
                 <p v-else class="info-text">暂无</p>
               </div>
               <div class="info-section">
                 <h3>可授课区域</h3>
-                <p class="info-text">{{ tutor.teachingAreas || '暂无' }}</p>
+                <div v-if="teachingAreaNames.length">
+                  <span style="color:#666;font-size:14px">{{ tutor.cityName || '' }}</span>
+                  <el-tag v-for="(a,i) in teachingAreaNames" :key="i" type="success" style="margin:2px 4px">{{ a }}</el-tag>
+                </div>
+                <p v-else class="info-text">暂无</p>
               </div>
               <div class="info-section">
                 <h3>授课方式</h3>
                 <p class="info-text">{{ teachingMethodMap[tutor.teachingMethod] || '暂无' }}</p>
               </div>
               <div class="info-section">
-                <h3>教学经验</h3>
-                <p class="info-text">{{ tutor.teachingExperience || '暂无' }}</p>
+                <h3>家教经验 / 教学成果</h3>
+                <p class="info-text" style="white-space:pre-line">{{ tutor.teachingExperience || '暂无' }}</p>
               </div>
               <div class="info-section">
                 <h3>课时费</h3>
                 <p class="info-text price">{{ tutor.priceMin || 0 }}-{{ tutor.priceMax || 0 }} 元/小时</p>
+                <p v-if="tutor.salaryRemark" class="info-text" style="color:#64748b;font-size:13px;margin-top:4px">{{ tutor.salaryRemark }}</p>
               </div>
             </el-tab-pane>
 
@@ -147,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
 import { useUserStore } from '~/stores/user'
@@ -182,6 +193,44 @@ function formatLastLogin(dt) {
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
   return m ? `${m[2]}-${m[3]}` : s
 }
+
+function formatDate(dt) {
+  if (!dt) return ''
+  const m = String(dt).match(/^(\d{4})-(\d{2})-(\d{2})/)
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : String(dt).slice(0, 10)
+}
+
+function ageFromBirth(birth) {
+  if (!birth) return '-'
+  const m = String(birth).match(/^(\d{4})-(\d{2})/)
+  if (!m) return '-'
+  const now = new Date()
+  let age = now.getFullYear() - parseInt(m[1], 10)
+  if (now.getMonth() + 1 < parseInt(m[2], 10)) age -= 1
+  return age > 0 ? age + ' 岁' : '-'
+}
+
+function buildLocation(t) {
+  const parts = []
+  if (t.cityName) parts.push(t.cityName)
+  if (t.districtName) parts.push(t.districtName)
+  return parts.length ? parts.join(' ') : '-'
+}
+
+// 后端返回 subjectNames: List<String>; subjects: List<{subjectId, subjectName}> — 任一可用
+const subjectNamesList = computed(() => {
+  const t = tutor.value
+  if (!t) return []
+  if (Array.isArray(t.subjectNames) && t.subjectNames.length) return t.subjectNames
+  if (Array.isArray(t.subjects)) return t.subjects.map(s => s?.subjectName).filter(Boolean)
+  return []
+})
+
+const teachingAreaNames = computed(() => {
+  const t = tutor.value
+  if (!t || !Array.isArray(t.teachingAreas)) return []
+  return t.teachingAreas.map(a => a?.districtName).filter(Boolean)
+})
 
 const loadTutor = async () => {
   loading.value = true
