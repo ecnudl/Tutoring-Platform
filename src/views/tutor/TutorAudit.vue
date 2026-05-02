@@ -55,17 +55,41 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="教员详情" width="700px">
-      <el-descriptions :column="2" border v-if="detail">
+    <el-dialog v-model="detailVisible" title="教员详情 - 审核" width="820px">
+      <el-descriptions :column="2" border v-if="detail" title="基本信息">
         <el-descriptions-item label="姓名">{{ detail.realName }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ detail.mobile }}</el-descriptions-item>
         <el-descriptions-item label="性别">{{ detail.gender === 1 ? '男' : '女' }}</el-descriptions-item>
-        <el-descriptions-item label="类型">{{ tutorTypeMap[detail.tutorType] }}</el-descriptions-item>
-        <el-descriptions-item label="学历">{{ degreeMap[detail.degree] }}</el-descriptions-item>
-        <el-descriptions-item label="学校">{{ detail.university }}</el-descriptions-item>
-        <el-descriptions-item label="专业">{{ detail.major }}</el-descriptions-item>
-        <el-descriptions-item label="课时费">{{ detail.priceMin }}-{{ detail.priceMax }}元/时</el-descriptions-item>
+        <el-descriptions-item label="出生年月">{{ detail.birthDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="籍贯">{{ detail.hometownProvince || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="证件号">{{ detail.idCard || '-' }}</el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" border v-if="detail" title="身份与学历" style="margin-top:16px">
+        <el-descriptions-item label="教员类型">{{ tutorTypeMap[detail.tutorType] || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="详细身份">{{ detail.identityDetail || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="学历">{{ degreeMap[detail.degree] || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="高中母校">{{ detail.highSchool || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="大学">{{ detail.university || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="专业">{{ detail.major || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="年级 / 年份">{{ detail.gradeYear || '-' }}</el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" border v-if="detail" title="联系方式" style="margin-top:16px">
+        <el-descriptions-item label="邮箱">{{ detail.email || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="微信">{{ detail.wechat || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所在城市">{{ detail.cityId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所在区域">{{ detail.districtId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="通信地址" :span="2">{{ detail.address || '-' }}</el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" border v-if="detail" title="家教信息" style="margin-top:16px">
+        <el-descriptions-item label="授课方式">{{ teachingMethodMap[detail.teachingMethod] || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="课时费">{{ detail.priceMin || 0 }}-{{ detail.priceMax || 0 }} 元/时</el-descriptions-item>
+        <el-descriptions-item label="授课科目" :span="2">{{ detail.subjects || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="薪资备注" :span="2">{{ detail.salaryRemark || '-' }}</el-descriptions-item>
         <el-descriptions-item label="自我介绍" :span="2">{{ detail.selfIntroduction || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所获证书" :span="2">{{ detail.certificatesDesc || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="家教经验" :span="2">{{ detail.teachingExperience || '-' }}</el-descriptions-item>
+      </el-descriptions>
+      <el-descriptions :column="2" border v-if="detail" title="审核状态" style="margin-top:16px">
         <el-descriptions-item label="认证状态">
           <el-tag :type="detail.isVerified === 1 ? 'success' : 'info'" size="small">
             {{ detail.isVerified === 1 ? '已认证' : '未认证' }}
@@ -152,8 +176,9 @@ const auditRemark = ref('')
 const auditRow = ref<any>(null)
 const submitting = ref(false)
 
-const tutorTypeMap: Record<number, string> = { 1: '大学生', 2: '专职', 3: '在职教师', 4: '退休教师' }
+const tutorTypeMap: Record<number, string> = { 1: '大学生', 2: '专职', 3: '在职教师', 4: '海归外教' }
 const degreeMap: Record<number, string> = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
+const teachingMethodMap: Record<number, string> = { 1: '教员上门', 2: '学员上门', 3: '网络辅导', 4: '均可' }
 const auditLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已通过', 3: '已驳回', 4: '已发布' }[s] || '未知')
 const auditTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'danger', 4: 'success' }[s] || 'info')
 
@@ -164,6 +189,7 @@ const search = async () => {
       pageCurrent: page.value,
       pageSize: 20,
       auditStatus: auditStatus.value,
+      firstAudit: true,  // 仅"首次注册待审" — 修改重审走 /tutor/recent-edited
       keyword: keyword.value || undefined
     })
     if (res.code === 200 && res.data) {
