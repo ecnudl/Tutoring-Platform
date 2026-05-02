@@ -33,6 +33,13 @@ public class AuthTutorProfileController {
         if (url == null || url.toString().isEmpty()) return Result.error("头像 URL 不能为空");
         return biz.updateAvatar(url.toString());
     }
+    @ApiOperation(value = "切换是否展示成功记录 (展示偏好, 不触发审核)") @PostMapping("/show-success-record")
+    public Result<String> updateShowSuccessRecord(@RequestBody java.util.Map<String, Object> req) {
+        Object flag = req.get("showSuccessRecord");
+        if (flag == null) return Result.error("参数错误");
+        try { return biz.updateShowSuccessRecord(Integer.parseInt(flag.toString())); }
+        catch (NumberFormatException e) { return Result.error("参数错误"); }
+    }
     @ApiOperation(value = "提交审核") @PostMapping("/submit-audit")
     public Result<String> submitAudit() { return biz.submitAudit(); }
     @ApiOperation(value = "保存证书") @PostMapping("/cert/save")

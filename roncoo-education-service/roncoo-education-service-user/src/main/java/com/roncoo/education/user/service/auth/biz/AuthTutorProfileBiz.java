@@ -111,9 +111,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setPriceMax(req.getPriceMax());
         update.setSalaryRemark(req.getSalaryRemark());
         update.setFreeTrial(req.getFreeTrial());
-        if (req.getShowSuccessRecord() != null) {
-            update.setShowSuccessRecord(req.getShowSuccessRecord());
-        }
+        // 注: showSuccessRecord 走独立端点 /show-success-record (展示偏好, 不触发审核流转), 这里故意不读
 
         // 审核状态流转: REJECTED→DRAFT, APPROVED/PUBLISHED→PENDING (已发布的修改后回到待审核, 公开页暂时下架)
         Integer curStatus = profile.getAuditStatus();
@@ -199,6 +197,24 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setAvatar(url);
         int n = tutorProfileDao.updateById(update);
         return n > 0 ? Result.success("头像已更新") : Result.error("更新失败");
+    }
+
+    /**
+     * 仅切换"是否展示成功记录"开关 — 教员自治, 不触发审核流转.
+     * flag: 0 = 不展示, 1 = 展示
+     */
+    public Result<String> updateShowSuccessRecord(Integer flag) {
+        if (flag == null || (flag != 0 && flag != 1)) return Result.error("参数错误");
+        Long userId = ThreadContext.userId();
+        Result<String> check = checkTutor(userId);
+        if (check != null) return check;
+        TutorProfile profile = tutorProfileDao.getByUserId(userId);
+        if (profile == null) return Result.error("教员资料不存在");
+        TutorProfile update = new TutorProfile();
+        update.setId(profile.getId());
+        update.setShowSuccessRecord(flag);
+        int n = tutorProfileDao.updateById(update);
+        return n > 0 ? Result.success(flag == 1 ? "已开启展示" : "已关闭展示") : Result.error("更新失败");
     }
 
     /**
