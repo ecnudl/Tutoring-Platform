@@ -148,9 +148,19 @@
       <el-input v-model="form.teachingExperience" type="textarea" :rows="4" placeholder="例: 2024 年初三英语 (浦东) 学员从 70 分提到 95 分; 2023 年高一数学 (徐汇) 期末从 50 → 90" :disabled="isLocked" maxlength="800" />
     </el-form-item>
     <el-form-item label="成功记录">
-      <el-switch v-model="form.showSuccessRecord" :active-value="1" :inactive-value="0" active-text="在主页展示" inactive-text="暂不展示" :disabled="isLocked" />
+      <el-switch
+        v-model="form.showSuccessRecord"
+        :active-value="1"
+        :inactive-value="0"
+        active-text="在主页展示"
+        inactive-text="暂不展示"
+        :loading="savingShowRecord"
+        :disabled="savingShowRecord"
+        @change="handleToggleShowRecord"
+      />
       <div style="font-size:12px;color:#94a3b8;margin-top:4px">
         开启后, 已撮合的订单 (脱敏) 会展示在您的教员主页, 家长更倾向选择有成功记录的教员。
+        <span style="color:#1F4E8C">展示偏好修改即时生效, 无需审核。</span>
       </div>
     </el-form-item>
 
@@ -193,6 +203,7 @@ const saving = ref(false)
 const submitting = ref(false)
 const pageLoading = ref(false)
 const uploadingAvatar = ref(false)
+const savingShowRecord = ref(false)
 const citiesList = ref([])
 const districtsList = ref([])
 
@@ -321,6 +332,27 @@ const loadProfile = async () => {
   finally { pageLoading.value = false }
 }
 
+// 切换"是否展示成功记录" — 走独立端点, 不触发整页审核
+const handleToggleShowRecord = async (val) => {
+  // val 是 el-switch 切换后的新值 (1 或 0)
+  savingShowRecord.value = true
+  // 先记下旧值用于回滚 (val 即新值, 旧值 = 1 - val)
+  const oldVal = val === 1 ? 0 : 1
+  try {
+    const res = await post('/user/auth/tutor-profile/show-success-record', { showSuccessRecord: val })
+    if (res?.code === 200) {
+      ElMessage.success(res.msg || (val === 1 ? '已开启主页展示' : '已关闭主页展示'))
+    } else {
+      ElMessage.error(res?.msg || '保存失败')
+      form.value.showSuccessRecord = oldVal   // 回滚 UI
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('网络错误, 请重试')
+    form.value.showSuccessRecord = oldVal
+  } finally { savingShowRecord.value = false }
+}
+
 const handleSave = async () => {
   if (!form.value.realName) { ElMessage.warning('请输入真实姓名'); return }
   if (!form.value.tutorType) { ElMessage.warning('请选择教员类型'); return }
@@ -328,8 +360,10 @@ const handleSave = async () => {
   if (subjectList.value.length === 0) { ElMessage.warning('请选择授课科目'); return }
   saving.value = true
   try {
+    // showSuccessRecord 走独立端点 /show-success-record (展示偏好, 不触发审核流转), 这里剔除避免回滚审核状态
+    const { showSuccessRecord: _omit, ...rest } = form.value
     const payload = {
-      ...form.value,
+      ...rest,
       subjects: JSON.stringify(subjectList.value.map(Number)),
       districts: JSON.stringify((form.value.districts || []).map(Number))
     }
