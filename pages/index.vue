@@ -286,7 +286,7 @@
           <h2>{{ cityStore.cityName }}家教感言</h2>
           <NuxtLink to="/center/feedback" class="share-link">分享您的感言 →</NuxtLink>
         </div>
-        <div class="testimonial-grid">
+        <div v-if="testimonials.length" class="testimonial-grid">
           <div v-for="(t, idx) in testimonials" :key="idx" class="testimonial-card">
             <div class="testimonial-top">
               <el-avatar :size="40">{{ t.name.charAt(0) }}</el-avatar>
@@ -297,6 +297,9 @@
             </div>
             <div class="testimonial-content">"{{ t.content }}"</div>
           </div>
+        </div>
+        <div v-else class="order-empty">
+          暂无家教感言 — 欢迎您 <NuxtLink to="/center/feedback">分享一段</NuxtLink>，经审核通过后将在此展示
         </div>
       </div>
 
@@ -350,14 +353,8 @@ const activeNoticeTab = ref(0)
 const latestOrdersData = ref([])
 const latestOrders = computed(() => latestOrdersData.value)
 
-const DEFAULT_TESTIMONIALS = [
-  { name: '张女士', role: '学生家长', content: '老师非常耐心，孩子数学从70分提到了95分，非常感谢平台推荐的教员！' },
-  { name: '李同学', role: '大学生教员', content: '平台派单很快，家长也很好沟通，一个月接了5个学生，课时费准时结算。' },
-  { name: '王先生', role: '学生家长', content: '给孩子找了一位复旦的英语家教，口语提升很明显，试讲免费这个政策很好。' },
-  { name: '陈老师', role: '专职教员', content: '在平台上教了两年了，学生资源稳定，匹配规则清晰、纠纷处理及时，比之前的机构好很多。' },
-]
 const testimonialsData = ref([])
-const testimonials = computed(() => testimonialsData.value.length ? testimonialsData.value : DEFAULT_TESTIMONIALS)
+const testimonials = computed(() => testimonialsData.value)
 const subjectExpanded = ref(false)
 const universityExpanded = ref(false)
 
