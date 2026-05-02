@@ -23,8 +23,16 @@ public class AuthTutorProfileController {
 
     @ApiOperation(value = "查看教员资料") @GetMapping("/view")
     public Result<?> view() { return biz.view(); }
+    @ApiOperation(value = "授课区域 (districtId 列表)") @GetMapping("/teaching-areas")
+    public Result<?> teachingAreas() { return biz.teachingAreas(); }
     @ApiOperation(value = "保存教员资料") @PostMapping("/save")
     public Result<String> save(@RequestBody AuthTutorProfileSaveReq req) { return biz.save(req); }
+    @ApiOperation(value = "更新头像 (单字段, 不重置审核状态)") @PostMapping("/avatar")
+    public Result<String> updateAvatar(@RequestBody java.util.Map<String, Object> req) {
+        Object url = req.get("avatar");
+        if (url == null || url.toString().isEmpty()) return Result.error("头像 URL 不能为空");
+        return biz.updateAvatar(url.toString());
+    }
     @ApiOperation(value = "提交审核") @PostMapping("/submit-audit")
     public Result<String> submitAudit() { return biz.submitAudit(); }
     @ApiOperation(value = "保存证书") @PostMapping("/cert/save")

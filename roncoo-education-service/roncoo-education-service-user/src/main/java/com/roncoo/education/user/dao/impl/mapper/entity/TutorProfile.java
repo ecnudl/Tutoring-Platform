@@ -104,9 +104,14 @@ public class TutorProfile implements Serializable {
 
     private LocalDateTime lastLoginTime;
 
+    private LocalDateTime lastPublishedAt;
+
     private Integer showSuccessRecord;
 
     private static final long serialVersionUID = 1L;
+
+    public LocalDateTime getLastPublishedAt() { return lastPublishedAt; }
+    public void setLastPublishedAt(LocalDateTime lastPublishedAt) { this.lastPublishedAt = lastPublishedAt; }
 
     public Integer getShowSuccessRecord() {
         return showSuccessRecord;

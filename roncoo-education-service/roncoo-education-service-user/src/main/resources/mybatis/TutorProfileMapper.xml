@@ -121,8 +121,8 @@
         high_school, hometown_province, email, wechat, tags, city_id, district_id, address, latitude, longitude,
         teaching_method, price_min, price_max, salary_remark, free_trial,
         audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
-        subjects, grades,
-        login_count, last_login_time, show_success_record
+        subjects, grades, certificates_desc,
+        login_count, last_login_time, last_published_at, show_success_record
     </sql>
     <sql id="Blob_Column_List">
         teaching_experience, self_introduction
@@ -357,6 +357,9 @@
             <if test="lastLoginTime != null">
                 last_login_time,
             </if>
+            <if test="lastPublishedAt != null">
+                last_published_at,
+            </if>
             <if test="showSuccessRecord != null">
                 show_success_record,
             </if>
@@ -499,6 +502,9 @@
             </if>
             <if test="lastLoginTime != null">
                 #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastPublishedAt != null">
+                #{lastPublishedAt,jdbcType=TIMESTAMP},
             </if>
             <if test="showSuccessRecord != null">
                 #{showSuccessRecord,jdbcType=TINYINT},
@@ -650,6 +656,9 @@
             <if test="record.lastLoginTime != null">
                 last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="record.lastPublishedAt != null">
+                last_published_at = #{record.lastPublishedAt,jdbcType=TIMESTAMP},
+            </if>
             <if test="record.showSuccessRecord != null">
                 show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT},
             </if>
@@ -703,6 +712,7 @@
         is_verified = #{record.isVerified,jdbcType=TINYINT},
         login_count = #{record.loginCount,jdbcType=INTEGER},
         last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
+        last_published_at = #{record.lastPublishedAt,jdbcType=TIMESTAMP},
         show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -751,6 +761,7 @@
         is_verified = #{record.isVerified,jdbcType=TINYINT},
         login_count = #{record.loginCount,jdbcType=INTEGER},
         last_login_time = #{record.lastLoginTime,jdbcType=TIMESTAMP},
+        last_published_at = #{record.lastPublishedAt,jdbcType=TIMESTAMP},
         show_success_record = #{record.showSuccessRecord,jdbcType=TINYINT}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -900,6 +911,9 @@
             <if test="lastLoginTime != null">
                 last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="lastPublishedAt != null">
+                last_published_at = #{lastPublishedAt,jdbcType=TIMESTAMP},
+            </if>
             <if test="showSuccessRecord != null">
                 show_success_record = #{showSuccessRecord,jdbcType=TINYINT},
             </if>
@@ -950,6 +964,7 @@
             is_verified = #{isVerified,jdbcType=TINYINT},
             login_count = #{loginCount,jdbcType=INTEGER},
             last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            last_published_at = #{lastPublishedAt,jdbcType=TIMESTAMP},
             show_success_record = #{showSuccessRecord,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -995,6 +1010,7 @@
             is_verified = #{isVerified,jdbcType=TINYINT},
             login_count = #{loginCount,jdbcType=INTEGER},
             last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            last_published_at = #{lastPublishedAt,jdbcType=TIMESTAMP},
             show_success_record = #{showSuccessRecord,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>

@@ -8,9 +8,13 @@ import com.roncoo.education.common.core.enums.UserTypeEnum;
 import com.roncoo.education.common.tools.BeanUtil;
 import com.roncoo.education.user.dao.TutorCertificationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
+import com.roncoo.education.user.dao.TutorSubjectDao;
+import com.roncoo.education.user.dao.TutorTeachingAreaDao;
 import com.roncoo.education.user.dao.UsersDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorCertification;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorSubject;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorTeachingArea;
 import com.roncoo.education.user.dao.impl.mapper.entity.Users;
 import com.roncoo.education.user.service.auth.req.AuthCertSaveReq;
 import com.roncoo.education.user.service.auth.req.AuthTutorProfileSaveReq;
@@ -29,6 +33,10 @@ public class AuthTutorProfileBiz extends BaseBiz {
     private final TutorProfileDao tutorProfileDao;
     @NotNull
     private final TutorCertificationDao tutorCertificationDao;
+    @NotNull
+    private final TutorSubjectDao tutorSubjectDao;
+    @NotNull
+    private final TutorTeachingAreaDao tutorTeachingAreaDao;
     @NotNull
     private final UsersDao usersDao;
 
@@ -90,6 +98,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setWechat(req.getWechat());
         update.setSelfIntroduction(req.getSelfIntroduction());
         update.setCertificatesDesc(req.getCertificatesDesc());
+        update.setTeachingExperience(req.getTeachingExperience());
         update.setTeachingMethod(req.getTeachingMethod());
         update.setSubjects(req.getSubjects());
         update.setGrades(req.getGrades());
@@ -106,13 +115,90 @@ public class AuthTutorProfileBiz extends BaseBiz {
             update.setShowSuccessRecord(req.getShowSuccessRecord());
         }
 
-        // 如果之前被驳回，修改后回到草稿状态
-        if (TutorAuditStatusEnum.REJECTED.getCode().equals(profile.getAuditStatus())) {
+        // 审核状态流转: REJECTED→DRAFT, APPROVED/PUBLISHED→PENDING (已发布的修改后回到待审核, 公开页暂时下架)
+        Integer curStatus = profile.getAuditStatus();
+        if (TutorAuditStatusEnum.REJECTED.getCode().equals(curStatus)) {
             update.setAuditStatus(TutorAuditStatusEnum.DRAFT.getCode());
+        } else if (TutorAuditStatusEnum.APPROVED.getCode().equals(curStatus)
+                || TutorAuditStatusEnum.PUBLISHED.getCode().equals(curStatus)) {
+            update.setAuditStatus(TutorAuditStatusEnum.PENDING.getCode());
         }
 
         tutorProfileDao.updateById(update);
+
+        // 同步可教科目子表 (tutor_profile.subjects 是 JSON 字符串, 子表用于 join 翻译科目名)
+        syncSubjects(profile.getId(), req.getSubjects());
+        // 同步授课区域子表 (基于 cityId + districts)
+        syncTeachingAreas(profile.getId(), req.getCityId(), req.getDistricts());
+
         return Result.success("保存成功");
+    }
+
+    /** 当前教员的授课区域 districtId 列表 (供编辑表单初始化多选) */
+    public Result<?> teachingAreas() {
+        Long userId = ThreadContext.userId();
+        Result<String> check = checkTutor(userId);
+        if (check != null) return check;
+        TutorProfile profile = tutorProfileDao.getByUserId(userId);
+        if (profile == null) return Result.error("教员资料不存在");
+        java.util.List<TutorTeachingArea> list = tutorTeachingAreaDao.listByTutorId(profile.getId());
+        java.util.List<Long> ids = list.stream().map(TutorTeachingArea::getDistrictId)
+                .filter(java.util.Objects::nonNull).toList();
+        return Result.success(ids);
+    }
+
+    /** 解析 JSON 数组字符串 "[1,2,3]" 或 CSV "1,2,3" → List<Long>, 容错空字符串和非法值 */
+    private static java.util.List<Long> parseIds(String s) {
+        if (s == null) return java.util.Collections.emptyList();
+        String t = s.trim();
+        if (t.isEmpty() || "[]".equals(t)) return java.util.Collections.emptyList();
+        // 去掉外层 [] 和所有空白, 然后按逗号分割
+        if (t.startsWith("[") && t.endsWith("]")) t = t.substring(1, t.length() - 1);
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        for (String p : t.split(",")) {
+            String x = p.trim().replace("\"", "").replace("'", "");
+            if (x.isEmpty()) continue;
+            try { out.add(Long.parseLong(x)); } catch (NumberFormatException ignore) {}
+        }
+        return out;
+    }
+
+    private void syncSubjects(Long tutorId, String subjectsJson) {
+        tutorSubjectDao.deleteByTutorId(tutorId);
+        for (Long sid : parseIds(subjectsJson)) {
+            TutorSubject ts = new TutorSubject();
+            ts.setTutorId(tutorId);
+            ts.setSubjectId(sid);
+            ts.setStatusId(1);
+            tutorSubjectDao.save(ts);
+        }
+    }
+
+    private void syncTeachingAreas(Long tutorId, Long cityId, String districtsJson) {
+        tutorTeachingAreaDao.deleteByTutorId(tutorId);
+        if (cityId == null) return; // 没城市就清空, 不再写入 (city_id NOT NULL)
+        for (Long did : parseIds(districtsJson)) {
+            TutorTeachingArea ta = new TutorTeachingArea();
+            ta.setTutorId(tutorId);
+            ta.setCityId(cityId);
+            ta.setDistrictId(did);
+            ta.setStatusId(1);
+            tutorTeachingAreaDao.save(ta);
+        }
+    }
+
+    /** 仅更新头像, 不重置审核状态 (供 /head-photo 等单字段操作使用) */
+    public Result<String> updateAvatar(String url) {
+        Long userId = ThreadContext.userId();
+        Result<String> check = checkTutor(userId);
+        if (check != null) return check;
+        TutorProfile profile = tutorProfileDao.getByUserId(userId);
+        if (profile == null) return Result.error("教员资料不存在");
+        TutorProfile update = new TutorProfile();
+        update.setId(profile.getId());
+        update.setAvatar(url);
+        int n = tutorProfileDao.updateById(update);
+        return n > 0 ? Result.success("头像已更新") : Result.error("更新失败");
     }
 
     /**

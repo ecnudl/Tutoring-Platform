@@ -1586,6 +1586,16 @@ public class TutorProfileExample {
             addCriterion("display_no in", values, "displayNo");
             return (Criteria) this;
         }
+
+        public Criteria andLastPublishedAtIsNull() {
+            addCriterion("last_published_at is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastPublishedAtIsNotNull() {
+            addCriterion("last_published_at is not null");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

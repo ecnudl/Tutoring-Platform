@@ -62,7 +62,7 @@ public class TutorProfileDaoImpl extends AbstractBaseJdbc implements TutorProfil
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria criteria = example.createCriteria();
         criteria.andUserIdEqualTo(userId);
-        List<TutorProfile> list = this.tutorProfileMapper.selectByExample(example);
+        List<TutorProfile> list = this.tutorProfileMapper.selectByExampleWithBLOBs(example);
         if (list.isEmpty()) {
             return null;
         }
@@ -82,7 +82,7 @@ public class TutorProfileDaoImpl extends AbstractBaseJdbc implements TutorProfil
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria criteria = example.createCriteria();
         criteria.andDisplayNoEqualTo(displayNo);
-        List<TutorProfile> list = this.tutorProfileMapper.selectByExample(example);
+        List<TutorProfile> list = this.tutorProfileMapper.selectByExampleWithBLOBs(example);
         if (list.isEmpty()) {
             return null;
         }

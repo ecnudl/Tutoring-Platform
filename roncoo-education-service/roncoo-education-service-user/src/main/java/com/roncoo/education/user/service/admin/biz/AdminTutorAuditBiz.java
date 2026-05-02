@@ -42,11 +42,18 @@ public class AdminTutorAuditBiz extends BaseBiz {
         int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
         int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
         Integer auditStatus = req.get("auditStatus") != null ? Integer.parseInt(req.get("auditStatus").toString()) : null;
+        // firstAudit=true (默认): 仅"首次注册待审" — last_published_at IS NULL;
+        // firstAudit=false: 历史用法, 不过滤 last_published_at
+        boolean firstAudit = req.get("firstAudit") == null
+                || Boolean.parseBoolean(req.get("firstAudit").toString());
 
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
         if (auditStatus != null) {
             c.andAuditStatusEqualTo(auditStatus);
+        }
+        if (firstAudit) {
+            c.andLastPublishedAtIsNull();
         }
         if (req.get("keyword") != null && StringUtils.hasText(req.get("keyword").toString())) {
             c.andRealNameLike(PageUtil.like(req.get("keyword").toString()));
@@ -89,6 +96,10 @@ public class AdminTutorAuditBiz extends BaseBiz {
         update.setId(id);
         update.setAuditStatus(TutorAuditStatusEnum.PUBLISHED.getCode());
         update.setAuditRemark(remark);
+        // 首次审核通过 → 标记 last_published_at; 修改重审通过时不更新此字段
+        if (profile.getLastPublishedAt() == null) {
+            update.setLastPublishedAt(java.time.LocalDateTime.now());
+        }
         // 兜底：历史数据 display_no 可能为空，此时补一个，避免详情页 404
         if (profile.getDisplayNo() == null || profile.getDisplayNo().isEmpty()) {
             update.setDisplayNo("T" + (100000 + id % 900000));
@@ -220,17 +231,20 @@ public class AdminTutorAuditBiz extends BaseBiz {
     }
 
     /**
-     * 近期被编辑的教员资料: 已审核通过 (audit_status=3 PUBLISHED 或 4 APPROVED) 的 profile 中,
-     * 按 gmt_modified 倒序, 默认返回最近 30 天的最多 50 条. 用于运营周期性巡检教员是否擅自修改了已审核内容.
+     * 修改重审列表: 教员"曾发布过但因修改回到 PENDING"的资料.
+     * 即 audit_status=PENDING(1) AND last_published_at IS NOT NULL.
+     * 跟 page() (= 首次注册待审, last_published_at IS NULL) 完全互斥, 不重叠.
      */
     public Result<?> recentEditedProfiles(Map<String, Object> req) {
-        int days = req.get("days") != null ? Integer.parseInt(req.get("days").toString()) : 30;
         int limit = req.get("limit") != null ? Integer.parseInt(req.get("limit").toString()) : 50;
 
         TutorProfileExample example = new TutorProfileExample();
         TutorProfileExample.Criteria c = example.createCriteria();
-        c.andAuditStatusIn(java.util.Arrays.asList(3, 4));
-        c.andGmtModifiedGreaterThanOrEqualTo(java.time.LocalDateTime.now().minusDays(days));
+        c.andAuditStatusEqualTo(TutorAuditStatusEnum.PENDING.getCode());
+        c.andLastPublishedAtIsNotNull();
+        if (req.get("keyword") != null && StringUtils.hasText(req.get("keyword").toString())) {
+            c.andRealNameLike(PageUtil.like(req.get("keyword").toString()));
+        }
         example.setOrderByClause("gmt_modified desc");
 
         com.roncoo.education.common.base.page.Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile> page =

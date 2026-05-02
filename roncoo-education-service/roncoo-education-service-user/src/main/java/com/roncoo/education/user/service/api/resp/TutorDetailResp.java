@@ -49,19 +49,31 @@ public class TutorDetailResp implements Serializable {
     private Integer gender;
 
     @ApiModelProperty(value = "出生日期")
-    private String birthDate;
+    private java.time.LocalDate birthDate;
 
-    @ApiModelProperty(value = "教员类型(1:大学生,2:专职教师,3:海外留学生,4:专业人士)")
+    @ApiModelProperty(value = "教员类型(1:大学生,2:专职,3:在职教师,4:海归外教)")
     private Integer tutorType;
 
-    @ApiModelProperty(value = "学历")
-    private String degree;
+    @ApiModelProperty(value = "详细身份(本科大四/在读硕士/在职高中教师等)")
+    private String identityDetail;
+
+    @ApiModelProperty(value = "学历(1:高中,2:大专,3:本科,4:硕士,5:博士)")
+    private Integer degree;
+
+    @ApiModelProperty(value = "高中母校")
+    private String highSchool;
 
     @ApiModelProperty(value = "毕业/在读院校")
     private String university;
 
     @ApiModelProperty(value = "专业")
     private String major;
+
+    @ApiModelProperty(value = "年级/年份 (如 大四 / 研二)")
+    private String gradeYear;
+
+    @ApiModelProperty(value = "籍贯")
+    private String hometownProvince;
 
     @ApiModelProperty(value = "城市名称")
     private String cityName;
@@ -84,8 +96,17 @@ public class TutorDetailResp implements Serializable {
     @ApiModelProperty(value = "教龄(年)")
     private Integer teachingAge;
 
+    @ApiModelProperty(value = "薪资备注 (教员自定的薪资说明)")
+    private String salaryRemark;
+
     @ApiModelProperty(value = "自我介绍")
     private String selfIntroduction;
+
+    @ApiModelProperty(value = "所获证书 (CSV/换行分隔)")
+    private String certificatesDesc;
+
+    @ApiModelProperty(value = "家教经验 / 教学成果")
+    private String teachingExperience;
 
     @ApiModelProperty(value = "教学特点")
     private String teachingStyle;

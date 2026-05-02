@@ -29,8 +29,10 @@ public class AuthTutorProfileSaveReq implements Serializable {
     private String wechat;
     private String selfIntroduction;
     private String certificatesDesc;
+    private String teachingExperience;
     private Integer teachingMethod;
     private String subjects;
+    private String districts; // JSON array of district ids, e.g. "[101,102,103]"
     private String grades;
     private String tags;
     private Long provinceId;

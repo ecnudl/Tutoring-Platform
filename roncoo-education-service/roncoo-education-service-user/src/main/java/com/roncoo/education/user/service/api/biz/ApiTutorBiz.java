@@ -9,6 +9,7 @@ import com.roncoo.education.common.tools.BeanUtil;
 import com.roncoo.education.common.core.enums.ReservationStatusEnum;
 import com.roncoo.education.user.dao.DictCityDao;
 import com.roncoo.education.user.dao.DictDistrictDao;
+import com.roncoo.education.user.dao.DictSubjectDao;
 import com.roncoo.education.user.dao.TutorCertificationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
 import com.roncoo.education.user.dao.TutorRequirementDao;
@@ -17,6 +18,7 @@ import com.roncoo.education.user.dao.TutorSubjectDao;
 import com.roncoo.education.user.dao.TutorTeachingAreaDao;
 import com.roncoo.education.user.dao.impl.mapper.entity.DictCity;
 import com.roncoo.education.user.dao.impl.mapper.entity.DictDistrict;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictSubject;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorCertification;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfileExample;
@@ -73,6 +75,9 @@ public class ApiTutorBiz extends BaseBiz {
 
     @NotNull
     private final DictDistrictDao dictDistrictDao;
+
+    @NotNull
+    private final DictSubjectDao dictSubjectDao;
 
     /**
      * 教员搜索（分页+多条件）
@@ -149,12 +154,47 @@ public class ApiTutorBiz extends BaseBiz {
         tutorProfileDao.updateById(update);
 
         TutorDetailResp resp = BeanUtil.copyProperties(profile, TutorDetailResp.class);
-        // 查询科目
+        // 查询科目 + 翻译科目名 (BeanUtil 不会自动 join dict_subject)
         List<TutorSubject> subjects = tutorSubjectDao.listByTutorId(profile.getId());
-        resp.setSubjects(BeanUtil.copyProperties(subjects, TutorDetailResp.SubjectItem.class));
-        // 查询授课区域
+        java.util.List<TutorDetailResp.SubjectItem> subjectItems = new java.util.ArrayList<>(subjects.size());
+        java.util.List<String> subjectNames = new java.util.ArrayList<>(subjects.size());
+        for (TutorSubject s : subjects) {
+            TutorDetailResp.SubjectItem item = new TutorDetailResp.SubjectItem();
+            item.setId(s.getId());
+            item.setSubjectId(s.getSubjectId());
+            if (s.getSubjectId() != null) {
+                DictSubject ds = dictSubjectDao.getById(s.getSubjectId());
+                if (ds != null) item.setSubjectName(ds.getSubjectName());
+            }
+            if (item.getSubjectName() != null) subjectNames.add(item.getSubjectName());
+            subjectItems.add(item);
+        }
+        resp.setSubjects(subjectItems);
+        resp.setSubjectNames(subjectNames);
+        // 翻译 cityId/districtId → cityName/districtName (entity 只存 ID, resp 暴露名字给前端展示)
+        if (profile.getCityId() != null) {
+            DictCity city = dictCityDao.getById(profile.getCityId());
+            if (city != null) resp.setCityName(city.getCityName());
+        }
+        if (profile.getDistrictId() != null) {
+            DictDistrict district = dictDistrictDao.getById(profile.getDistrictId());
+            if (district != null) resp.setDistrictName(district.getDistrictName());
+        }
+        // 查询授课区域 + 翻译区域名
         List<TutorTeachingArea> areas = tutorTeachingAreaDao.listByTutorId(profile.getId());
-        resp.setTeachingAreas(BeanUtil.copyProperties(areas, TutorDetailResp.TeachingAreaItem.class));
+        java.util.List<TutorDetailResp.TeachingAreaItem> areaItems = new java.util.ArrayList<>(areas.size());
+        for (TutorTeachingArea a : areas) {
+            TutorDetailResp.TeachingAreaItem item = new TutorDetailResp.TeachingAreaItem();
+            item.setId(a.getId());
+            item.setCityId(a.getCityId());
+            item.setDistrictId(a.getDistrictId());
+            if (a.getDistrictId() != null) {
+                DictDistrict dd = dictDistrictDao.getById(a.getDistrictId());
+                if (dd != null) item.setDistrictName(dd.getDistrictName());
+            }
+            areaItems.add(item);
+        }
+        resp.setTeachingAreas(areaItems);
         // 查询资质证书
         List<TutorCertification> certs = tutorCertificationDao.listByTutorId(profile.getId());
         resp.setCertifications(BeanUtil.copyProperties(certs, TutorDetailResp.CertificationItem.class));
