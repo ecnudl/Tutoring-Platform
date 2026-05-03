@@ -137,7 +137,54 @@ public class ApiTutorBiz extends BaseBiz {
         }
         example.setOrderByClause(orderBy);
         Page<TutorProfile> page = tutorProfileDao.page(req.getPageCurrent(), req.getPageSize(), example);
-        return Result.success(PageUtil.transform(page, TutorSearchResp.class));
+        Page<TutorSearchResp> outPage = PageUtil.transform(page, TutorSearchResp.class);
+        // 翻译 subjects: entity 存的是 JSON id 数组(如 "[2013, 2014]") → resp 改写为 name CSV ("小学全科,数学")
+        // 前端卡片直接 t.subjects.split(',') 渲染, 不需要前端改
+        translateSubjectsForList(page.getList(), outPage.getList());
+        return Result.success(outPage);
+    }
+
+    /** 解析 "[1,2,3]" 或 "1,2,3" → List<Long>, 容错 */
+    private static java.util.List<Long> parseSubjectIds(String s) {
+        if (s == null) return java.util.Collections.emptyList();
+        String t = s.trim();
+        if (t.isEmpty() || "[]".equals(t)) return java.util.Collections.emptyList();
+        if (t.startsWith("[") && t.endsWith("]")) t = t.substring(1, t.length() - 1);
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        for (String p : t.split(",")) {
+            String x = p.trim().replace("\"", "").replace("'", "");
+            if (x.isEmpty()) continue;
+            try { out.add(Long.parseLong(x)); } catch (NumberFormatException ignore) {}
+        }
+        return out;
+    }
+
+    /** 批量翻译: 一页教员的 subjects 字段 id JSON → name CSV */
+    private void translateSubjectsForList(java.util.List<TutorProfile> rows, java.util.List<TutorSearchResp> resps) {
+        if (rows == null || resps == null || rows.isEmpty()) return;
+        // 收集本页所有用到的 subject_id, 去重
+        java.util.Set<Long> allIds = new java.util.HashSet<>();
+        java.util.List<java.util.List<Long>> perRow = new java.util.ArrayList<>(rows.size());
+        for (TutorProfile p : rows) {
+            java.util.List<Long> ids = parseSubjectIds(p.getSubjects());
+            perRow.add(ids);
+            allIds.addAll(ids);
+        }
+        // 一次性查 dict_subject (本页教员涉及到的 id, 通常去重后 < 20 个)
+        java.util.Map<Long, String> idToName = new java.util.HashMap<>();
+        for (Long sid : allIds) {
+            DictSubject ds = dictSubjectDao.getById(sid);
+            if (ds != null && ds.getSubjectName() != null) idToName.put(sid, ds.getSubjectName());
+        }
+        // 改写每行 resp.subjects
+        for (int i = 0; i < resps.size() && i < perRow.size(); i++) {
+            java.util.List<String> names = new java.util.ArrayList<>();
+            for (Long sid : perRow.get(i)) {
+                String n = idToName.get(sid);
+                if (n != null) names.add(n);
+            }
+            resps.get(i).setSubjects(String.join(",", names));
+        }
     }
 
     /**
