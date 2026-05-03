@@ -208,8 +208,8 @@ public class AdminRequirementBiz extends BaseBiz {
                 com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation resUp =
                         new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
                 resUp.setId(res.getId());
-                // res_status: 2 = COMPLETED (per ReservationStatusEnum, 已完成)
-                resUp.setResStatus(2);
+                // 撮合时是 CONFIRMED (已撮合, 待履约), 7 天后由 MatchExpireJob 自动 promote 到 COMPLETED
+                resUp.setResStatus(com.roncoo.education.common.core.enums.ReservationStatusEnum.CONFIRMED.getCode());
                 resUp.setMatchedAt(now);
                 reservationDao.updateById(resUp);
             }
@@ -317,24 +317,9 @@ public class AdminRequirementBiz extends BaseBiz {
         reqUp.setMatchedAt(null);
         requirementDao.updateById(reqUp);
 
-        // 2. 关联 reservation 全部 CANCELLED
-        com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample resEx =
-                new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample();
-        resEx.createCriteria()
-                .andRequirementIdEqualTo(id)
-                .andResStatusEqualTo(com.roncoo.education.common.core.enums.ReservationStatusEnum.CONFIRMED.getCode());
-        Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> rPage =
-                reservationDao.page(1, 100, resEx);
-        List<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> reservations =
-                rPage == null ? java.util.Collections.emptyList() : rPage.getList();
-        for (com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation r : reservations) {
-            com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation upd =
-                    new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
-            upd.setId(r.getId());
-            upd.setResStatus(com.roncoo.education.common.core.enums.ReservationStatusEnum.CANCELLED.getCode());
-            upd.setCancelReason("admin 撤销匹配, 订单已转回公开池");
-            reservationDao.updateById(upd);
-        }
+        // 2. reservation 不动 — 教员的成功撮合是其个人信用, 学员换教员不应抹掉历史功绩
+        //   语义: requirement.req_status (公开池可见性) 与 reservation.res_status (教员撮合记录) 解耦
+        //   reservation 仍保留 CONFIRMED/COMPLETED, 教员公开页"成功记录"继续展示
 
         // 3. 之前 ACCEPTED 的 application 改回 APPLIED, 通知教员
         List<TutorApplication> apps = applicationDao.listByRequirementId(id);
