@@ -117,6 +117,11 @@ public class ApiTutorBiz extends BaseBiz {
         if (StringUtils.hasText(req.getSubject())) {
             c.andSubjectsLike(PageUtil.like(req.getSubject()));
         }
+        if (StringUtils.hasText(req.getUniversity())) {
+            // 模糊匹配, 兼容教员自由文本填写的院校 ("复旦"/"复旦大学"/"复旦大学(邯郸校区)" 都命中"复旦")
+            // 院校"不限"时前端不传该字段 → 不加条件, 自由文本(如"湖南大学")的教员自然落入"不限"结果
+            c.andUniversityLike(PageUtil.like(req.getUniversity()));
+        }
         if (StringUtils.hasText(req.getKeyword())) {
             c.andRealNameLike(PageUtil.like(req.getKeyword()));
         }

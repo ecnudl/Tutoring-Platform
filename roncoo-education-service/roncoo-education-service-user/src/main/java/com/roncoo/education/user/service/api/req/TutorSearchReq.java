@@ -61,6 +61,9 @@ public class TutorSearchReq implements Serializable {
     @ApiModelProperty(value = "高校ID")
     private Long universityId;
 
+    @ApiModelProperty(value = "高校名称 (LIKE 模糊匹配, 兼容教员自由文本输入)")
+    private String university;
+
     @ApiModelProperty(value = "授课方式(1:教员上门,2:学员上门,3:线上授课)")
     private Integer teachingMethod;
 
