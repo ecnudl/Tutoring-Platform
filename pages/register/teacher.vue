@@ -209,18 +209,14 @@
               <el-input v-model="step2.highSchool" placeholder="请填写全称" />
             </el-form-item>
             <el-form-item label="所在大学" prop="universityId" required>
-              <el-select v-model="step2.universityId" filterable allow-create placeholder="选择所在高校（或手动输入）" @change="onUniversityChange" style="width:100%">
-                <el-option v-for="u in universityList" :key="u" :label="u" :value="u" />
-              </el-select>
+              <el-input v-model="step2.universityId" placeholder="请输入所在高校全称, 例如: 上海大学" maxlength="100" />
             </el-form-item>
           </template>
 
           <!-- 其他 / 在职 / 外籍：大学 -->
           <template v-if="step2.tutorType === 2 || step2.tutorType === 3 || step2.tutorType === 4">
             <el-form-item label="所在大学/或毕业大学" prop="universityId" required>
-              <el-select v-model="step2.universityId" filterable allow-create placeholder="选择大学（或手动输入）" @change="onUniversityChange" style="width:100%">
-                <el-option v-for="u in universityList" :key="u" :label="u" :value="u" />
-              </el-select>
+              <el-input v-model="step2.universityId" placeholder="请输入大学全称, 例如: 复旦大学" maxlength="100" />
             </el-form-item>
           </template>
 
@@ -327,7 +323,7 @@ import { CITY_LIST, navigateToCity, PINYIN_TO_CITY } from '~/composables/useCity
 import { SUBJECT_NAMES } from '~/composables/subjectList'
 
 const cityStore = useCityStore()
-const { districts, universities } = useCityData()
+const { districts } = useCityData()
 const router = useRouter()
 const { post } = useApi()
 const config = useRuntimeConfig()
@@ -341,7 +337,6 @@ const step2Ref = ref(null)
 const step3Ref = ref(null)
 
 const districtsRef = computed(() => districts.value)
-const universityList = computed(() => universities.value)
 
 // —— Step1: 账号信息 ——
 const step1 = reactive({
@@ -431,10 +426,6 @@ const onTutorTypeChange = () => {
   step2.hometownProvince = ''
 }
 
-const onUniversityChange = (val) => {
-  // universityId 字段在这个表单里就是学校名
-}
-
 const step2Rules = {
   realName: [
     { required: true, message: '请输入真实姓名', trigger: 'blur' },
@@ -449,7 +440,7 @@ const step2Rules = {
   degree: [{ required: true, message: '请选择学历', trigger: 'change' }],
   idCard: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
   highSchool: [{ required: true, message: '请填写高中母校', trigger: 'blur' }],
-  universityId: [{ required: true, message: '请选择或输入大学', trigger: 'change' }],
+  universityId: [{ required: true, message: '请输入所在大学/毕业大学', trigger: 'blur' }],
   districtId: [{ required: true, message: '请选择所在区', trigger: 'change' }],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
