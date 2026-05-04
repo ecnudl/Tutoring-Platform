@@ -115,7 +115,25 @@ public class ApiTutorBiz extends BaseBiz {
             c.andPriceMinLessThan(req.getPriceMax().add(java.math.BigDecimal.ONE));
         }
         if (StringUtils.hasText(req.getSubject())) {
-            c.andSubjectsLike(PageUtil.like(req.getSubject()));
+            // entity.subjects 存的是 JSON id 数组 (如 "[2013]"), 用户传的是科目名 (如 "小学全科").
+            // 直接 LIKE %小学全科% 永不命中. 走 dict_subject 翻译 + tutor_subject 子表 join.
+            Long subjectId = null;
+            for (DictSubject ds : dictSubjectDao.listAll()) {
+                if (req.getSubject().equals(ds.getSubjectName())) { subjectId = ds.getId(); break; }
+            }
+            if (subjectId == null) {
+                return Result.success(emptyTutorSearchPage(req));
+            }
+            java.util.List<TutorSubject> tsList = tutorSubjectDao.listBySubjectId(subjectId);
+            java.util.List<Long> tutorIds = tsList.stream()
+                    .map(TutorSubject::getTutorId)
+                    .filter(java.util.Objects::nonNull)
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList());
+            if (tutorIds.isEmpty()) {
+                return Result.success(emptyTutorSearchPage(req));
+            }
+            c.andIdIn(tutorIds);
         }
         if (StringUtils.hasText(req.getUniversity())) {
             // 模糊匹配, 兼容教员自由文本填写的院校 ("复旦"/"复旦大学"/"复旦大学(邯郸校区)" 都命中"复旦")
@@ -142,6 +160,17 @@ public class ApiTutorBiz extends BaseBiz {
         // 前端卡片直接 t.subjects.split(',') 渲染, 不需要前端改
         translateSubjectsForList(page.getList(), outPage.getList());
         return Result.success(outPage);
+    }
+
+    /** 提前返回的空 page (subject 翻译失败 / 子表 0 行的快路径) */
+    private Page<TutorSearchResp> emptyTutorSearchPage(TutorSearchReq req) {
+        Page<TutorSearchResp> empty = new Page<>();
+        empty.setList(java.util.Collections.emptyList());
+        empty.setPageCurrent(req.getPageCurrent() <= 0 ? 1 : req.getPageCurrent());
+        empty.setPageSize(req.getPageSize() <= 0 ? 20 : req.getPageSize());
+        empty.setTotalCount(0);
+        empty.setTotalPage(0);
+        return empty;
     }
 
     /** 解析 "[1,2,3]" 或 "1,2,3" → List<Long>, 容错 */
