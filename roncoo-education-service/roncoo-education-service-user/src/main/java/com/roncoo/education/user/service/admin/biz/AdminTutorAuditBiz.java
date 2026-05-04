@@ -7,13 +7,28 @@ import com.roncoo.education.common.base.page.PageUtil;
 import com.roncoo.education.common.core.base.Result;
 import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
 import com.roncoo.education.common.tools.BeanUtil;
+import com.roncoo.education.user.dao.DictCityDao;
+import com.roncoo.education.user.dao.DictDistrictDao;
+import com.roncoo.education.user.dao.DictSubjectDao;
 import com.roncoo.education.user.dao.TutorAuditRecordDao;
 import com.roncoo.education.user.dao.TutorCertificationDao;
 import com.roncoo.education.user.dao.TutorProfileDao;
+import com.roncoo.education.user.dao.TutorSubjectDao;
+import com.roncoo.education.user.dao.TutorTeachingAreaDao;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictCity;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictDistrict;
+import com.roncoo.education.user.dao.impl.mapper.entity.DictSubject;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorAuditRecord;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorCertification;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile;
 import com.roncoo.education.user.dao.impl.mapper.entity.TutorProfileExample;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorSubject;
+import com.roncoo.education.user.dao.impl.mapper.entity.TutorTeachingArea;
+import com.roncoo.education.user.dao.impl.mapper.entity.Users;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -34,6 +49,36 @@ public class AdminTutorAuditBiz extends BaseBiz {
     private final TutorCertificationDao tutorCertificationDao;
     @NotNull
     private final com.roncoo.education.user.dao.UsersDao usersDao;
+    @NotNull
+    private final DictCityDao dictCityDao;
+    @NotNull
+    private final DictDistrictDao dictDistrictDao;
+    @NotNull
+    private final DictSubjectDao dictSubjectDao;
+    @NotNull
+    private final TutorSubjectDao tutorSubjectDao;
+    @NotNull
+    private final TutorTeachingAreaDao tutorTeachingAreaDao;
+
+    /**
+     * 详情响应: 继承 TutorProfile 自动获得全 entity 字段, 再追加翻译字段
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    public static class AdminTutorAuditViewResp extends TutorProfile {
+        private String cityName;          // 翻译 cityId
+        private String districtName;      // 翻译 districtId
+        private String subjectNames;      // 翻译 subjects JSON ids → CSV ("小学全科,数学")
+        private java.util.List<AreaItem> teachingAreasResolved; // 子表 + 翻译
+
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class AreaItem {
+            private Long districtId;
+            private String districtName;
+        }
+    }
 
     /**
      * 待审核教员分页列表
@@ -64,14 +109,82 @@ public class AdminTutorAuditBiz extends BaseBiz {
     }
 
     /**
-     * 教员审核详情
+     * 教员审核详情. 返回 entity 全字段 + 翻译字段 + 子表数据
+     * (cityId/districtId/subjects 这些裸 ID 不该让 admin 看 raw 值, mobile 兜底从 users 表回填)
      */
     public Result<?> view(Long id) {
         TutorProfile profile = tutorProfileDao.getById(id);
-        if (profile == null) {
-            return Result.error("教员不存在");
+        if (profile == null) return Result.error("教员不存在");
+
+        AdminTutorAuditViewResp resp = BeanUtil.copyProperties(profile, AdminTutorAuditViewResp.class);
+
+        // mobile 兜底: profile.mobile 为空时从 users.mobile 取
+        if (!StringUtils.hasText(resp.getMobile()) && profile.getUserId() != null) {
+            try {
+                Users u = usersDao.getById(profile.getUserId());
+                if (u != null && StringUtils.hasText(u.getMobile())) resp.setMobile(u.getMobile());
+            } catch (Exception ignored) {}
         }
-        return Result.success(profile);
+
+        // cityName / districtName 翻译
+        if (profile.getCityId() != null) {
+            DictCity city = dictCityDao.getById(profile.getCityId());
+            if (city != null) resp.setCityName(city.getCityName());
+        }
+        if (profile.getDistrictId() != null) {
+            DictDistrict d = dictDistrictDao.getById(profile.getDistrictId());
+            if (d != null) resp.setDistrictName(d.getDistrictName());
+        }
+
+        // subjects 翻译 (JSON id → name CSV). 优先用 tutor_subject 子表 (如果同步了), 否则解析 entity.subjects 字段
+        java.util.List<String> subjectNames = new java.util.ArrayList<>();
+        java.util.List<TutorSubject> subRows = tutorSubjectDao.listByTutorId(profile.getId());
+        if (subRows != null && !subRows.isEmpty()) {
+            for (TutorSubject ts : subRows) {
+                if (ts.getSubjectId() == null) continue;
+                DictSubject ds = dictSubjectDao.getById(ts.getSubjectId());
+                if (ds != null && StringUtils.hasText(ds.getSubjectName())) subjectNames.add(ds.getSubjectName());
+            }
+        } else {
+            // 子表为空, 解析 entity.subjects JSON
+            for (Long sid : parseSubjectIds(profile.getSubjects())) {
+                DictSubject ds = dictSubjectDao.getById(sid);
+                if (ds != null && StringUtils.hasText(ds.getSubjectName())) subjectNames.add(ds.getSubjectName());
+            }
+        }
+        resp.setSubjectNames(String.join(", ", subjectNames));
+
+        // 授课区域子表 + 翻译每条
+        java.util.List<TutorTeachingArea> areaRows = tutorTeachingAreaDao.listByTutorId(profile.getId());
+        java.util.List<AdminTutorAuditViewResp.AreaItem> areaItems = new java.util.ArrayList<>();
+        if (areaRows != null) {
+            for (TutorTeachingArea a : areaRows) {
+                String dn = null;
+                if (a.getDistrictId() != null) {
+                    DictDistrict dd = dictDistrictDao.getById(a.getDistrictId());
+                    if (dd != null) dn = dd.getDistrictName();
+                }
+                areaItems.add(new AdminTutorAuditViewResp.AreaItem(a.getDistrictId(), dn));
+            }
+        }
+        resp.setTeachingAreasResolved(areaItems);
+
+        return Result.success(resp);
+    }
+
+    /** 解析 "[1,2,3]" 或 "1,2,3" → List<Long>, 容错 */
+    private static java.util.List<Long> parseSubjectIds(String s) {
+        if (s == null) return java.util.Collections.emptyList();
+        String t = s.trim();
+        if (t.isEmpty() || "[]".equals(t)) return java.util.Collections.emptyList();
+        if (t.startsWith("[") && t.endsWith("]")) t = t.substring(1, t.length() - 1);
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        for (String p : t.split(",")) {
+            String x = p.trim().replace("\"", "").replace("'", "");
+            if (x.isEmpty()) continue;
+            try { out.add(Long.parseLong(x)); } catch (NumberFormatException ignore) {}
+        }
+        return out;
     }
 
     /**
