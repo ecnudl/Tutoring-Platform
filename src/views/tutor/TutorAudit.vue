@@ -56,9 +56,27 @@
 
     <!-- 详情弹窗 -->
     <el-dialog v-model="detailVisible" title="教员详情 - 审核" width="820px">
+      <!-- 顶部概要: 头像 + 姓名 + 类型 + 明星 -->
+      <div v-if="detail" class="detail-header">
+        <el-image v-if="detail.avatar" :src="detail.avatar" class="detail-avatar" :preview-src-list="[detail.avatar]" />
+        <div v-else class="detail-avatar detail-avatar-empty">未上传</div>
+        <div>
+          <div class="detail-name">
+            {{ detail.realName || '匿名' }}
+            <span class="detail-no">{{ detail.displayNo }}</span>
+          </div>
+          <div class="detail-meta">
+            {{ tutorTypeMap[detail.tutorType] || '-' }}
+            <span v-if="detail.gender">· {{ detail.gender === 1 ? '男' : '女' }}</span>
+            <span v-if="detail.isVerified === 1" class="detail-chip detail-chip-success">已认证</span>
+            <span v-if="detail.isStar === 1" class="detail-chip detail-chip-star">★ 明星教员</span>
+          </div>
+        </div>
+      </div>
+
       <el-descriptions :column="2" border v-if="detail" title="基本信息">
         <el-descriptions-item label="姓名">{{ detail.realName }}</el-descriptions-item>
-        <el-descriptions-item label="手机号">{{ detail.mobile }}</el-descriptions-item>
+        <el-descriptions-item label="手机号">{{ detail.mobile || '-' }}</el-descriptions-item>
         <el-descriptions-item label="性别">{{ detail.gender === 1 ? '男' : '女' }}</el-descriptions-item>
         <el-descriptions-item label="出生年月">{{ detail.birthDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="籍贯">{{ detail.hometownProvince || '-' }}</el-descriptions-item>
@@ -76,17 +94,37 @@
       <el-descriptions :column="2" border v-if="detail" title="联系方式" style="margin-top:16px">
         <el-descriptions-item label="邮箱">{{ detail.email || '-' }}</el-descriptions-item>
         <el-descriptions-item label="微信">{{ detail.wechat || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="所在城市">{{ detail.cityId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="所在区域">{{ detail.districtId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所在城市">{{ detail.cityName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所在区域">{{ detail.districtName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="通信地址" :span="2">{{ detail.address || '-' }}</el-descriptions-item>
       </el-descriptions>
       <el-descriptions :column="2" border v-if="detail" title="家教信息" style="margin-top:16px">
         <el-descriptions-item label="授课方式">{{ teachingMethodMap[detail.teachingMethod] || '-' }}</el-descriptions-item>
         <el-descriptions-item label="课时费">{{ detail.priceMin || 0 }}-{{ detail.priceMax || 0 }} 元/时</el-descriptions-item>
-        <el-descriptions-item label="授课科目" :span="2">{{ detail.subjects || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="授课科目" :span="2">{{ detail.subjectNames || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="可授课区域" :span="2">
+          <template v-if="detail.teachingAreasResolved && detail.teachingAreasResolved.length">
+            <span style="color:#666;margin-right:6px">{{ detail.cityName || '' }} ·</span>
+            <el-tag
+              v-for="(a, i) in detail.teachingAreasResolved" :key="i"
+              type="info" size="small" style="margin:2px 4px"
+            >{{ a.districtName || '-' }}</el-tag>
+          </template>
+          <span v-else>-</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="免费试课">
+          <el-tag :type="detail.freeTrial === 1 ? 'success' : 'info'" size="small">
+            {{ detail.freeTrial === 1 ? '支持' : '不支持' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="主页展示成功记录">
+          <el-tag :type="detail.showSuccessRecord === 0 ? 'info' : 'success'" size="small">
+            {{ detail.showSuccessRecord === 0 ? '不展示' : '展示' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="薪资备注" :span="2">{{ detail.salaryRemark || '-' }}</el-descriptions-item>
         <el-descriptions-item label="自我介绍" :span="2">{{ detail.selfIntroduction || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="所获证书" :span="2">{{ detail.certificatesDesc || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="所获证书 (描述)" :span="2">{{ detail.certificatesDesc || '-' }}</el-descriptions-item>
         <el-descriptions-item label="家教经验" :span="2">{{ detail.teachingExperience || '-' }}</el-descriptions-item>
       </el-descriptions>
       <el-descriptions :column="2" border v-if="detail" title="审核状态" style="margin-top:16px">
@@ -286,3 +324,59 @@ const submitAudit = async () => {
 
 onMounted(() => { search() })
 </script>
+
+<style scoped>
+.detail-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+.detail-avatar {
+  width: 80px; height: 80px;
+  border-radius: 6px; object-fit: cover;
+  border: 1px solid #eee;
+}
+.detail-avatar-empty {
+  background: #f5f5f5;
+  color: #999;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-name {
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.detail-no { color: #999; font-weight: 400; font-size: 13px; }
+.detail-meta {
+  color: #666;
+  font-size: 13px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-chip {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.detail-chip-success {
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+.detail-chip-star {
+  color: #d97706;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+</style>
