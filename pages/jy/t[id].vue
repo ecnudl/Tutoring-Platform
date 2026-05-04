@@ -260,7 +260,7 @@ function getDisplayName(t) {
   const name = (t.realName || '').trim()
   if (!name) return '匿名教员'
   const surname = name.charAt(0)
-  const suffix = t.tutorType === 1 ? '同学' : '老师'
+  const suffix = t.tutorType === 1 ? '教员' : '老师'
   return surname + suffix
 }
 
