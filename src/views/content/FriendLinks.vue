@@ -59,7 +59,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Check, RefreshRight } from '@element-plus/icons-vue'
-import { post } from '@/api/index'
+import { post, get } from '@/api/index'
 
 interface FriendLink { name: string; url: string }
 
@@ -75,11 +75,12 @@ const addForm = ref<FriendLink>({ name: '', url: '' })
 const load = async () => {
   loading.value = true
   try {
-    const res = await post('/system/admin/sys/config/list', {})
-    if (res?.code === 200 && Array.isArray(res.data)) {
-      const row = res.data.find((c: any) => c.configKey === KEY)
-      if (row && row.configValue) {
-        try { links.value = JSON.parse(row.configValue) } catch { links.value = [] }
+    // 用公开端点读 (sys/config/list 受 RBAC 限制, 当前 admin 角色可能没"系统配置"权限)
+    const res = await get('/system/api/site/config')
+    if (res?.code === 200 && res.data) {
+      const raw = res.data.siteFriendLinksJson
+      if (raw) {
+        try { links.value = JSON.parse(raw) } catch { links.value = [] }
       } else {
         links.value = []
       }
