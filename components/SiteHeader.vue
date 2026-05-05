@@ -364,38 +364,84 @@ const handleLogout = () => {
 }
 
 /* ============================================
-   Responsive
+   Responsive (≤ 768px) — 紧凑 navbar, 总高 ~120px
+   行 1: 591家教网 (左) + 切换城市/家教热线 (右)
+   行 2: 5 个核心 nav
+   行 3: 5 个次级 nav (含登录态)
    ============================================ */
 @media (max-width: 768px) {
-  .site-header-outer { padding: var(--space-md) 0 0; }
+  .site-header-outer { padding: 6px 0 0; }
   .site-header-card {
-    flex-direction: column;
-    border-radius: 8px 8px 0 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-radius: 6px 6px 0 0;
+    min-height: auto;
   }
-  .nav-center {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-light);
-    min-width: auto;
-    padding: var(--space-md) var(--space-lg);
-    align-items: center;
-  }
+
+  /* 行 1 左: 品牌, 隐藏副标题 + 域名 */
   .nav-brand {
+    flex: 0 0 auto;
+    padding: 8px 10px;
     border-right: none;
     border-bottom: 1px solid var(--color-border-light);
-    padding: var(--space-md);
   }
+  .brand-main { font-size: 18px; }
+  .brand-num { font-size: 20px; }
+  .brand-cn { letter-spacing: 1px; }
+  .brand-sub { display: none; }
+  .nav-brand-domains { display: none; }
+
+  /* 行 1 右: 移动端只显示"城市切换" — 电话号码移到 footer (避免在 390px 下挤压, footer 也有) */
+  .nav-center {
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 10px;
+    gap: 8px;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .nav-center-row { gap: 0; }
+  .nav-center-label { display: none; }
+  /* 第 2 行 (家教热线) 在移动端隐藏 — footer 已展示同号码 */
+  .nav-center > .nav-center-row:nth-child(2) { display: none; }
+  .city-btn {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  /* 行 2 + 行 3: 5 列等分 nav, 字号缩小, 边距收紧 */
   .nav-right {
-    padding: var(--space-md) var(--space-lg);
+    flex: 0 0 100%;
+    padding: 6px 4px 10px;
     width: 100%;
+    gap: 4px;
+    overflow: hidden;
   }
   .nav-right-row {
     grid-template-columns: repeat(5, 1fr);
-    justify-items: center;
     gap: 0;
   }
   .nav-cell {
-    font-size: var(--font-size-sm);
-    padding: 4px 6px;
+    font-size: 12px;
+    padding: 6px 2px;
+    letter-spacing: 0;
   }
+}
+
+/* 超窄屏 (≤ 360px) 进一步收紧, 防止 iPhone SE / 老 Android 折行 */
+@media (max-width: 360px) {
+  .brand-main { font-size: 16px; }
+  .brand-num { font-size: 18px; }
+  .city-btn, .nav-phone {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  .phone-num { font-size: 11px; }
+  .nav-cell { font-size: 11px; padding: 5px 1px; }
 }
 </style>
