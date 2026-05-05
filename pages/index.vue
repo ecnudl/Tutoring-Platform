@@ -247,36 +247,76 @@
         <el-empty v-else description="暂无教员数据" />
       </div>
 
-      <!-- ========== 家教最新订单 ========== -->
+      <!-- ========== 家教最新订单 (与 /xy 学员库卡片对齐) ========== -->
       <div class="section-box">
         <div class="section-header">
           <h2>{{ cityStore.cityName }}家教最新订单</h2>
           <NuxtLink to="/xy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
-        <div class="order-list" v-if="latestOrders.length">
-          <div
-            v-for="order in latestOrders"
-            :key="order.id"
-            class="order-item"
-            :class="{ 'is-matched': order.isMatched }"
-          >
-            <div class="order-left">
-              <span v-if="order.isMatched" class="order-tag tag-done">已接</span>
-              <span v-else-if="order.isUrgent" class="order-tag tag-urgent">急</span>
-              <span class="order-title">{{ order.title }}</span>
+
+        <div class="req-list" v-if="latestOrders.length">
+          <template v-for="r in latestOrders" :key="r.id">
+            <NuxtLink
+              v-if="!r.isMatched"
+              :to="'/xy/s' + (r.displayNo ? r.displayNo.replace(/^S/i, '') : r.id)"
+              class="req-row"
+            >
+              <div class="rc-c1">
+                <div class="rc-title">
+                  <span v-if="r.isUrgent" class="rc-urgent">急</span>
+                  {{ buildCardTitle(r) }}
+                </div>
+                <div class="rc-no">{{ r.displayNo || ('S' + r.id) }}</div>
+              </div>
+              <div class="rc-c2">
+                <template v-if="Number(r.teachingMethod) === 3">
+                  <div class="rc-online">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                    网络授课
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="rc-region">{{ buildRegion(r) }}</div>
+                </template>
+              </div>
+              <div class="rc-c3">
+                <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+                <div class="rc-pref">{{ buildTutorPref(r) }}</div>
+              </div>
+              <div class="rc-c4">
+                <div class="rc-budget">{{ buildBudget(r) }}</div>
+                <span class="rc-cta">详情</span>
+              </div>
+            </NuxtLink>
+
+            <div v-else class="req-row is-matched">
+              <div class="rc-c1">
+                <div class="rc-title">{{ buildCardTitle(r) }}</div>
+                <div class="rc-no">{{ r.displayNo || ('S' + r.id) }}</div>
+              </div>
+              <div class="rc-c2">
+                <template v-if="Number(r.teachingMethod) === 3">
+                  <div class="rc-online">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                    网络授课
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="rc-region">{{ buildRegion(r) }}</div>
+                </template>
+              </div>
+              <div class="rc-c3">
+                <div class="rc-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+                <div class="rc-pref">{{ buildTutorPref(r) }}</div>
+              </div>
+              <div class="rc-c4">
+                <div class="rc-budget">{{ buildBudget(r) }}</div>
+                <span class="rc-done">已接单</span>
+              </div>
             </div>
-            <div class="order-right">
-              <span class="order-area">{{ order.area }}</span>
-              <span class="order-time">{{ order.time }}</span>
-              <span v-if="order.isMatched" class="order-btn order-btn-done" aria-disabled="true">已接单</span>
-              <NuxtLink
-                v-else
-                class="order-btn"
-                :to="'/xy/s' + (order.displayNo ? order.displayNo.replace(/^S/i, '') : order.id)"
-              >详情 →</NuxtLink>
-            </div>
-          </div>
+          </template>
         </div>
+
         <div v-else class="order-empty">暂无最新订单 — 可前往 <NuxtLink to="/xy">学员库</NuxtLink> 浏览全部需求</div>
       </div>
 
@@ -412,33 +452,50 @@ const doSearch = () => {
 
 const handleLogout = () => { userStore.logout(); router.push('/') }
 
+// 卡片渲染助手 (与 /xy 学员库卡片完全一致)
+const csvFirst = (s) => {
+  if (!s) return ''
+  return String(s).split(',').map(x => x.trim()).filter(Boolean)[0] || ''
+}
+const csvJoin = (s) => {
+  if (!s) return ''
+  return String(s).split(',').map(x => x.trim()).filter(Boolean).join('、')
+}
+const buildCardTitle = (r) => {
+  if (r && r.title && String(r.title).trim()) return r.title
+  const subjects = csvJoin(r.subjectIds)
+  return subjects || '暂无科目要求'
+}
+const buildRegion = (r) => {
+  const dn = csvFirst(r.districtNames)
+  return dn || '区域待确认'
+}
+const buildTutorPref = (r) => {
+  // 注: latest API 字段是 studentGender, xy 是 tutorGender — 同一含义, 这里兼容两个名字
+  const g = r.tutorGender !== undefined ? r.tutorGender : r.studentGender
+  const gPart = g === 1 ? '[男]' : g === 2 ? '[女]' : '[无限制]'
+  const types = csvJoin(r.tutorTypePref)
+  return types ? `${gPart}需要教员身份${types}` : `${gPart}不限教员类型`
+}
+const buildBudget = (r) => {
+  if (r.budgetMin && r.budgetMax && Number(r.budgetMin) !== Number(r.budgetMax)) {
+    return `${r.budgetMin}-${r.budgetMax} 元/小时`
+  }
+  if (r.budgetMin) return `${r.budgetMin} 元/小时`
+  if (r.budgetMax) return `${r.budgetMax} 元/小时`
+  return '面议'
+}
+
 const loadLatestOrders = async () => {
   try {
     const res = await get('/user/api/requirement/latest', { cityId: cityStore.cityId, limit: 6 })
     if (res?.code === 200 && Array.isArray(res.data)) {
-      latestOrdersData.value = res.data.map((r) => {
-        // 标题优先级: admin 手填 title > subjectIds CSV 拼接 > "暂无科目要求"
-        const subjects = r.subjectIds ? String(r.subjectIds).split(',').map(s => s.trim()).filter(Boolean).join('、') : ''
-        const title = (r.title && r.title.trim()) || subjects || '暂无科目要求'
-        // 区域: 在线 → 网络授课; 否则 districtNames 第一项 / address / 区域待确认
-        let area
-        if (Number(r.teachingMethod) === 3) {
-          area = '网络授课'
-        } else if (r.districtNames) {
-          area = String(r.districtNames).split(',').map(s => s.trim()).filter(Boolean)[0] || '区域待确认'
-        } else {
-          area = '区域待确认'
-        }
-        return {
-          id: r.id,
-          displayNo: r.displayNo,
-          isUrgent: r.isUrgent === 1,
-          title,
-          area,
-          time: r.gmtCreate ? timeAgo(r.gmtCreate) : '',
-          isMatched: r.reqStatus === 3
-        }
-      })
+      // 直接保留原 r 字段供 buildXxx 渲染, 仅追加便于 v-if 判断的 isMatched / isUrgent (boolean)
+      latestOrdersData.value = res.data.map((r) => ({
+        ...r,
+        isUrgent: r.isUrgent === 1,
+        isMatched: r.reqStatus === 3
+      }))
     }
   } catch (e) { /* leave empty */ }
 }
@@ -1249,59 +1306,178 @@ onMounted(async () => {
 }
 
 /* ============================================
-   最新订单
+   最新订单 — 与 /xy 学员库卡片完全对齐
    ============================================ */
-.order-list {
+.req-list {
   display: flex;
   flex-direction: column;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.order-item {
-  display: flex;
-  justify-content: space-between;
+.req-row {
+  display: grid;
+  grid-template-columns: 200px 160px 1fr 150px;
+  gap: 20px;
   align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 18px 18px;
+  background: #fff;
+  border-bottom: 1px dashed #e5e7eb;
   text-decoration: none;
-  color: inherit;
-  transition: background 0.15s;
-  border-radius: 4px;
+  position: relative;
+  transition: background 0.15s, transform 0.15s;
 }
-.order-item:last-child { border-bottom: none; }
-.order-item.is-matched { opacity: 0.55; }
+.req-row:hover { background: #f8fafc; }
+.req-row:hover .rc-cta {
+  background: #b45309;
+  transform: translateX(2px);
+  box-shadow: 0 6px 20px -8px rgba(180, 83, 9, 0.45);
+}
+.req-row:last-child { border-bottom: none; }
+.req-row.is-matched {
+  opacity: 0.65;
+  cursor: default;
+  background: #fafbfc;
+}
+.req-row.is-matched:hover { background: #fafbfc; }
 
-.tag-done {
-  background: #e2e8f0;
-  color: #64748b;
+/* col 1: 标题 + 编号 */
+.rc-c1 { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rc-title {
+  font-size: 16px; font-weight: 700;
+  color: #111827;
+  letter-spacing: 0.4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rc-urgent {
+  display: inline-block;
+  background: #FEE2E2;
+  color: #DC2626;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+.rc-no {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
 }
 
-/* "详情 →" 按钮: 海军蓝描边, hover 填充. 已接单灰色禁用. */
-.order-btn {
+/* col 2: 区域 / 网络授课 */
+.rc-c2 { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rc-region {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rc-online {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  gap: 6px;
+  color: #d97706;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.rc-online svg { flex-shrink: 0; }
+
+/* col 3: 备注 + 教员偏好 */
+.rc-c3 { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rc-req {
+  font-size: 13px;
+  color: #111827;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.rc-pref {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary-light);
-  border-radius: 4px;
-  text-decoration: none;
-  letter-spacing: 0.5px;
+  color: #64748b;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* col 4: 预算 + CTA */
+.rc-c4 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+.rc-budget {
+  font-size: 15px;
+  font-weight: 700;
+  color: #d97706;
+  font-family: Georgia, serif;
+  letter-spacing: 0.4px;
   white-space: nowrap;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
-  margin-left: var(--space-sm);
 }
-.order-btn:hover {
-  background: var(--color-primary);
+.rc-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  background: #d97706;
   color: #fff;
-  border-color: var(--color-primary);
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
 }
-.order-btn-done {
+.rc-done {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   color: #94a3b8;
-  border-color: #cbd5e1;
-  background: #f1f5f9;
-  cursor: not-allowed;
-  pointer-events: none;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
+  cursor: default;
+  user-select: none;
+  background: transparent;
+}
+
+/* 折叠 */
+@media (max-width: 1100px) {
+  .req-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 18px;
+    padding: 16px 16px;
+  }
+  .rc-c4 {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    border-top: 1px dashed #f1f5f9;
+    padding-top: 12px;
+  }
+}
+@media (max-width: 768px) {
+  .req-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 14px;
+  }
+  .rc-c4 {
+    flex-direction: row-reverse;
+    border-top: 1px dashed #f1f5f9;
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+  .rc-cta { padding: 7px 14px; }
 }
 
 .order-empty {
@@ -1314,58 +1490,6 @@ onMounted(async () => {
   color: var(--color-primary);
   text-decoration: underline;
   margin: 0 4px;
-}
-
-.order-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  min-width: 0;
-}
-
-.order-tag {
-  display: inline-block;
-  padding: 1px 6px;
-  font-size: 11px;
-  font-weight: var(--font-weight-bold);
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-.tag-urgent {
-  background: #FEE2E2;
-  color: #DC2626;
-}
-.tag-new {
-  background: var(--color-primary-lighter);
-  color: var(--color-primary);
-}
-
-.order-title {
-  font-size: var(--font-size-base);
-  color: var(--color-text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.order-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-  flex-shrink: 0;
-  margin-left: var(--space-lg);
-}
-
-.order-area {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.order-time {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  white-space: nowrap;
 }
 
 /* ============================================
