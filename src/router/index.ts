@@ -19,6 +19,7 @@ const routes = [
     { path: 'content/tutor-group-qr', component: () => import('@/views/content/TutorGroupQr.vue') },
     { path: 'content/announcement', component: () => import('@/views/content/AnnouncementList.vue') },
     { path: 'content/faq', component: () => import('@/views/content/FaqList.vue') },
+    { path: 'content/friend-links', component: () => import('@/views/content/FriendLinks.vue') },
   ]}
 ]
 const router = createRouter({ history: createWebHistory('/admin/'), routes })
