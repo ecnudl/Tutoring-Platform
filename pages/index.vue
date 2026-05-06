@@ -238,11 +238,7 @@
             </div>
             <div class="tutor-name-row">
               <span class="tutor-name">{{ getTutorDisplayName(t) }}</span>
-              <span class="tutor-icons">
-                <span v-if="t.isStar === 1" class="tutor-icon" title="明星教员">⭐</span>
-                <span v-if="t.isVerified === 1" class="tutor-icon" title="证件已认证">✅</span>
-                <span v-if="t.teachingMethod === 3 || t.teachingMethod === 4" class="tutor-icon" title="可网络授课">🌐</span>
-              </span>
+              <TutorIcons :tutor="t" :size="14" />
             </div>
             <div class="tutor-school">{{ t.university || '未填写' }}</div>
           </NuxtLink>
@@ -1286,16 +1282,6 @@ onMounted(async () => {
   white-space: nowrap;
 }
 .tutor-name { color: var(--color-text); }
-.tutor-icons {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-.tutor-icon {
-  display: inline-block;
-  font-size: 13px;
-  line-height: 1;
-}
 
 .tutor-school {
   font-size: 12px;
