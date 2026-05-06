@@ -24,6 +24,10 @@ public class AuthRequirementController {
     public Result<?> page(@RequestBody AuthRequirementPageReq req) { return biz.page(req); }
     @ApiOperation(value = "保存需求") @PostMapping("/save")
     public Result<String> save(@RequestBody AuthRequirementSaveReq req) { return biz.save(req); }
+    @ApiOperation(value = "快速提交需求 (qjj 入口, 必须登录学员账号)") @PostMapping("/quick-submit")
+    public Result<String> quickSubmit(@RequestBody com.roncoo.education.user.service.api.req.RequirementQuickSubmitReq req) {
+        return biz.quickSubmit(req);
+    }
     @ApiOperation(value = "提交审核") @PostMapping("/submit-audit")
     public Result<String> submitAudit(@RequestParam Long id) { return biz.submitAudit(id); }
     @ApiOperation(value = "需求详情") @GetMapping("/view")

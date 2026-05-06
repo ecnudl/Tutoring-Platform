@@ -261,9 +261,15 @@ public class ApiRequirementBiz extends BaseBiz {
     }
 
     /**
-     * 游客快速提交家教需求(无需登录)
+     * 已废弃 — 游客快速提交需求路径已下线 (防滥用 / 防虚假数据).
+     * 请改用 POST /user/auth/requirement/quick-submit (必须登录学员账号).
      */
     public Result<String> quickSubmit(RequirementQuickSubmitReq req) {
+        return Result.error("请先登录后再提交需求");
+    }
+
+    @SuppressWarnings("unused")
+    private Result<String> quickSubmitDeprecated(RequirementQuickSubmitReq req) {
         if (!StringUtils.hasText(req.getContactName())) {
             return Result.error("联系人姓名不能为空");
         }

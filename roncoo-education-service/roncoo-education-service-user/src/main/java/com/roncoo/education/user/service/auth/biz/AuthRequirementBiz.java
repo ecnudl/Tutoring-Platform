@@ -227,4 +227,41 @@ public class AuthRequirementBiz extends BaseBiz {
         }
         return null;
     }
+
+    /**
+     * 登录用户快速提交需求 (从首页 qjj 走) — 必须是学员账号 (家长身份)
+     * 替代 ApiRequirementBiz.quickSubmit (那是游客无登录提交, 已废弃以防滥用)
+     */
+    public Result<String> quickSubmit(com.roncoo.education.user.service.api.req.RequirementQuickSubmitReq req) {
+        Long userId = ThreadContext.userId();
+        Result<String> check = checkStudent(userId);
+        if (check != null) return check;
+
+        if (!StringUtils.hasText(req.getContactName())) return Result.error("联系人姓名不能为空");
+        if (!StringUtils.hasText(req.getContactMobile())) return Result.error("联系电话不能为空");
+        if (!req.getContactMobile().matches("^1[3-9]\\d{9}$")) return Result.error("手机号格式不正确");
+        if (req.getContactName().length() > 50
+                || (req.getContactWechat() != null && req.getContactWechat().length() > 50)
+                || (req.getRequirementDetail() != null && req.getRequirementDetail().length() > 500)) {
+            return Result.error("提交内容超过长度限制");
+        }
+
+        TutorRequirement requirement = new TutorRequirement();
+        requirement.setId(com.roncoo.education.common.tools.IdWorker.getId());
+        requirement.setUserId(userId);  // 写入真实登录用户 (不再是游客 0L)
+        requirement.setContactName(req.getContactName());
+        requirement.setContactMobile(req.getContactMobile());
+        requirement.setContactWechat(req.getContactWechat());
+        requirement.setRequirementDetail(req.getRequirementDetail());
+        requirement.setCityId(req.getCityId());
+        requirement.setDistrictId(req.getDistrictId());
+        requirement.setGradeId(req.getGradeId());
+        requirement.setTeachingMethod(req.getTeachingMethod() != null ? req.getTeachingMethod() : 0);
+        requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
+        requirement.setDisplayNo("S" + (100000 + requirement.getId() % 900000));
+        requirement.setTitle(req.getRequirementDetail() != null && req.getRequirementDetail().length() > 20
+                ? req.getRequirementDetail().substring(0, 20) : req.getRequirementDetail());
+        tutorRequirementDao.save(requirement);
+        return Result.success("提交成功，工作人员将尽快与您联系");
+    }
 }
