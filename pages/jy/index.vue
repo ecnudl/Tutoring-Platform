@@ -103,19 +103,18 @@
         <div v-for="t in tutors" :key="t.id" class="tutor-card-h">
           <div class="tutor-avatar">
             <el-avatar :size="64" :src="t.avatar || '/placeholder/avatar.png'" />
-            <div v-if="t.isVerified === 1" class="cert-verified-chip">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:3px">
-                <path d="M5 12.5l4.5 4.5L19 7" stroke="#047857" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>证件已认证
-            </div>
           </div>
           <div class="tutor-body">
             <div class="tutor-top">
               <span class="tutor-name">{{ t.surname || (t.realName ? t.realName.charAt(0) : '') }}老师</span>
+              <span class="tutor-icons">
+                <span v-if="t.isStar === 1" class="tutor-icon" title="明星教员">⭐</span>
+                <span v-if="t.isVerified === 1" class="tutor-icon" title="证件已认证">✅</span>
+                <span v-if="t.teachingMethod === 3 || t.teachingMethod === 4" class="tutor-icon" title="可网络授课">🌐</span>
+              </span>
               <el-tag size="small" v-if="t.tutorType">{{ tutorTypeMap[t.tutorType] }}</el-tag>
               <el-tag size="small" type="info" v-if="t.gender === 1">男</el-tag>
               <el-tag size="small" type="danger" v-if="t.gender === 2">女</el-tag>
-              
             </div>
             <div class="tutor-detail">
               <span v-if="t.university">{{ t.university }}</span>
@@ -484,19 +483,17 @@ onMounted(() => {
   .tutor-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
 }
 
-/* 证件认证 chip — 在 flow 内, 列宽 80px 容下, 不会越过 card 边界 */
-.cert-verified-chip {
+/* 教员图标组 (姓名旁 0-3 个: ⭐ 明星 / ✅ 已认证 / 🌐 可网络授课) */
+.tutor-icons {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  color: #047857;
-  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 1px solid #a7f3d0;
-  border-radius: 999px;
-  white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.12);
+  gap: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.tutor-icon {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
 }
 </style>

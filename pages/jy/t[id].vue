@@ -26,10 +26,12 @@
             </div>
             <div class="tt-hero-name-row">
               <span class="tt-hero-name">{{ getDisplayName(tutor) }}</span>
+              <span class="tt-hero-icons">
+                <span v-if="tutor.isStar === 1" class="tt-hero-icon" title="明星教员">⭐</span>
+                <span v-if="tutor.isVerified === 1" class="tt-hero-icon" title="证件已认证">✅</span>
+                <span v-if="tutor.teachingMethod === 3 || tutor.teachingMethod === 4" class="tt-hero-icon" title="可网络授课">🌐</span>
+              </span>
               <span v-if="tutor.gender === 1 || tutor.gender === 2" class="tt-hero-gender">[{{ genderMap[tutor.gender] }}]</span>
-            </div>
-            <div v-if="tutor.isStar === 1" class="tt-hero-star">
-              <span class="tt-hero-star-mark">★</span>明星教员
             </div>
             <div class="tt-hero-price">
               <span class="tt-hero-price-label">课时费：</span>
@@ -430,9 +432,11 @@ onMounted(() => { loadTutor() })
 .tt-hero-no { font-size: 22px; line-height: 1.2; }
 .tt-hero-no-label { color: #667085; font-size: 14px; font-weight: 400; }
 .tt-hero-no-value { color: var(--tt-primary); font-weight: 600; letter-spacing: 0.5px; font-size: 22px; }
-.tt-hero-name-row { display: flex; align-items: baseline; gap: 8px; }
+.tt-hero-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .tt-hero-name { font-size: 20px; color: #1F2937; font-weight: 500; }
 .tt-hero-gender { color: #94a3b8; font-size: 15px; }
+.tt-hero-icons { display: inline-flex; align-items: center; gap: 4px; }
+.tt-hero-icon { display: inline-block; font-size: 18px; line-height: 1; }
 .tt-hero-star {
   display: inline-flex; align-items: center; gap: 4px;
   align-self: flex-start;
