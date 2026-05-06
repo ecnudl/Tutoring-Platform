@@ -53,7 +53,7 @@
           <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
           <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
           <el-badge :value="userStore.unreadCount" :hidden="!userStore.isLoggedIn || !userStore.unreadCount" :max="99">
-            <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
+            <NuxtLink :to="userStore.unreadCount > 0 ? '/center/messages' : '/center'" class="nav-cell">个人中心</NuxtLink>
           </el-badge>
         </div>
         <div class="nav-right-row">
@@ -62,7 +62,7 @@
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
             <el-badge :value="userStore.unreadCount" :hidden="!userStore.unreadCount" :max="99">
-              <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
+              <NuxtLink :to="userStore.unreadCount > 0 ? '/center/messages' : '/center'" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
             </el-badge>
             <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
           </template>

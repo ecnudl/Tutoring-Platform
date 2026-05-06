@@ -1,7 +1,7 @@
 <template>
   <div class="layout-default">
     <!-- 统一头部 - 所有页面都显示 -->
-    <SiteHeader v-if="route.path !== '/'" />
+    <SiteHeader />
 
     <main class="page-content"><slot /></main>
     <SiteFooter />
