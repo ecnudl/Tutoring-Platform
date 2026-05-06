@@ -88,9 +88,13 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CircleCheck } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
+import { useUserStore } from '~/stores/user'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const cityStore = useCityStore()
+const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
 const { post } = useApi()
 const { config, load } = useSiteConfig()
 
@@ -122,13 +126,24 @@ const rules = {
 }
 
 const handleSubmit = async () => {
+  // 必须登录
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再提交需求')
+    router.push('/login?redirect=' + encodeURIComponent(route.fullPath))
+    return
+  }
+  // 必须是学员账号 (家长)
+  if (!userStore.isStudent) {
+    ElMessage.warning('仅家长账号可提交需求 (当前账号为教员或未设置类型)')
+    return
+  }
   if (!formRef.value) return
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
   submitting.value = true
   try {
-    const res = await post('/user/api/requirement/quick-submit', {
+    const res = await post('/user/auth/requirement/quick-submit', {
       contactName: form.contactName,
       contactMobile: form.contactMobile,
       contactWechat: form.contactWechat ? form.contactMobile : '',
