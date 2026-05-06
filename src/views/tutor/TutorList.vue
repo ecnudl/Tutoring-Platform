@@ -40,13 +40,25 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="明星" width="80" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.isStar === 1" type="warning" size="small">★ 明星</el-tag>
+          <span v-else style="color:#cbd5e1">—</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="gmtCreate" label="创建时间" width="170" />
-      <el-table-column label="操作" width="280" fixed="right">
+      <el-table-column label="操作" width="380" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click="viewDetail(row)">详情</el-button>
           <el-button size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
           <el-button v-if="row.statusId === 1" size="small" type="warning" @click="quickToggle(row, 0)">禁用</el-button>
           <el-button v-else size="small" type="success" @click="quickToggle(row, 1)">启用</el-button>
+          <el-button
+            v-if="row.auditStatus === 2 || row.auditStatus === 4"
+            size="small"
+            :type="row.isStar === 1 ? 'info' : 'warning'"
+            @click="toggleStar(row)"
+          >{{ row.isStar === 1 ? '取消明星' : '设为明星' }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -157,6 +169,27 @@ const submitEdit = async () => {
     else ElMessage.error(res.msg || '操作失败')
   } catch (e) { ElMessage.error('网络错误') }
   finally { saving.value = false }
+}
+
+const toggleStar = async (row: any) => {
+  const next = row.isStar === 1 ? 0 : 1
+  const action = next === 1 ? '设为明星教员' : '取消明星教员'
+  try {
+    await ElMessageBox.confirm(
+      `确认${action}「${row.realName}」？`,
+      `${action}确认`,
+      { confirmButtonText: action, cancelButtonText: '取消', type: 'warning' }
+    )
+  } catch { return }
+  try {
+    const res = await put('/user/admin/tutor-audit/star', { id: row.id, isStar: next })
+    if (res.code === 200) {
+      ElMessage.success(res.msg || `${action}成功`)
+      row.isStar = next
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (e) { ElMessage.error('网络错误') }
 }
 
 const quickToggle = async (row: any, target: 0 | 1) => {
