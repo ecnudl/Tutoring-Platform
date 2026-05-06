@@ -52,18 +52,14 @@
           <NuxtLink to="/jy" class="nav-cell">教员库</NuxtLink>
           <NuxtLink to="/xy" class="nav-cell">学员库</NuxtLink>
           <NuxtLink to="/zf" class="nav-cell">家教价格</NuxtLink>
-          <el-badge :value="userStore.unreadCount" :hidden="!userStore.isLoggedIn || !userStore.unreadCount" :max="99">
-            <NuxtLink :to="userStore.unreadCount > 0 ? '/center/messages' : '/center'" class="nav-cell">个人中心</NuxtLink>
-          </el-badge>
+          <NuxtLink to="/center" class="nav-cell">个人中心</NuxtLink>
         </div>
         <div class="nav-right-row">
           <NuxtLink to="/qjj" class="nav-cell">请家教</NuxtLink>
           <NuxtLink to="/about/tutor" class="nav-cell">做老师</NuxtLink>
           <NuxtLink to="/help" class="nav-cell">帮助</NuxtLink>
           <template v-if="userStore.isLoggedIn">
-            <el-badge :value="userStore.unreadCount" :hidden="!userStore.unreadCount" :max="99">
-              <NuxtLink :to="userStore.unreadCount > 0 ? '/center/messages' : '/center'" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
-            </el-badge>
+            <NuxtLink to="/center" class="nav-cell nav-highlight">{{ userStore.displayName }}</NuxtLink>
             <a href="javascript:;" @click="handleLogout" class="nav-cell">退出</a>
           </template>
           <template v-else>
@@ -143,6 +139,9 @@ const handleLogout = () => {
   display: flex;
   align-items: stretch;
   min-height: 100px;
+  /* 限宽 + 居中, 与首页 home-card / 轮播图 / 各 section-box 对齐 (1200px container) */
+  max-width: var(--content-width);
+  margin: 0 auto;
   background: var(--color-surface);
   border-radius: 12px 12px 0 0;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);

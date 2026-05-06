@@ -46,11 +46,9 @@
         <NuxtLink :to="isTutor ? '/center/applications' : '/center/received-applications'"
                   class="col-chip chip-a">
           <span>{{ isTutor ? '最新申请' : '收到申请' }}</span>
-          <span class="chip-badge" v-if="stats.latestApply">{{ stats.latestApply }}</span>
         </NuxtLink>
         <NuxtLink to="/center/messages" class="col-chip chip-b">
           <span>消息</span>
-          <span class="chip-badge" v-if="stats.unread">{{ stats.unread }}</span>
         </NuxtLink>
       </div>
     </div>
@@ -60,11 +58,9 @@
       <div class="col-items">
         <NuxtLink to="/center/orders" class="col-chip chip-c">
           <span>全部订单</span>
-          <span class="chip-badge" v-if="stats.orders">{{ stats.orders }}</span>
         </NuxtLink>
         <NuxtLink to="/center/reservations" class="col-chip chip-d">
           <span>我的预约</span>
-          <span class="chip-badge" v-if="stats.reservations">{{ stats.reservations }}</span>
         </NuxtLink>
       </div>
     </div>
@@ -234,21 +230,7 @@ onMounted(async () => {
     }
   } catch (e) { /* silent */ }
 
-  // 申请数、预约数等的粗略统计（有接口就拉，没有就零）
-  // 预约 badge 语义: "未查看的新预约数" — 用 localStorage 'reservations-last-seen-count' 记录上次进入预约页时的总数
-  try {
-    const r1 = await post('/user/auth/reservation/page', { pageCurrent: 1, pageSize: 1 }).catch(() => null)
-    if (r1?.code === 200 && r1.data) {
-      const total = r1.data.totalCount || 0
-      let lastSeen = 0
-      try {
-        if (typeof localStorage !== 'undefined') {
-          lastSeen = parseInt(localStorage.getItem('reservations-last-seen-count') || '0', 10) || 0
-        }
-      } catch (_) {}
-      stats.value.reservations = Math.max(0, total - lastSeen)
-    }
-  } catch (e) {}
+  // chip-badge 已删除, 不再 fetch reservations totalCount
 })
 </script>
 

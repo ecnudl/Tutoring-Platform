@@ -91,13 +91,6 @@ const load = async () => {
     const res = await post('/user/auth/reservation/page', { pageCurrent: 1, pageSize: 50 })
     if (res.code === 200 && res.data) {
       list.value = res.data.list || []
-      // 进入"我的预约"页 = 已查看, badge 清零
-      const total = res.data.totalCount || list.value.length
-      try {
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('reservations-last-seen-count', String(total))
-        }
-      } catch (_) {}
     }
   } catch (e) { console.error(e) }
   finally { loading.value = false }
