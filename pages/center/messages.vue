@@ -81,11 +81,20 @@ const loadingSystem = ref(false)
 const loadingNotice = ref(false)
 const dlgVisible = ref(false)
 const dlgItem = ref(null)
+// 未读计数 — badge 用这两个, 看完即清零
+const sysUnreadCount = ref(0)
+const lastNoticeSeen = ref('')
 
-const tabs = computed(() => [
-  { key: 'system', label: '系统消息', badge: systemMessages.value.length ? systemMessages.value.length : 0 },
-  { key: 'notice', label: '网站公告', badge: notices.value.length ? notices.value.length : 0 }
-])
+const tabs = computed(() => {
+  // 公告"新"判定: gmtCreate 晚于 localStorage 上次查看时间
+  const noticeNew = lastNoticeSeen.value
+    ? notices.value.filter(n => String(n.gmtCreate || '') > lastNoticeSeen.value).length
+    : notices.value.length   // 从未访问过, 全部算新
+  return [
+    { key: 'system', label: '系统消息', badge: sysUnreadCount.value },
+    { key: 'notice', label: '网站公告', badge: noticeNew }
+  ]
+})
 
 const formatTime = (s) => {
   if (!s) return ''
@@ -157,7 +166,9 @@ async function loadSystem() {
     try {
       const res = await post('/user/auth/msg/user/list', { pageCurrent: 1, pageSize: 30 })
       if (res?.code === 200 && res.data?.list) {
+        let unread = 0
         for (const m of res.data.list) {
+          if (!m.isRead) unread++
           systemMessages.value.unshift({
             tag: m.isRead ? '读' : '新',
             tagClass: m.isRead ? 'tag-tip' : 'tag-ok',
@@ -165,6 +176,7 @@ async function loadSystem() {
             time: formatTime(m.gmtCreate)
           })
         }
+        sysUnreadCount.value = unread
       }
     } catch (e) { /* ignore msg errors */ }
   } catch (e) { /* ignore */ }
@@ -192,12 +204,29 @@ const goExternal = (url) => {
 }
 
 onMounted(async () => {
+  // 公告"上次查看时间"从 localStorage 读
+  const noticeKey = 'msg-notice-last-seen'
+  if (typeof localStorage !== 'undefined') {
+    lastNoticeSeen.value = localStorage.getItem(noticeKey) || ''
+  }
   await loadSystem()
   await loadNotices()
   // 进入消息中心 = 全部已读, 同步刷新角标
   try {
     await post('/user/auth/msg/user/mark-all-read', {})
     userStore.fetchUnreadCount?.()
+    // 视觉上立即清零 (不再 reload, 直接改本地状态)
+    sysUnreadCount.value = 0
+    systemMessages.value.forEach(m => {
+      if (m.tag === '新') { m.tag = '读'; m.tagClass = 'tag-tip' }
+    })
+    // 公告 lastSeen 更新到当前时间, 下次进来 badge 仍 0 (除非新增公告)
+    // 用本地 ISO 字符串 (sys_announcement.gmt_create 也是这个格式 "yyyy-MM-dd HH:mm:ss")
+    const d = new Date()
+    const pad = (n) => String(n).padStart(2, '0')
+    const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+    if (typeof localStorage !== 'undefined') localStorage.setItem(noticeKey, now)
+    lastNoticeSeen.value = now
   } catch (_) { /* ignore */ }
 })
 </script>
