@@ -30,9 +30,6 @@
           <el-form-item label="联系电话" prop="contactMobile">
             <el-input v-model="form.contactMobile" placeholder="请输入手机号码" />
           </el-form-item>
-          <el-form-item>
-            <el-checkbox v-model="form.contactWechat">手机号同微信号</el-checkbox>
-          </el-form-item>
           <el-form-item label="学生情况" prop="studentInfo">
             <el-input v-model="form.studentInfo" type="textarea" :rows="4"
               placeholder="请填写学生的程度、目前学习情况，需要辅导的科目和年级，以及希望的上课频率和时间。例如：高一学生，物理薄弱常 50 分上下，希望补到 75 分以上，每周六下午 2 小时。" />
@@ -121,7 +118,6 @@ const successVisible = ref(false)
 const form = reactive({
   contactName: '',
   contactMobile: '',
-  contactWechat: false,
   studentInfo: '',
   tutorRequest: '',
   trafficInfo: ''
@@ -159,7 +155,6 @@ const handleSubmit = async () => {
     const res = await post('/user/auth/requirement/quick-submit', {
       contactName: form.contactName,
       contactMobile: form.contactMobile,
-      contactWechat: form.contactWechat ? form.contactMobile : '',
       studentInfo: form.studentInfo,
       tutorRequest: form.tutorRequest,
       trafficInfo: form.trafficInfo,
@@ -169,7 +164,6 @@ const handleSubmit = async () => {
       successVisible.value = true
       form.contactName = ''
       form.contactMobile = ''
-      form.contactWechat = false
       form.studentInfo = ''
       form.tutorRequest = ''
       form.trafficInfo = ''
