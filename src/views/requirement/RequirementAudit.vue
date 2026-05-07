@@ -39,14 +39,25 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="需求详情" width="600px">
+    <el-dialog v-model="detailVisible" title="需求详情" width="720px" top="6vh">
       <el-descriptions :column="2" border v-if="detail">
-        <el-descriptions-item label="标题" :span="2">{{ detail.title }}</el-descriptions-item>
-        <el-descriptions-item label="联系人">{{ detail.contactName }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ detail.contactMobile }}</el-descriptions-item>
-        <el-descriptions-item label="预算">{{ detail.budgetMin || 0 }}-{{ detail.budgetMax || 0 }}元/时</el-descriptions-item>
+        <el-descriptions-item label="标题" :span="2">{{ detail.title || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="联系人">{{ detail.contactName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ detail.contactMobile || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="预算">{{ detail.budgetMin || 0 }}-{{ detail.budgetMax || 0 }} 元/时</el-descriptions-item>
         <el-descriptions-item label="时间安排">{{ detail.schedule || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="详细需求" :span="2">{{ detail.requirementDetail || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="学生情况" :span="2">
+          <pre class="req-text">{{ detail.studentInfo || '-' }}</pre>
+        </el-descriptions-item>
+        <el-descriptions-item label="教员要求" :span="2">
+          <pre class="req-text">{{ detail.tutorRequest || '-' }}</pre>
+        </el-descriptions-item>
+        <el-descriptions-item label="交通信息" :span="2">
+          <pre class="req-text">{{ detail.trafficInfo || '-' }}</pre>
+        </el-descriptions-item>
+        <el-descriptions-item label="补充说明" :span="2">
+          <pre class="req-text">{{ detail.requirementDetail || '-' }}</pre>
+        </el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusTagType(detail.reqStatus)">{{ statusLabel(detail.reqStatus) }}</el-tag>
         </el-descriptions-item>
@@ -151,3 +162,18 @@ const handleMatch = async (row: any) => {
   } catch { ElMessage.error('网络错误') }
 }
 </script>
+
+<style scoped>
+.page-container .req-text {
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  color: #1F2937;
+  font-size: 13px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+</style>
