@@ -20,14 +20,26 @@
     <el-form-item label="时间安排">
       <el-input v-model="form.schedule" placeholder="例如：每周六下午2-5点" />
     </el-form-item>
-    <el-form-item label="详细要求">
-      <el-input v-model="form.requirementDetail" type="textarea" :rows="4" placeholder="描述您的辅导需求" />
-    </el-form-item>
     <el-form-item label="联系人">
       <el-input v-model="form.contactName" placeholder="联系人姓名" />
     </el-form-item>
     <el-form-item label="联系电话">
       <el-input v-model="form.contactMobile" placeholder="联系电话" />
+    </el-form-item>
+    <el-form-item label="学生情况">
+      <el-input v-model="form.studentInfo" type="textarea" :rows="4"
+        placeholder="请填写学生的程度、目前学习情况，需要辅导的科目和年级，以及希望的上课频率和时间。例如：高一学生，物理薄弱常 50 分上下，希望补到 75 分以上，每周六下午 2 小时。" />
+    </el-form-item>
+    <el-form-item label="教员要求">
+      <el-input v-model="form.tutorRequest" type="textarea" :rows="3"
+        placeholder="请填写您对教员的具体要求。例如：教员性别（女老师优先 / 不限）、教员居住地区或便于上课的区域、是否有教学经验要求、学历背景、其他偏好等。" />
+    </el-form-item>
+    <el-form-item label="交通信息">
+      <el-input v-model="form.trafficInfo" type="textarea" :rows="3"
+        placeholder="如果是线上授课请填「线上授课，无需上门」；如果需要老师上门，请写明具体小区/弄号或最近地铁站，以及大致路口。" />
+    </el-form-item>
+    <el-form-item label="补充说明">
+      <el-input v-model="form.requirementDetail" type="textarea" :rows="3" placeholder="（可选）其他想告诉教员的信息" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" :loading="saving" @click="handleSave">保存草稿</el-button>
@@ -53,7 +65,7 @@ const router = useRouter()
 const editId = computed(() => route.query.id ? Number(route.query.id) : null)
 const isEdit = computed(() => !!editId.value)
 
-const form = ref({ title: '', budgetMin: 0, budgetMax: 0, schedule: '', requirementDetail: '', contactName: '', contactMobile: '' })
+const form = ref({ title: '', budgetMin: 0, budgetMax: 0, schedule: '', requirementDetail: '', contactName: '', contactMobile: '', studentInfo: '', tutorRequest: '', trafficInfo: '' })
 const subjectList = ref([])
 const saving = ref(false)
 
@@ -61,6 +73,9 @@ const handleSave = async () => {
   if (!form.value.title) { ElMessage.warning('请输入需求标题'); return }
   if (!form.value.contactName) { ElMessage.warning('请输入联系人'); return }
   if (!form.value.contactMobile) { ElMessage.warning('请输入联系电话'); return }
+  if (!form.value.studentInfo) { ElMessage.warning('请填写学生情况'); return }
+  if (!form.value.tutorRequest) { ElMessage.warning('请填写教员要求'); return }
+  if (!form.value.trafficInfo) { ElMessage.warning('请填写交通信息'); return }
   saving.value = true
   try {
     const data = {
@@ -83,7 +98,7 @@ const loadExisting = async () => {
     const res = await get('/user/auth/requirement/view', { id: editId.value })
     if (res.code === 200 && res.data) {
       const d = res.data
-      form.value = { title: d.title||'', budgetMin: d.budgetMin||0, budgetMax: d.budgetMax||0, schedule: d.schedule||'', requirementDetail: d.requirementDetail||'', contactName: d.contactName||'', contactMobile: d.contactMobile||'' }
+      form.value = { title: d.title||'', budgetMin: d.budgetMin||0, budgetMax: d.budgetMax||0, schedule: d.schedule||'', requirementDetail: d.requirementDetail||'', contactName: d.contactName||'', contactMobile: d.contactMobile||'', studentInfo: d.studentInfo||'', tutorRequest: d.tutorRequest||'', trafficInfo: d.trafficInfo||'' }
       try { subjectList.value = JSON.parse(d.subjectIds||'[]').map(String) } catch { subjectList.value = [] }
     }
   } catch (e) { console.error(e) }

@@ -33,8 +33,17 @@
           <el-form-item>
             <el-checkbox v-model="form.contactWechat">手机号同微信号</el-checkbox>
           </el-form-item>
-          <el-form-item label="需求描述" prop="requirementDetail">
-            <el-input v-model="form.requirementDetail" type="textarea" :rows="4" placeholder="请简要描述您的家教需求，如：科目、年级、上课时间、地点等" />
+          <el-form-item label="学生情况" prop="studentInfo">
+            <el-input v-model="form.studentInfo" type="textarea" :rows="4"
+              placeholder="请填写学生的程度、目前学习情况，需要辅导的科目和年级，以及希望的上课频率和时间。例如：高一学生，物理薄弱常 50 分上下，希望补到 75 分以上，每周六下午 2 小时。" />
+          </el-form-item>
+          <el-form-item label="教员要求" prop="tutorRequest">
+            <el-input v-model="form.tutorRequest" type="textarea" :rows="3"
+              placeholder="请填写您对教员的具体要求。例如：教员性别（女老师优先 / 不限）、教员居住地区或便于上课的区域、是否有教学经验要求、学历背景、其他偏好等。" />
+          </el-form-item>
+          <el-form-item label="交通信息" prop="trafficInfo">
+            <el-input v-model="form.trafficInfo" type="textarea" :rows="3"
+              placeholder="如果是线上授课请填写「线上授课，无需上门」；如果需要老师上门，请写明具体小区/弄号或最近地铁站，以及大致路口（例如：徐汇区天钥桥路 100 弄，地铁 1 号线徐家汇站附近，xx 路与 yy 路交界）。" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" size="large" style="width:100%" :loading="submitting" @click="handleSubmit">提交需求</el-button>
@@ -113,7 +122,9 @@ const form = reactive({
   contactName: '',
   contactMobile: '',
   contactWechat: false,
-  requirementDetail: ''
+  studentInfo: '',
+  tutorRequest: '',
+  trafficInfo: ''
 })
 
 const rules = {
@@ -122,7 +133,9 @@ const rules = {
     { required: true, message: '请输入联系电话', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
   ],
-  requirementDetail: [{ required: true, message: '请简要描述您的需求', trigger: 'blur' }]
+  studentInfo:  [{ required: true, message: '请填写学生情况', trigger: 'blur' }],
+  tutorRequest: [{ required: true, message: '请填写教员要求', trigger: 'blur' }],
+  trafficInfo:  [{ required: true, message: '请填写交通信息 (线上授课请填「线上授课，无需上门」)', trigger: 'blur' }]
 }
 
 const handleSubmit = async () => {
@@ -147,7 +160,9 @@ const handleSubmit = async () => {
       contactName: form.contactName,
       contactMobile: form.contactMobile,
       contactWechat: form.contactWechat ? form.contactMobile : '',
-      requirementDetail: form.requirementDetail,
+      studentInfo: form.studentInfo,
+      tutorRequest: form.tutorRequest,
+      trafficInfo: form.trafficInfo,
       cityId: cityStore.cityId
     })
     if (res.code === 200) {
@@ -155,7 +170,9 @@ const handleSubmit = async () => {
       form.contactName = ''
       form.contactMobile = ''
       form.contactWechat = false
-      form.requirementDetail = ''
+      form.studentInfo = ''
+      form.tutorRequest = ''
+      form.trafficInfo = ''
     } else {
       ElMessage.error(res.msg || '提交失败，请稍后重试')
     }
