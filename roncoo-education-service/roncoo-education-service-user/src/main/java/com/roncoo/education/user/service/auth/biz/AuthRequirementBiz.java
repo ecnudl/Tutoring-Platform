@@ -142,6 +142,15 @@ public class AuthRequirementBiz extends BaseBiz {
         if (!StringUtils.hasText(requirement.getContactMobile())) {
             return Result.error("请先填写联系电话");
         }
+        if (!StringUtils.hasText(requirement.getStudentInfo())) {
+            return Result.error("请先填写学生情况");
+        }
+        if (!StringUtils.hasText(requirement.getTutorRequest())) {
+            return Result.error("请先填写教员要求");
+        }
+        if (!StringUtils.hasText(requirement.getTrafficInfo())) {
+            return Result.error("请先填写交通信息");
+        }
 
         TutorRequirement update = new TutorRequirement();
         update.setId(id);
@@ -215,6 +224,9 @@ public class AuthRequirementBiz extends BaseBiz {
         entity.setRequirementDetail(req.getRequirementDetail());
         entity.setContactName(req.getContactName());
         entity.setContactMobile(req.getContactMobile());
+        if (req.getStudentInfo() != null)  entity.setStudentInfo(req.getStudentInfo());
+        if (req.getTutorRequest() != null) entity.setTutorRequest(req.getTutorRequest());
+        if (req.getTrafficInfo() != null)  entity.setTrafficInfo(req.getTrafficInfo());
     }
 
     private Result<String> checkStudent(Long userId) {
@@ -240,9 +252,15 @@ public class AuthRequirementBiz extends BaseBiz {
         if (!StringUtils.hasText(req.getContactName())) return Result.error("联系人姓名不能为空");
         if (!StringUtils.hasText(req.getContactMobile())) return Result.error("联系电话不能为空");
         if (!req.getContactMobile().matches("^1[3-9]\\d{9}$")) return Result.error("手机号格式不正确");
+        if (!StringUtils.hasText(req.getStudentInfo())) return Result.error("请填写学生情况");
+        if (!StringUtils.hasText(req.getTutorRequest())) return Result.error("请填写教员要求");
+        if (!StringUtils.hasText(req.getTrafficInfo())) return Result.error("请填写交通信息");
         if (req.getContactName().length() > 50
                 || (req.getContactWechat() != null && req.getContactWechat().length() > 50)
-                || (req.getRequirementDetail() != null && req.getRequirementDetail().length() > 500)) {
+                || (req.getRequirementDetail() != null && req.getRequirementDetail().length() > 500)
+                || req.getStudentInfo().length() > 1000
+                || req.getTutorRequest().length() > 1000
+                || req.getTrafficInfo().length() > 1000) {
             return Result.error("提交内容超过长度限制");
         }
 
@@ -253,14 +271,20 @@ public class AuthRequirementBiz extends BaseBiz {
         requirement.setContactMobile(req.getContactMobile());
         requirement.setContactWechat(req.getContactWechat());
         requirement.setRequirementDetail(req.getRequirementDetail());
+        requirement.setStudentInfo(req.getStudentInfo());
+        requirement.setTutorRequest(req.getTutorRequest());
+        requirement.setTrafficInfo(req.getTrafficInfo());
         requirement.setCityId(req.getCityId());
         requirement.setDistrictId(req.getDistrictId());
         requirement.setGradeId(req.getGradeId());
         requirement.setTeachingMethod(req.getTeachingMethod() != null ? req.getTeachingMethod() : 0);
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         requirement.setDisplayNo("S" + (100000 + requirement.getId() % 900000));
-        requirement.setTitle(req.getRequirementDetail() != null && req.getRequirementDetail().length() > 20
-                ? req.getRequirementDetail().substring(0, 20) : req.getRequirementDetail());
+        // 标题优先用 student_info 前 20 字 (新结构), fallback 到 requirement_detail
+        String titleSource = StringUtils.hasText(req.getStudentInfo()) ? req.getStudentInfo() : req.getRequirementDetail();
+        if (titleSource != null) {
+            requirement.setTitle(titleSource.length() > 20 ? titleSource.substring(0, 20) : titleSource);
+        }
         tutorRequirementDao.save(requirement);
         return Result.success("提交成功，工作人员将尽快与您联系");
     }

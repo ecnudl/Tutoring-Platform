@@ -24,4 +24,7 @@ public class AuthRequirementSaveReq implements Serializable {
     private String requirementDetail;
     private String contactName;
     private String contactMobile;
+    private String studentInfo;
+    private String tutorRequest;
+    private String trafficInfo;
 }

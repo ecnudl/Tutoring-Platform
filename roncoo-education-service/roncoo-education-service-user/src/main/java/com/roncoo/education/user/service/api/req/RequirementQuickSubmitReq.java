@@ -48,4 +48,13 @@ public class RequirementQuickSubmitReq implements Serializable {
 
     @ApiModelProperty(value = "授课方式(1:教员上门,2:学员上门,3:线上授课)")
     private Integer teachingMethod;
+
+    @ApiModelProperty(value = "学生情况 (必填, 自由文本: 程度/学习情况/科目年级/上课频率)", required = true)
+    private String studentInfo;
+
+    @ApiModelProperty(value = "教员要求 (必填, 自由文本: 性别/地区等偏好)", required = true)
+    private String tutorRequest;
+
+    @ApiModelProperty(value = "交通信息 (必填, 自由文本: 线上无需填; 否则具体街道/地点)", required = true)
+    private String trafficInfo;
 }

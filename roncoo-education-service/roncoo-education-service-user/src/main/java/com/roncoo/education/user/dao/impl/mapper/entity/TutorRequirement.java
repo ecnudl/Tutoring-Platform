@@ -44,6 +44,9 @@ public class TutorRequirement implements Serializable {
     private String districtNames;
     private String gradeName;
     private Integer isUrgent;
+    private String studentInfo;
+    private String tutorRequest;
+    private String trafficInfo;
     private static final long serialVersionUID = 1L;
 
     public Long getId() { return id; }
@@ -131,4 +134,10 @@ public class TutorRequirement implements Serializable {
     public void setGradeName(String gradeName) { this.gradeName = gradeName == null ? null : gradeName.trim(); }
     public Integer getIsUrgent() { return isUrgent; }
     public void setIsUrgent(Integer isUrgent) { this.isUrgent = isUrgent; }
+    public String getStudentInfo() { return studentInfo; }
+    public void setStudentInfo(String studentInfo) { this.studentInfo = studentInfo == null ? null : studentInfo.trim(); }
+    public String getTutorRequest() { return tutorRequest; }
+    public void setTutorRequest(String tutorRequest) { this.tutorRequest = tutorRequest == null ? null : tutorRequest.trim(); }
+    public String getTrafficInfo() { return trafficInfo; }
+    public void setTrafficInfo(String trafficInfo) { this.trafficInfo = trafficInfo == null ? null : trafficInfo.trim(); }
 }
