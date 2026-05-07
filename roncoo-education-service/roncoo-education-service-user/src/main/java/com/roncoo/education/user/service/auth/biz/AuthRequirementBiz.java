@@ -104,6 +104,10 @@ public class AuthRequirementBiz extends BaseBiz {
             record.setUserId(userId);
             record.setReqStatus(RequirementStatusEnum.DRAFT.getCode());
             copyReqToEntity(req, record);
+            // 草稿允许 3 必填字段为空 (用户慢慢填), 但 DB NOT NULL 不允许 null, 所以兜底空串
+            if (record.getStudentInfo()  == null) record.setStudentInfo("");
+            if (record.getTutorRequest() == null) record.setTutorRequest("");
+            if (record.getTrafficInfo()  == null) record.setTrafficInfo("");
             tutorRequirementDao.save(record);
             return Result.success("创建成功");
         }

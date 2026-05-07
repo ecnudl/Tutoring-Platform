@@ -212,6 +212,15 @@ public class AuthReservationBiz extends BaseBiz {
         if (scheduleTime != null) requirement.setSchedule(scheduleTime);
         if (subjectId != null) requirement.setSubjectIds(subjectId.toString());
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
+        // 3 必填字段 (定向预约由学员选教员发起, 学员未填具体描述; 用 remark fallback + 占位)
+        String defaultStudentInfo = (remark != null && !remark.isEmpty())
+                ? remark
+                : "（定向预约: 学员主动申请该教员, 详细情况待联系沟通）";
+        requirement.setStudentInfo(defaultStudentInfo);
+        requirement.setTutorRequest("（定向预约: 学员已指定该教员, 无额外要求）");
+        requirement.setTrafficInfo(address != null && !address.isEmpty()
+                ? address
+                : "（定向预约: 详细交通待联系沟通）");
         tutorRequirementDao.save(requirement);
         // 落库后回填 display_no (公开详情页按 S + 6 位数字 查找)
         TutorRequirement upDisplay = new TutorRequirement();
