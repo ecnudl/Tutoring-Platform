@@ -261,15 +261,9 @@ public class ApiRequirementBiz extends BaseBiz {
     }
 
     /**
-     * 已废弃 — 游客快速提交需求路径已下线 (防滥用 / 防虚假数据).
-     * 请改用 POST /user/auth/requirement/quick-submit (必须登录学员账号).
+     * 游客 (无登录) 快速提交需求. IP 限流 + 必填字段 + 手机号格式校验防滥用.
      */
     public Result<String> quickSubmit(RequirementQuickSubmitReq req) {
-        return Result.error("请先登录后再提交需求");
-    }
-
-    @SuppressWarnings("unused")
-    private Result<String> quickSubmitDeprecated(RequirementQuickSubmitReq req) {
         if (!StringUtils.hasText(req.getContactName())) {
             return Result.error("联系人姓名不能为空");
         }
@@ -280,10 +274,20 @@ public class ApiRequirementBiz extends BaseBiz {
         if (!req.getContactMobile().matches("^1[3-9]\\d{9}$")) {
             return Result.error("手机号格式不正确");
         }
+        if (!StringUtils.hasText(req.getStudentInfo())) {
+            return Result.error("请填写学生情况");
+        }
+        if (!StringUtils.hasText(req.getTutorRequest())) {
+            return Result.error("请填写教员要求");
+        }
+        if (!StringUtils.hasText(req.getTrafficInfo())) {
+            return Result.error("请填写交通信息");
+        }
         // 字段长度上限, 防巨大文本撑爆审核队列
         if (req.getContactName().length() > 50
-                || (req.getContactWechat() != null && req.getContactWechat().length() > 50)
-                || (req.getRequirementDetail() != null && req.getRequirementDetail().length() > 500)) {
+                || req.getStudentInfo().length() > 1000
+                || req.getTutorRequest().length() > 1000
+                || req.getTrafficInfo().length() > 1000) {
             return Result.error("提交内容超过长度限制");
         }
         // IP 维度限流: 每 IP 每小时最多 3 次, 防游客接口被刷
@@ -301,8 +305,9 @@ public class ApiRequirementBiz extends BaseBiz {
         requirement.setUserId(0L); // 游客
         requirement.setContactName(req.getContactName());
         requirement.setContactMobile(req.getContactMobile());
-        requirement.setContactWechat(req.getContactWechat());
-        requirement.setRequirementDetail(req.getRequirementDetail());
+        requirement.setStudentInfo(req.getStudentInfo());
+        requirement.setTutorRequest(req.getTutorRequest());
+        requirement.setTrafficInfo(req.getTrafficInfo());
         requirement.setCityId(req.getCityId());
         requirement.setDistrictId(req.getDistrictId());
         requirement.setGradeId(req.getGradeId());
@@ -310,8 +315,9 @@ public class ApiRequirementBiz extends BaseBiz {
         requirement.setReqStatus(RequirementStatusEnum.PENDING.getCode());
         // 生成展示编号
         requirement.setDisplayNo("S" + (100000 + requirement.getId() % 900000));
-        requirement.setTitle(req.getRequirementDetail() != null && req.getRequirementDetail().length() > 20
-                ? req.getRequirementDetail().substring(0, 20) : req.getRequirementDetail());
+        // 标题用 studentInfo 前 20 字 (新结构)
+        String titleSrc = req.getStudentInfo();
+        requirement.setTitle(titleSrc.length() > 20 ? titleSrc.substring(0, 20) : titleSrc);
         tutorRequirementDao.save(requirement);
         return Result.success("提交成功，工作人员将尽快与您联系");
     }
