@@ -41,8 +41,8 @@
               <span class="tt-hero-stat-label">浏览次数：</span>
               <span class="tt-hero-stat-value">{{ tutor.viewCount || 0 }}次</span>
               <span v-if="tutor.teachingMethod === 3 || tutor.teachingMethod === 4" class="tt-hero-online-chip">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#D97706" stroke-width="2" style="margin-right:3px;vertical-align:-1px">
-                  <circle cx="12" cy="10" r="3"/><path d="M12 21s-7-7-7-11a7 7 0 1114 0c0 4-7 11-7 11z"/>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;vertical-align:-1px">
+                  <circle cx="12" cy="10" r="5"/><circle cx="12" cy="10" r="1.6" fill="#D97706" stroke="none"/><path d="M12 15v3M8 19h8"/>
                 </svg>
                 可网络授课
               </span>
