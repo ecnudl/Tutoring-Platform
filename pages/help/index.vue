@@ -116,7 +116,7 @@ const categories = reactive([])
 
 const { config, load } = useSiteConfig()
 const hotline = computed(() => config.value.siteHotline || '13795420591')
-const csEmail = computed(() => config.value.siteCsEmail || 'service@591jiajiao.com')
+const csEmail = computed(() => config.value.siteCsEmail || 'jiajiao591@126.com')
 const csWechat = computed(() => config.value.siteCsWechat || '')
 const workTime = computed(() => config.value.siteWorkTime || '周一至周日 9:00-21:00')
 

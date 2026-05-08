@@ -125,7 +125,7 @@ const { config, load } = useSiteConfig()
 const runtimeConfig = useRuntimeConfig()
 const overrideHtml = computed(() => (config.value.agreementUserHtml || '').trim())
 const siteBrand = computed(() => config.value.siteBrandName || '591家教网')
-const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
+const csEmail = computed(() => config.value.siteCsEmail || 'jiajiao591@126.com')
 const primaryDomain = computed(() => (runtimeConfig.public.brandDomains?.[0]) || 'www.591jiajiao.com')
 onMounted(() => { load() })
 </script>

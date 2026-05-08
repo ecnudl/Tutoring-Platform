@@ -160,7 +160,7 @@ import { useSiteConfig } from '~/composables/useSiteConfig'
 const { config, load } = useSiteConfig()
 const overrideHtml = computed(() => (config.value.agreementPrivacyHtml || '').trim())
 const siteBrand = computed(() => config.value.siteBrandName || '591家教网')
-const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
+const csEmail = computed(() => config.value.siteCsEmail || 'jiajiao591@126.com')
 const privacyEmail = computed(() => {
   // 默认用 siteCsEmail 替换 prefix；sys_config 有 privacy 字段时优先
   const cs = csEmail.value

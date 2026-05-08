@@ -114,7 +114,7 @@ import { computed, onMounted } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 const { config, load } = useSiteConfig()
 const overrideHtml = computed(() => (config.value.agreementDisclaimerHtml || '').trim())
-const csEmail = computed(() => config.value.siteCsEmail || 'service@example.com')
+const csEmail = computed(() => config.value.siteCsEmail || 'jiajiao591@126.com')
 onMounted(() => { load() })
 </script>
 

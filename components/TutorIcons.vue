@@ -17,13 +17,18 @@
       </svg>
     </span>
 
-    <!-- 可网络授课: 橙色圆 + 白色信号波纹 -->
+    <!-- 可网络授课: 橙色圆 + 白色摄像头 (镜头 + 底座) -->
     <span v-if="tutor && (tutor.teachingMethod === 3 || tutor.teachingMethod === 4)" class="tutor-icon" title="可网络授课" aria-label="可网络授课">
       <svg viewBox="0 0 24 24" :width="size" :height="size" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="11" fill="#f97316"/>
-        <path d="M5.5 11.5a9 9 0 0 1 13 0" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        <path d="M8 14a5 5 0 0 1 8 0" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        <circle cx="12" cy="17" r="1.5" fill="#fff"/>
+        <!-- 摄像头主体 (镜头外圈) -->
+        <circle cx="12" cy="10.5" r="4" fill="none" stroke="#fff" stroke-width="1.6"/>
+        <!-- 镜头 (内圆点) -->
+        <circle cx="12" cy="10.5" r="1.4" fill="#fff"/>
+        <!-- 底座颈部 -->
+        <rect x="11.4" y="14.4" width="1.2" height="1.5" fill="#fff"/>
+        <!-- 底座 -->
+        <rect x="8.6" y="15.9" width="6.8" height="1.4" rx="0.5" fill="#fff"/>
       </svg>
     </span>
   </span>

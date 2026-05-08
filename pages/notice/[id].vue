@@ -249,7 +249,7 @@ const noticeMap = {
       <p>如您在使用平台过程中遇到任何问题，可通过以下方式联系我们：</p>
       <ul>
         <li><strong>客服热线</strong>：13795420591（周一至周日 9:00-21:00）</li>
-        <li><strong>客服邮箱</strong>：service@591jiajiao.com（24小时内回复）</li>
+        <li><strong>客服邮箱</strong>：jiajiao591@126.com（24小时内回复）</li>
         <li><strong>微信客服</strong>：扫描首页二维码添加</li>
       </ul>
       <p>我们会尽快处理您的反馈，感谢您的支持与信任！</p>
