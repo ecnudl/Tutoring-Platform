@@ -49,6 +49,15 @@ public class TutorSubjectDaoImpl extends AbstractBaseJdbc implements TutorSubjec
     }
 
     @Override
+    public List<TutorSubject> listBySubjectIds(List<Long> subjectIds) {
+        if (subjectIds == null || subjectIds.isEmpty()) return java.util.Collections.emptyList();
+        TutorSubjectExample example = new TutorSubjectExample();
+        TutorSubjectExample.Criteria criteria = example.createCriteria();
+        criteria.andSubjectIdIn(subjectIds).andStatusIdEqualTo(1);
+        return this.tutorSubjectMapper.selectByExample(example);
+    }
+
+    @Override
     public int deleteByTutorId(Long tutorId) {
         TutorSubjectExample example = new TutorSubjectExample();
         TutorSubjectExample.Criteria criteria = example.createCriteria();

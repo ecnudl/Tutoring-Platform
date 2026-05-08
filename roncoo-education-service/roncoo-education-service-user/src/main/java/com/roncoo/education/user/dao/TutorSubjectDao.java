@@ -13,5 +13,8 @@ public interface TutorSubjectDao {
 
     List<TutorSubject> listBySubjectId(Long subjectId);
 
+    /** 任一 ID 命中即返回. 用于"全科"通配 (filterId + 3000). */
+    List<TutorSubject> listBySubjectIds(List<Long> subjectIds);
+
     int deleteByTutorId(Long tutorId);
 }

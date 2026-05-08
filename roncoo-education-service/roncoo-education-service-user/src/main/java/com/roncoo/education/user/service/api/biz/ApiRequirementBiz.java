@@ -41,6 +41,8 @@ public class ApiRequirementBiz extends BaseBiz {
     @NotNull
     private final TutorRequirementDao tutorRequirementDao;
     @NotNull
+    private final com.roncoo.education.user.dao.DictSubjectDao dictSubjectDao;
+    @NotNull
     private final CacheRedis cacheRedis;
     @NotNull
     private final HttpServletRequest request;
@@ -125,11 +127,47 @@ public class ApiRequirementBiz extends BaseBiz {
         return r.getDistrictNames().contains(req.getDistrict());
     }
 
-    /** subject 通配规则: filter 空命中, 订单 subject_ids 空命中, 否则 contains */
-    private static boolean matchSubject(TutorRequirement r, RequirementSearchReq req) {
+    /**
+     * subject 通配规则:
+     *   - filter 空 → 命中
+     *   - 订单 subject_ids 空 → 命中 (家长没填具体科目, 默认对所有筛选可见)
+     *   - 否则: 把 filter 名翻译成 ID, 再到订单 subject_ids CSV 中按 ID 等值匹配
+     *   - "全科"(3000) 通配: 订单含 3000 → 任意 filter 命中; filter 是 3000 → 仅匹配明确写 3000 的订单
+     */
+    private boolean matchSubject(TutorRequirement r, RequirementSearchReq req) {
         if (!StringUtils.hasText(req.getSubject())) return true;
         if (!StringUtils.hasText(r.getSubjectIds())) return true;
-        return r.getSubjectIds().contains(req.getSubject());
+
+        Long filterId = null;
+        for (com.roncoo.education.user.dao.impl.mapper.entity.DictSubject ds : dictSubjectDao.listAll()) {
+            if (req.getSubject().equals(ds.getSubjectName())) {
+                filterId = ds.getId();
+                break;
+            }
+        }
+        if (filterId == null) return false;
+
+        java.util.Set<Long> reqIds = parseCsvIds(r.getSubjectIds());
+        if (reqIds.isEmpty()) return false;
+
+        // 订单含"全科" → 任意 filter 命中 (家长接所有科目)
+        if (reqIds.contains(3000L) && filterId.longValue() != 3000L) return true;
+        // 否则等值匹配 (filter=3000 时也走这里, 仅匹配明确含 3000 的订单)
+        return reqIds.contains(filterId);
+    }
+
+    private static java.util.Set<Long> parseCsvIds(String csv) {
+        if (csv == null) return java.util.Collections.emptySet();
+        String t = csv.trim();
+        if (t.isEmpty() || "[]".equals(t)) return java.util.Collections.emptySet();
+        if (t.startsWith("[") && t.endsWith("]")) t = t.substring(1, t.length() - 1);
+        java.util.Set<Long> out = new java.util.HashSet<>();
+        for (String p : t.split(",")) {
+            String x = p.trim().replace("\"", "").replace("'", "");
+            if (x.isEmpty()) continue;
+            try { out.add(Long.parseLong(x)); } catch (NumberFormatException ignore) {}
+        }
+        return out;
     }
 
     /** tutorType 同上 */

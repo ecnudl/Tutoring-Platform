@@ -59,8 +59,10 @@ public class DictSubjectDaoImpl extends AbstractBaseJdbc implements DictSubjectD
 
     @Override
     public List<DictSubject> listAll() {
+        // 仅启用项 (status_id=1). 软删的旧条目 status_id=0 不返回, 否则前端字典里会同时出现新/旧科目.
         DictSubjectExample example = new DictSubjectExample();
-        example.setOrderByClause("sort asc");
+        example.createCriteria().andStatusIdEqualTo(1);
+        example.setOrderByClause("id asc, sort asc");
         return this.dictSubjectMapper.selectByExample(example);
     }
 

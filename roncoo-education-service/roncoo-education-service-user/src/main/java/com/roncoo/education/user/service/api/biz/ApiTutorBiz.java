@@ -115,8 +115,10 @@ public class ApiTutorBiz extends BaseBiz {
             c.andPriceMinLessThan(req.getPriceMax().add(java.math.BigDecimal.ONE));
         }
         if (StringUtils.hasText(req.getSubject())) {
-            // entity.subjects 存的是 JSON id 数组 (如 "[2013]"), 用户传的是科目名 (如 "小学全科").
-            // 直接 LIKE %小学全科% 永不命中. 走 dict_subject 翻译 + tutor_subject 子表 join.
+            // tutor_profile.subjects 已规范化为 CSV of new IDs (如 "3002,3003"); 前端传科目名.
+            // 步骤: dict_subject 翻译 (name → id) + tutor_subject 链接表 IN 查询 (含"全科"通配).
+            // 通配规则: 教员选了"全科"(3000) → 学员搜任何科目都命中 → 加 3000 作为 OR 条件.
+            // 反向: 学员搜"全科" → 只匹配教员明确选了"全科"的, 不再展开.
             Long subjectId = null;
             for (DictSubject ds : dictSubjectDao.listAll()) {
                 if (req.getSubject().equals(ds.getSubjectName())) { subjectId = ds.getId(); break; }
@@ -124,7 +126,13 @@ public class ApiTutorBiz extends BaseBiz {
             if (subjectId == null) {
                 return Result.success(emptyTutorSearchPage(req));
             }
-            java.util.List<TutorSubject> tsList = tutorSubjectDao.listBySubjectId(subjectId);
+            final long ALL_SUBJECTS_ID = 3000L;
+            java.util.List<Long> filterIds = new java.util.ArrayList<>();
+            filterIds.add(subjectId);
+            if (subjectId.longValue() != ALL_SUBJECTS_ID) {
+                filterIds.add(ALL_SUBJECTS_ID);
+            }
+            java.util.List<TutorSubject> tsList = tutorSubjectDao.listBySubjectIds(filterIds);
             java.util.List<Long> tutorIds = tsList.stream()
                     .map(TutorSubject::getTutorId)
                     .filter(java.util.Objects::nonNull)
