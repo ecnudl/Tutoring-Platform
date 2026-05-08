@@ -85,7 +85,9 @@ public class TutorRequirementDaoImpl extends AbstractBaseJdbc implements TutorRe
         TutorRequirementExample example = new TutorRequirementExample();
         TutorRequirementExample.Criteria criteria = example.createCriteria();
         criteria.andDisplayNoEqualTo(displayNo);
-        List<TutorRequirement> list = this.tutorRequirementMapper.selectByExample(example);
+        // 用 WithBLOBs 把 schedule / requirement_detail / student_info /
+        // tutor_request / traffic_info 一并加载, 否则公开详情页这些字段会显示空
+        List<TutorRequirement> list = this.tutorRequirementMapper.selectByExampleWithBLOBs(example);
         if (list.isEmpty()) {
             return null;
         }
