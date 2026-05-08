@@ -72,12 +72,15 @@ public class ApiRequirementBiz extends BaseBiz {
         Page<TutorRequirement> rawPage = tutorRequirementDao.page(1, 5000, example);
         java.util.List<TutorRequirement> all = rawPage.getList() != null ? rawPage.getList() : java.util.Collections.emptyList();
 
+        // 预先把 filter 的 subject 名称翻成 ID, 避免 matchSubject 内部每行调一次 dictSubjectDao.listAll()
+        final Long resolvedSubjectId = resolveFilterSubjectId(req);
+
         // Java 后过滤. /xy 学员库不做 24h cutoff (保留 MATCHED 作为社会证明), 仅首页 latest 才过滤.
         java.util.List<TutorRequirement> filtered = all.stream()
                 .filter(r -> matchTeachingMethod(r, req))
                 .filter(r -> matchCity(r, req))
                 .filter(r -> matchDistrict(r, req))
-                .filter(r -> matchSubject(r, req))
+                .filter(r -> matchSubject(r, req, resolvedSubjectId))
                 .filter(r -> matchTutorType(r, req))
                 .filter(r -> matchKeyword(r, req))
                 .filter(r -> matchGrade(r, req))
@@ -127,33 +130,32 @@ public class ApiRequirementBiz extends BaseBiz {
         return r.getDistrictNames().contains(req.getDistrict());
     }
 
+    /** 把 req.subject (科目中文名) 翻成 ID. filter 为空时返回 null. 名字没匹配上时返回特殊哨兵 -1L (走 matchSubject 时秒拒). */
+    private Long resolveFilterSubjectId(RequirementSearchReq req) {
+        if (!StringUtils.hasText(req.getSubject())) return null;
+        for (com.roncoo.education.user.dao.impl.mapper.entity.DictSubject ds : dictSubjectDao.listAll()) {
+            if (req.getSubject().equals(ds.getSubjectName())) return ds.getId();
+        }
+        return -1L;
+    }
+
     /**
      * subject 通配规则:
-     *   - filter 空 → 命中
+     *   - filter 空 (resolvedFilterId == null) → 命中
+     *   - filter 名字没匹配上 dict (resolvedFilterId == -1) → 不命中
      *   - 订单 subject_ids 空 → 命中 (家长没填具体科目, 默认对所有筛选可见)
-     *   - 否则: 把 filter 名翻译成 ID, 再到订单 subject_ids CSV 中按 ID 等值匹配
      *   - "全科"(3000) 通配: 订单含 3000 → 任意 filter 命中; filter 是 3000 → 仅匹配明确写 3000 的订单
      */
-    private boolean matchSubject(TutorRequirement r, RequirementSearchReq req) {
-        if (!StringUtils.hasText(req.getSubject())) return true;
+    private boolean matchSubject(TutorRequirement r, RequirementSearchReq req, Long resolvedFilterId) {
+        if (resolvedFilterId == null) return true;
+        if (resolvedFilterId == -1L) return false;
         if (!StringUtils.hasText(r.getSubjectIds())) return true;
-
-        Long filterId = null;
-        for (com.roncoo.education.user.dao.impl.mapper.entity.DictSubject ds : dictSubjectDao.listAll()) {
-            if (req.getSubject().equals(ds.getSubjectName())) {
-                filterId = ds.getId();
-                break;
-            }
-        }
-        if (filterId == null) return false;
 
         java.util.Set<Long> reqIds = parseCsvIds(r.getSubjectIds());
         if (reqIds.isEmpty()) return false;
 
-        // 订单含"全科" → 任意 filter 命中 (家长接所有科目)
-        if (reqIds.contains(3000L) && filterId.longValue() != 3000L) return true;
-        // 否则等值匹配 (filter=3000 时也走这里, 仅匹配明确含 3000 的订单)
-        return reqIds.contains(filterId);
+        if (reqIds.contains(3000L) && resolvedFilterId.longValue() != 3000L) return true;
+        return reqIds.contains(resolvedFilterId);
     }
 
     private static java.util.Set<Long> parseCsvIds(String csv) {
