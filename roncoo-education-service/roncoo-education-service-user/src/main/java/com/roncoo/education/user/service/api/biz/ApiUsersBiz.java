@@ -24,6 +24,7 @@ import com.roncoo.education.system.feign.interfaces.IFeignSysConfig;
 import com.roncoo.education.system.feign.interfaces.vo.LoginConfig;
 import com.roncoo.education.common.core.enums.TutorAuditStatusEnum;
 import com.roncoo.education.common.core.enums.UserTypeEnum;
+import com.roncoo.education.common.tools.IpUtil;
 import com.roncoo.education.user.dao.*;
 import com.roncoo.education.user.dao.impl.mapper.entity.*;;
 import com.roncoo.education.user.service.api.req.*;
@@ -238,31 +239,44 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
-     * 简化注册（不依赖RSA，需短信验证码）
+     * 简化注册. 必须带图形验证码 (verToken/verCode 来自 GET /system/api/common/code).
+     * 限流: 同 IP 3次/小时.
      */
     @Transactional(rollbackFor = Exception.class)
     public Result<UsersLoginResp> registerSimple(SimpleRegisterReq req) {
+        // 同 IP 限流 (注册接口高危, 防机器人批量造账号)
+        String ip = IpUtil.getIpAddress(request);
+        if (StringUtils.hasText(ip)) {
+            String rateKey = Constants.RedisPre.RATE_LIMIT_IP + "register:" + ip;
+            String cnt = cacheRedis.get(rateKey);
+            int n = StringUtils.hasText(cnt) ? safeInt(cnt) : 0;
+            if (n >= 3) {
+                return Result.error("注册过于频繁，请稍后再试");
+            }
+            cacheRedis.set(rateKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
+        }
+
+        // 图形验证码强校验 (必须有 token + 答对)
+        if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
+            return Result.error("请输入图形验证码");
+        }
+        String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+        if (!StringUtils.hasText(expectedCaptcha)) {
+            return Result.error("图形验证码已过期，请刷新");
+        }
+        if (!expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
+            // 答错也消耗 token (防同一图反复猜)
+            cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+            return Result.error("图形验证码不正确，请刷新重试");
+        }
+        cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+
         // 手机号校验
         if (!StringUtils.hasText(req.getMobile())) {
             return Result.error("手机号不能为空");
         }
         if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
             return Result.error("手机号格式不正确");
-        }
-        // 短信验证码校验：Redis 中无验证码视为"SMS 未开通"模式，任意6位数字放行；
-        // 一旦 sendCode 真正写入 Redis 后自动切换为严格校验。
-        if (StringUtils.hasText(req.getCode())) {
-            String redisCode = cacheRedis.get(Constants.RedisPre.CODE + req.getMobile());
-            if (StringUtils.hasText(redisCode)) {
-                if (!req.getCode().equals(redisCode)) {
-                    return Result.error("验证码不正确");
-                }
-                cacheRedis.delete(Constants.RedisPre.CODE + req.getMobile());
-            } else {
-                log.warn("[SMS未启用] 跳过验证码校验，手机号：{}", req.getMobile());
-            }
-        } else {
-            log.warn("[测试模式] 跳过短信验证码校验，手机号：{}", req.getMobile());
         }
 
         // 密码校验
@@ -319,7 +333,7 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
-     * 简化登录（开发环境，不依赖RSA和图形验证码）
+     * 简化登录. 限流: 同 IP 30/小时 + 同 mobile 10/小时 (防爆破密码).
      */
     public Result<UsersLoginResp> loginSimple(SimpleLoginReq req) {
         if (!StringUtils.hasText(req.getMobile())) {
@@ -328,6 +342,19 @@ public class ApiUsersBiz extends BaseBiz {
         if (!StringUtils.hasText(req.getPassword())) {
             return Result.error("密码不能为空");
         }
+
+        // 限流 — 同 IP 30/小时 + 同 mobile 10/小时
+        String ip = IpUtil.getIpAddress(request);
+        if (StringUtils.hasText(ip)) {
+            String ipKey = Constants.RedisPre.RATE_LIMIT_IP + "login:ip:" + ip;
+            int n = safeInt(cacheRedis.get(ipKey));
+            if (n >= 30) return Result.error("登录尝试过于频繁，请稍后再试");
+            cacheRedis.set(ipKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
+        }
+        String mobileKey = Constants.RedisPre.RATE_LIMIT_IP + "login:mobile:" + req.getMobile();
+        int mCnt = safeInt(cacheRedis.get(mobileKey));
+        if (mCnt >= 10) return Result.error("该账号登录尝试过多，请稍后再试");
+        cacheRedis.set(mobileKey, String.valueOf(mCnt + 1), 1, TimeUnit.HOURS);
 
         // 用户校验
         Users user = usersDao.getByMobile(req.getMobile());
@@ -775,6 +802,12 @@ public class ApiUsersBiz extends BaseBiz {
             return "该手机号是家长账号，请切换到家长登录页面";
         }
         return "账号类型不匹配当前登录入口";
+    }
+
+    /** 把 redis 计数 string 安全解析为 int (空/异常返回 0). */
+    private static int safeInt(String s) {
+        if (s == null || s.isEmpty()) return 0;
+        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
     }
 
     /**
