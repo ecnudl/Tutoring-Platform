@@ -321,12 +321,13 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("该手机号已经注册，请更换手机号");
         }
 
-        // 浏览器指纹去重 (FingerprintJS): 同设备 24 小时内最多 3 次注册
-        // visitorId 为空时跳过 (老客户端 / curl 直接打)
+        // 浏览器指纹去重 (FingerprintJS OSS, ~70% 准确率): 同设备 24 小时内最多 5 次注册
+        // 阈值故意放宽到 5 (原 3 误伤风险高: 同款手机+同款浏览器版本可能哈希相同)
+        // visitorId 为空时跳过 (老客户端 / curl 直接打 / 用户禁用 JS)
         if (StringUtils.hasText(req.getVisitorId()) && req.getVisitorId().length() <= 64) {
             String fpKey = "fp:reg:" + req.getVisitorId();
             long fpCount = atomicBump(fpKey, 24 * 3600);
-            if (fpCount > 3) {
+            if (fpCount > 5) {
                 bumpFail(failKey);
                 log.warn("[fingerprint] 同设备多账号注册阻断, fp={}, mobile={}", req.getVisitorId(), req.getMobile());
                 return Result.error("同设备已注册多个账号, 如有疑问请联系客服");
@@ -877,34 +878,42 @@ public class ApiUsersBiz extends BaseBiz {
         atomicBump(key, 30 * 60);
     }
 
+    // Lua: 原子 INCR + 仅当 TTL=-1 (未设置) 时 EXPIRE; 同时修复"被 INCR 后 EXPIRE 失败导致永生 key"
+    private static final org.springframework.data.redis.core.script.DefaultRedisScript<Long> INCR_WITH_TTL_SCRIPT =
+            new org.springframework.data.redis.core.script.DefaultRedisScript<>(
+                    "local n = redis.call('INCR', KEYS[1]); " +
+                    "if redis.call('TTL', KEYS[1]) < 0 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end; " +
+                    "return n",
+                    Long.class);
+
     /**
-     * 原子计数器: INCR + 仅在第一次设置 EXPIRE.
-     * 返回当前计数 (>=1). 防 GET→SET 竞态.
+     * 原子计数器 (Lua INCR + 修复 TTL): 单 Redis 往返, 即使 INCR 后崩溃, 下次调用也会补 EXPIRE,
+     * 不再会出现"无 TTL 的永生 key".
      */
     private long atomicBump(String key, int ttlSeconds) {
         var redis = cacheRedis.getStringRedisTemplate();
-        Long n = redis.opsForValue().increment(key);
-        if (n != null && n == 1L) {
-            redis.expire(key, ttlSeconds, TimeUnit.SECONDS);
-        }
+        Long n = redis.execute(INCR_WITH_TTL_SCRIPT,
+                java.util.Collections.singletonList(key),
+                String.valueOf(ttlSeconds));
         return n != null ? n : 0L;
     }
 
+    // Lua: 原子 GET + DEL, 同 token 并发只能成功 1 次
+    private static final org.springframework.data.redis.core.script.DefaultRedisScript<String> GETDEL_SCRIPT =
+            new org.springframework.data.redis.core.script.DefaultRedisScript<>(
+                    "local v = redis.call('GET', KEYS[1]); " +
+                    "if v then redis.call('DEL', KEYS[1]) end; " +
+                    "return v",
+                    String.class);
+
     /**
-     * 原子消费 captcha: GETDEL (Redis 6.2+) 或回退 GET+DEL.
-     * 同一 token 只能成功 1 次, 防并发重放.
+     * 原子消费 captcha. 用 Lua 保证 GET+DEL 一致, 不依赖 Redis 6.2+ GETDEL.
      */
     private String consumeCaptcha(String token) {
         if (!StringUtils.hasText(token)) return null;
         String key = Constants.RedisPre.VER_CODE + token;
-        try {
-            return cacheRedis.getStringRedisTemplate().opsForValue().getAndDelete(key);
-        } catch (Exception e) {
-            // 兜底: 老 Redis 不支持 GETDEL
-            String v = cacheRedis.get(key);
-            cacheRedis.delete(key);
-            return v;
-        }
+        return cacheRedis.getStringRedisTemplate().execute(GETDEL_SCRIPT,
+                java.util.Collections.singletonList(key));
     }
 
     /**

@@ -94,13 +94,19 @@ public class AuthFeedbackBiz extends BaseBiz {
         return Result.success("提交成功，审核通过后将展示在首页");
     }
 
-    /** 原子 INCR + 仅首次 EXPIRE. 返回当前计数, 防 GET→SET 竞态. */
+    // Lua: 原子 INCR + 修复 TTL (单往返, 永不留无 TTL 的 key)
+    private static final org.springframework.data.redis.core.script.DefaultRedisScript<Long> INCR_WITH_TTL_SCRIPT =
+            new org.springframework.data.redis.core.script.DefaultRedisScript<>(
+                    "local n = redis.call('INCR', KEYS[1]); " +
+                    "if redis.call('TTL', KEYS[1]) < 0 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end; " +
+                    "return n",
+                    Long.class);
+
+    /** 原子 INCR + 修复 TTL. */
     private long atomicBump(String key, int ttlSeconds) {
-        var redis = cacheRedis.getStringRedisTemplate();
-        Long n = redis.opsForValue().increment(key);
-        if (n != null && n == 1L) {
-            redis.expire(key, ttlSeconds, TimeUnit.SECONDS);
-        }
+        Long n = cacheRedis.getStringRedisTemplate().execute(INCR_WITH_TTL_SCRIPT,
+                java.util.Collections.singletonList(key),
+                String.valueOf(ttlSeconds));
         return n != null ? n : 0L;
     }
 
