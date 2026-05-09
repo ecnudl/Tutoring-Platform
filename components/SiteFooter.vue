@@ -35,21 +35,22 @@ import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const { config, load, footerMenus } = useSiteConfig()
 
+// 学员/教员 板块所有条目都指向 /help 帮助中心 (统一入口, 减少分散子页);
+// /zf 收费标准是独立功能页, 保留入口. 关于我们继续指向独立页面 (内容性质不同).
 const DEFAULT_GROUPS = [
   { group: '我是学员', items: [
-    { label: '请家教流程', href: '/help/request-process' },
+    { label: '请家教流程', href: '/help' },
     { label: '请家教收费标准', href: '/zf' },
-    { label: '请家教常见问题', href: '/help/request-faq' },
-    { label: '怎样快速找到老师', href: '/help/find-tutor' }
+    { label: '请家教常见问题', href: '/help' },
+    { label: '怎样快速找到老师', href: '/help' }
   ]},
   { group: '我是教员', items: [
-    { label: '成为家教老师', href: '/help/become-tutor' },
+    { label: '成为家教老师', href: '/help' },
     { label: '家教课时费参考标准', href: '/zf' },
-    { label: '做家教收费标准', href: '/help/tutor-pricing' },
-    { label: '做家教常见问题', href: '/help/tutor-faq' }
+    { label: '做家教收费标准', href: '/help' },
+    { label: '做家教常见问题', href: '/help' }
   ]},
   { group: '关于我们', items: [
-    { label: '服务号', href: '/about/wechat' },
     { label: '联系我们', href: '/about/contact' },
     { label: '公司简介', href: '/about/intro' },
     { label: '免责声明', href: '/agreement/disclaimer' },
