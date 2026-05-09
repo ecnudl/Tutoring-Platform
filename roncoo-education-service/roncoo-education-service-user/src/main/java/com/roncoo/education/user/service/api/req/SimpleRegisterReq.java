@@ -29,6 +29,9 @@ public class SimpleRegisterReq implements Serializable {
     @ApiModelProperty(value = "图形验证码 (用户输入)", required = true)
     private String verCode;
 
+    @ApiModelProperty(value = "蜜罐字段 (隐藏, 真人不应该填)")
+    private String honeypot;
+
     @ApiModelProperty(value = "用户类型 1教员 2学员", required = true)
     private Integer userType;
 

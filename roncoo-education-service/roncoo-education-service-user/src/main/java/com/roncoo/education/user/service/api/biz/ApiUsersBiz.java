@@ -239,65 +239,91 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
-     * 简化注册. 必须带图形验证码 (verToken/verCode 来自 GET /system/api/common/code).
+     * 简化注册. 智能 captcha (仅当 IP 历史失败 ≥3 次时才强制要求, 否则首次/无失败用户免验证码),
+     * 加 honeypot 字段 (机器填会被静默拒绝).
      * 限流: 同 IP 3次/小时.
      */
     @Transactional(rollbackFor = Exception.class)
     public Result<UsersLoginResp> registerSimple(SimpleRegisterReq req) {
-        // 同 IP 限流 (注册接口高危, 防机器人批量造账号)
         String ip = IpUtil.getIpAddress(request);
+
+        // 0. Honeypot: 隐藏字段 honeypot 任何值都视为机器, 静默 success 但不真注册
+        // (前端隐藏字段, 真人不会填)
+        if (StringUtils.hasText(req.getHoneypot())) {
+            log.warn("[honeypot] 机器人触发, ip={}, value={}", ip, req.getHoneypot());
+            return Result.success(new UsersLoginResp());
+        }
+
+        // 1. 同 IP 限流 (硬性, 不绕过)
         if (StringUtils.hasText(ip)) {
             String rateKey = Constants.RedisPre.RATE_LIMIT_IP + "register:" + ip;
-            String cnt = cacheRedis.get(rateKey);
-            int n = StringUtils.hasText(cnt) ? safeInt(cnt) : 0;
+            int n = safeInt(cacheRedis.get(rateKey));
             if (n >= 3) {
                 return Result.error("注册过于频繁，请稍后再试");
             }
             cacheRedis.set(rateKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
         }
 
-        // 图形验证码强校验 (必须有 token + 答对)
-        if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
-            return Result.error("请输入图形验证码");
-        }
-        String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
-        if (!StringUtils.hasText(expectedCaptcha)) {
-            return Result.error("图形验证码已过期，请刷新");
-        }
-        if (!expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
-            // 答错也消耗 token (防同一图反复猜)
+        // 2. 智能 captcha: 该 IP 历史失败次数 ≥3 才强制要求 captcha
+        String failKey = "reg:fail:" + (StringUtils.hasText(ip) ? ip : "unknown");
+        int recentFails = safeInt(cacheRedis.get(failKey));
+        boolean captchaRequired = recentFails >= 3;
+        if (captchaRequired) {
+            if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
+                return Result.error("CAPTCHA_REQUIRED");
+            }
+            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+            if (!StringUtils.hasText(expectedCaptcha)) {
+                return Result.error("图形验证码已过期，请刷新");
+            }
+            if (!expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
+                cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+                bumpFail(failKey);
+                return Result.error("图形验证码不正确，请刷新重试");
+            }
             cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
-            return Result.error("图形验证码不正确，请刷新重试");
+        } else if (StringUtils.hasText(req.getVerCode()) && StringUtils.hasText(req.getVerToken())) {
+            // 用户主动填了 captcha, 仍然校验, 通过则消耗 token
+            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+            if (StringUtils.hasText(expectedCaptcha) && expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
+                cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+            }
         }
-        cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
 
-        // 手机号校验
+        // 3. 手机号校验
         if (!StringUtils.hasText(req.getMobile())) {
+            bumpFail(failKey);
             return Result.error("手机号不能为空");
         }
         if (!req.getMobile().matches("^1[3-9]\\d{9}$")) {
+            bumpFail(failKey);
             return Result.error("手机号格式不正确");
         }
 
         // 密码校验
         if (!StringUtils.hasText(req.getPassword())) {
+            bumpFail(failKey);
             return Result.error("密码不能为空");
         }
         // 姓名/尊称校验
         if (!StringUtils.hasText(req.getRealName())) {
+            bumpFail(failKey);
             return Result.error("请填写姓名或尊称");
         }
         // userType 校验
         if (req.getUserType() == null || (!UserTypeEnum.TUTOR.getCode().equals(req.getUserType()) && !UserTypeEnum.STUDENT.getCode().equals(req.getUserType()))) {
+            bumpFail(failKey);
             return Result.error("用户类型不合法，只能为1(教员)或2(学员)");
         }
         // 手机号重复校验
         Users existUser = usersDao.getByMobile(req.getMobile());
         if (existUser != null) {
+            bumpFail(failKey);
             return Result.error("该手机号已经注册，请更换手机号");
         }
 
-        // 注册（直接明文密码，内部会SHA1加盐哈希存储）
+        // 注册成功 — 清失败计数
+        cacheRedis.delete(failKey);
         Users user = register(req.getMobile(), req.getPassword(), 1, null, null, req.getUserType());
 
         // 安全问题(可选): 如果填了, 存到 users 表, 用于找回密码
@@ -333,9 +359,17 @@ public class ApiUsersBiz extends BaseBiz {
     }
 
     /**
-     * 简化登录. 限流: 同 IP 30/小时 + 同 mobile 10/小时 (防爆破密码).
+     * 简化登录. 智能 captcha (失败 3+ 次需 captcha) + honeypot + 限流硬上限.
      */
     public Result<UsersLoginResp> loginSimple(SimpleLoginReq req) {
+        String ip = IpUtil.getIpAddress(request);
+
+        // 0. Honeypot
+        if (StringUtils.hasText(req.getHoneypot())) {
+            log.warn("[honeypot] 登录机器人, ip={}", ip);
+            return Result.error("账号或者密码不正确");
+        }
+
         if (!StringUtils.hasText(req.getMobile())) {
             return Result.error("手机号不能为空");
         }
@@ -343,8 +377,7 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("密码不能为空");
         }
 
-        // 限流 — 同 IP 30/小时 + 同 mobile 10/小时
-        String ip = IpUtil.getIpAddress(request);
+        // 1. 硬限流 - 同 IP 30/小时 + 同 mobile 10/小时 (兜底, 阻止极端爆破)
         if (StringUtils.hasText(ip)) {
             String ipKey = Constants.RedisPre.RATE_LIMIT_IP + "login:ip:" + ip;
             int n = safeInt(cacheRedis.get(ipKey));
@@ -356,9 +389,26 @@ public class ApiUsersBiz extends BaseBiz {
         if (mCnt >= 10) return Result.error("该账号登录尝试过多，请稍后再试");
         cacheRedis.set(mobileKey, String.valueOf(mCnt + 1), 1, TimeUnit.HOURS);
 
+        // 2. 智能 captcha - 该 mobile 失败 3+ 次后必须带 captcha
+        String failKey = "login:fail:" + req.getMobile();
+        int recentFails = safeInt(cacheRedis.get(failKey));
+        if (recentFails >= 3) {
+            if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
+                return Result.error("CAPTCHA_REQUIRED");
+            }
+            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+            if (!StringUtils.hasText(expectedCaptcha)
+                    || !expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
+                if (StringUtils.hasText(req.getVerToken())) cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+                return Result.error("图形验证码不正确，请刷新重试");
+            }
+            cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+        }
+
         // 用户校验
         Users user = usersDao.getByMobile(req.getMobile());
         if (user == null) {
+            bumpFail(failKey);
             return Result.error("账号或者密码不正确");
         }
 
@@ -378,9 +428,12 @@ public class ApiUsersBiz extends BaseBiz {
             UsersLog usersLog = new UsersLog();
             usersLog.setLoginIp("127.0.0.1");
             log(user.getId(), LoginStatusEnum.FAIL, usersLog);
+            bumpFail(failKey);
             return Result.error("账号或者密码不正确");
         }
 
+        // 登录成功 — 清失败计数
+        cacheRedis.delete(failKey);
         UsersLog usersLog = new UsersLog();
         usersLog.setLoginIp("127.0.0.1");
         return Result.success(login(user.getId(), user.getMobile(), LoginStatusEnum.SUCCESS, usersLog));
@@ -808,6 +861,12 @@ public class ApiUsersBiz extends BaseBiz {
     private static int safeInt(String s) {
         if (s == null || s.isEmpty()) return 0;
         try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
+    }
+
+    /** 失败计数 +1, TTL 30 分钟. 用于智能 captcha 阶梯触发. */
+    private void bumpFail(String key) {
+        int n = safeInt(cacheRedis.get(key));
+        cacheRedis.set(key, String.valueOf(n + 1), 30, TimeUnit.MINUTES);
     }
 
     /**

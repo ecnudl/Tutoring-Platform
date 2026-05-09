@@ -22,4 +22,13 @@ public class SimpleLoginReq implements Serializable {
 
     @ApiModelProperty(value = "期望登录的用户类型：1=教员，2=家长；不传则不校验")
     private Integer userType;
+
+    @ApiModelProperty(value = "图形验证码 token (失败 ≥3 次后必填)")
+    private String verToken;
+
+    @ApiModelProperty(value = "图形验证码 (失败 ≥3 次后必填)")
+    private String verCode;
+
+    @ApiModelProperty(value = "蜜罐字段 (隐藏, 真人不应该填)")
+    private String honeypot;
 }
