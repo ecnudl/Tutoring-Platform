@@ -71,21 +71,19 @@ public class AuthFeedbackBiz extends BaseBiz {
             return Result.error("感言内容过短或含大量不可见字符，请认真填写至少 10 字");
         }
 
-        // 限流: 单账号
+        // 限流: 单账号 (原子 INCR + EXPIRE)
         String userKey = Constants.RedisPre.RATE_LIMIT_IP + "fb:user:" + userId;
-        if (overLimit(userKey, USER_LIMIT_PER_HOUR)) {
+        if (atomicBump(userKey, 3600) > USER_LIMIT_PER_HOUR) {
             return Result.error("您提交过于频繁，每小时最多 " + USER_LIMIT_PER_HOUR + " 条，请稍后再试");
         }
         // 限流: 同 IP (防同人换号)
         String ip = IpUtil.getIpAddress(request);
         if (StringUtils.hasText(ip)) {
             String ipKey = Constants.RedisPre.RATE_LIMIT_IP + "fb:ip:" + ip;
-            if (overLimit(ipKey, IP_LIMIT_PER_HOUR)) {
+            if (atomicBump(ipKey, 3600) > IP_LIMIT_PER_HOUR) {
                 return Result.error("您提交过于频繁，请稍后再试");
             }
-            cacheRedis.set(ipKey, String.valueOf(readCount(ipKey) + 1), 1, TimeUnit.HOURS);
         }
-        cacheRedis.set(userKey, String.valueOf(readCount(userKey) + 1), 1, TimeUnit.HOURS);
 
         Feedback fb = new Feedback();
         fb.setUserId(userId);
@@ -96,14 +94,14 @@ public class AuthFeedbackBiz extends BaseBiz {
         return Result.success("提交成功，审核通过后将展示在首页");
     }
 
-    private boolean overLimit(String key, int max) {
-        return readCount(key) >= max;
-    }
-
-    private int readCount(String key) {
-        String v = cacheRedis.get(key);
-        if (!StringUtils.hasText(v)) return 0;
-        try { return Integer.parseInt(v); } catch (NumberFormatException e) { return 0; }
+    /** 原子 INCR + 仅首次 EXPIRE. 返回当前计数, 防 GET→SET 竞态. */
+    private long atomicBump(String key, int ttlSeconds) {
+        var redis = cacheRedis.getStringRedisTemplate();
+        Long n = redis.opsForValue().increment(key);
+        if (n != null && n == 1L) {
+            redis.expire(key, ttlSeconds, TimeUnit.SECONDS);
+        }
+        return n != null ? n : 0L;
     }
 
     /** 去掉空白 + 常见不可见控制字符 (零宽 / 方向标 / BOM / NBSP 等) */

@@ -254,14 +254,13 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.success(new UsersLoginResp());
         }
 
-        // 1. 同 IP 限流 (硬性, 不绕过)
+        // 1. 同 IP 限流 (原子 INCR + EXPIRE, 防 GET→SET 竞态丢失计数)
         if (StringUtils.hasText(ip)) {
             String rateKey = Constants.RedisPre.RATE_LIMIT_IP + "register:" + ip;
-            int n = safeInt(cacheRedis.get(rateKey));
-            if (n >= 3) {
+            long n = atomicBump(rateKey, 3600);
+            if (n > 3) {
                 return Result.error("注册过于频繁，请稍后再试");
             }
-            cacheRedis.set(rateKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
         }
 
         // 2. 智能 captcha: 该 IP 历史失败次数 ≥3 才强制要求 captcha
@@ -272,21 +271,21 @@ public class ApiUsersBiz extends BaseBiz {
             if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
                 return Result.error("CAPTCHA_REQUIRED");
             }
-            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+            // 原子消费 captcha (GETDEL): 同一 token 只能成功 1 次, 防并发重放
+            String expectedCaptcha = consumeCaptcha(req.getVerToken());
             if (!StringUtils.hasText(expectedCaptcha)) {
-                return Result.error("图形验证码已过期，请刷新");
+                return Result.error("图形验证码已过期或已使用，请刷新");
             }
             if (!expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
-                cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
                 bumpFail(failKey);
                 return Result.error("图形验证码不正确，请刷新重试");
             }
-            cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
         } else if (StringUtils.hasText(req.getVerCode()) && StringUtils.hasText(req.getVerToken())) {
-            // 用户主动填了 captcha, 仍然校验, 通过则消耗 token
-            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
-            if (StringUtils.hasText(expectedCaptcha) && expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
-                cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
+            // 用户主动填了 captcha, 校验通过则消耗 token (原子)
+            String expectedCaptcha = consumeCaptcha(req.getVerToken());
+            // 错误也已消费; 这里不报错给智能 captcha 路径用户更宽松
+            if (!StringUtils.hasText(expectedCaptcha) || !expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
+                // 静默 - 用户没被强制, 答错就当没填
             }
         }
 
@@ -373,40 +372,38 @@ public class ApiUsersBiz extends BaseBiz {
         if (!StringUtils.hasText(req.getMobile())) {
             return Result.error("手机号不能为空");
         }
+        // 提前格式校验, 防 redis key 被任意字符串污染
+        String mobile = req.getMobile().trim();
+        if (mobile.length() > 20 || !mobile.matches("^[A-Za-z0-9_@.\\-]+$")) {
+            return Result.error("账号或者密码不正确");
+        }
         if (!StringUtils.hasText(req.getPassword())) {
             return Result.error("密码不能为空");
         }
 
-        // 1. 硬限流 - 同 IP 30/小时 + 同 mobile 10/小时 (兜底, 阻止极端爆破)
+        // 1. 硬限流 - 同 IP 30/小时 (原子 INCR; 仅做尝试计数, 不锁账号)
         if (StringUtils.hasText(ip)) {
             String ipKey = Constants.RedisPre.RATE_LIMIT_IP + "login:ip:" + ip;
-            int n = safeInt(cacheRedis.get(ipKey));
-            if (n >= 30) return Result.error("登录尝试过于频繁，请稍后再试");
-            cacheRedis.set(ipKey, String.valueOf(n + 1), 1, TimeUnit.HOURS);
+            long n = atomicBump(ipKey, 3600);
+            if (n > 30) return Result.error("登录尝试过于频繁，请稍后再试");
         }
-        String mobileKey = Constants.RedisPre.RATE_LIMIT_IP + "login:mobile:" + req.getMobile();
-        int mCnt = safeInt(cacheRedis.get(mobileKey));
-        if (mCnt >= 10) return Result.error("该账号登录尝试过多，请稍后再试");
-        cacheRedis.set(mobileKey, String.valueOf(mCnt + 1), 1, TimeUnit.HOURS);
 
-        // 2. 智能 captcha - 该 mobile 失败 3+ 次后必须带 captcha
-        String failKey = "login:fail:" + req.getMobile();
+        // 2. 智能 captcha - 该 mobile 失败 3+ 次后必须带 captcha (用 fail 计数, 不锁账号)
+        String failKey = "login:fail:" + mobile;
         int recentFails = safeInt(cacheRedis.get(failKey));
         if (recentFails >= 3) {
             if (!StringUtils.hasText(req.getVerToken()) || !StringUtils.hasText(req.getVerCode())) {
                 return Result.error("CAPTCHA_REQUIRED");
             }
-            String expectedCaptcha = cacheRedis.get(Constants.RedisPre.VER_CODE + req.getVerToken());
+            String expectedCaptcha = consumeCaptcha(req.getVerToken());
             if (!StringUtils.hasText(expectedCaptcha)
                     || !expectedCaptcha.equalsIgnoreCase(req.getVerCode().trim())) {
-                if (StringUtils.hasText(req.getVerToken())) cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
                 return Result.error("图形验证码不正确，请刷新重试");
             }
-            cacheRedis.delete(Constants.RedisPre.VER_CODE + req.getVerToken());
         }
 
         // 用户校验
-        Users user = usersDao.getByMobile(req.getMobile());
+        Users user = usersDao.getByMobile(mobile);
         if (user == null) {
             bumpFail(failKey);
             return Result.error("账号或者密码不正确");
@@ -863,10 +860,39 @@ public class ApiUsersBiz extends BaseBiz {
         try { return Integer.parseInt(s); } catch (NumberFormatException e) { return 0; }
     }
 
-    /** 失败计数 +1, TTL 30 分钟. 用于智能 captcha 阶梯触发. */
+    /** 失败计数 +1, TTL 30 分钟. 原子 INCR + EXPIRE, 防并发丢失计数. */
     private void bumpFail(String key) {
-        int n = safeInt(cacheRedis.get(key));
-        cacheRedis.set(key, String.valueOf(n + 1), 30, TimeUnit.MINUTES);
+        atomicBump(key, 30 * 60);
+    }
+
+    /**
+     * 原子计数器: INCR + 仅在第一次设置 EXPIRE.
+     * 返回当前计数 (>=1). 防 GET→SET 竞态.
+     */
+    private long atomicBump(String key, int ttlSeconds) {
+        var redis = cacheRedis.getStringRedisTemplate();
+        Long n = redis.opsForValue().increment(key);
+        if (n != null && n == 1L) {
+            redis.expire(key, ttlSeconds, TimeUnit.SECONDS);
+        }
+        return n != null ? n : 0L;
+    }
+
+    /**
+     * 原子消费 captcha: GETDEL (Redis 6.2+) 或回退 GET+DEL.
+     * 同一 token 只能成功 1 次, 防并发重放.
+     */
+    private String consumeCaptcha(String token) {
+        if (!StringUtils.hasText(token)) return null;
+        String key = Constants.RedisPre.VER_CODE + token;
+        try {
+            return cacheRedis.getStringRedisTemplate().opsForValue().getAndDelete(key);
+        } catch (Exception e) {
+            // 兜底: 老 Redis 不支持 GETDEL
+            String v = cacheRedis.get(key);
+            cacheRedis.delete(key);
+            return v;
+        }
     }
 
     /**
