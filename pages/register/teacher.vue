@@ -80,13 +80,14 @@
             <el-input v-model="step1.securityAnswer" placeholder="不区分大小写，请记牢；忘记密码时需要回答" />
           </el-form-item>
 
-          <el-form-item label="图形验证码" prop="verCode" required>
+          <el-form-item v-if="captchaRequired" label="图形验证码" prop="verCode">
             <div style="display:flex;gap:8px;width:100%">
               <el-input v-model="step1.verCode" placeholder="请输入右图字符" style="flex:1" />
               <img v-if="captchaImg" :src="captchaImg" alt="captcha" @click="loadCaptcha" style="height:40px;cursor:pointer;border-radius:6px" title="点击刷新" />
               <el-button v-else @click="loadCaptcha">获取验证码</el-button>
             </div>
           </el-form-item>
+          <input v-model="step1.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
 
           <div class="agreement-box" :class="{ error: agreementError }">
             <el-checkbox v-model="step1.agreed" @change="agreementError = false">
@@ -356,10 +357,12 @@ const step1 = reactive({
   securityAnswer: '',
   verToken: '',
   verCode: '',
+  honeypot: '',
   agreed: false
 })
 
 const captchaImg = ref('')
+const captchaRequired = ref(false)
 const loadCaptcha = async () => {
   try {
     const r = await get('/system/api/common/code')
@@ -386,8 +389,8 @@ const step1Rules = {
     { validator: (_, v, cb) => v === step1.password ? cb() : cb(new Error('两次密码不一致')), trigger: 'blur' }
   ],
   securityQuestion: [{ required: true, message: '请选择安全问题', trigger: 'change' }],
-  securityAnswer: [{ required: true, message: '请填写安全答案', trigger: 'blur' }],
-  verCode: [{ required: true, message: '请输入图形验证码', trigger: 'blur' }]
+  securityAnswer: [{ required: true, message: '请填写安全答案', trigger: 'blur' }]
+  // verCode 不再硬性必填; 由 captchaRequired 控制
 }
 
 const onCityChange = (newId) => {
@@ -524,13 +527,22 @@ const handleSubmit = async () => {
       securityQuestion: step1.securityQuestion,
       securityAnswer: step1.securityAnswer,
       verToken: step1.verToken,
-      verCode: step1.verCode
+      verCode: step1.verCode,
+      honeypot: step1.honeypot
     })
     if (regRes.code !== 200) {
-      ElMessage.error(regRes.msg || '注册失败')
       submitting.value = false
+      if (regRes.msg === 'CAPTCHA_REQUIRED') {
+        // 触发智能 captcha — 切回 step1, 弹出验证码
+        captchaRequired.value = true
+        currentStep.value = 1
+        await loadCaptcha()
+        ElMessage.warning('请完成图形验证码后重试')
+        return
+      }
+      ElMessage.error(regRes.msg || '注册失败')
       currentStep.value = 1
-      loadCaptcha()  // 验证码消耗后必须刷新
+      if (captchaRequired.value) await loadCaptcha()
       return
     }
 
@@ -630,7 +642,7 @@ function mapDegreeForBackend(val) {
 
 onMounted(() => {
   step1.cityId = cityStore.cityId
-  loadCaptcha()
+  // 不再 onMount 加载 captcha; 触发智能升级时再加载
 })
 </script>
 

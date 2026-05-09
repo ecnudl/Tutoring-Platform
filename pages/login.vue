@@ -35,6 +35,14 @@
           <el-form-item>
             <el-input v-model="passwordForm.password" type="password" placeholder="请输入密码" size="large" show-password />
           </el-form-item>
+          <el-form-item v-if="captchaRequired">
+            <div style="display:flex;gap:8px;width:100%">
+              <el-input v-model="passwordForm.verCode" placeholder="请输入右图字符" size="large" style="flex:1" />
+              <img v-if="captchaImg" :src="captchaImg" alt="captcha" @click="loadCaptcha" style="height:40px;cursor:pointer;border-radius:6px" title="点击刷新" />
+              <el-button v-else size="large" @click="loadCaptcha">获取验证码</el-button>
+            </div>
+          </el-form-item>
+          <input v-model="passwordForm.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
           <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handlePasswordLogin">登录</el-button>
         </el-form>
         <div class="login-footer">
@@ -52,20 +60,37 @@ import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
 
 const selectedRole = ref(null)
-const passwordForm = ref({ mobile: '', password: '' })
+const passwordForm = ref({ mobile: '', password: '', verToken: '', verCode: '', honeypot: '' })
 const loading = ref(false)
+const captchaImg = ref('')
+const captchaRequired = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
-const { post } = useApi()
+const { post, get } = useApi()
 const route = useRoute()
 
 if (route.query.type === 'student' || route.query.type === 'teacher') {
   selectedRole.value = route.query.type
 }
 
+const loadCaptcha = async () => {
+  try {
+    const r = await get('/system/api/common/code')
+    if (r?.code === 200 && r.data) {
+      passwordForm.value.verToken = r.data.verToken
+      captchaImg.value = r.data.img
+      passwordForm.value.verCode = ''
+    }
+  } catch (e) { ElMessage.error('图形码获取失败') }
+}
+
 const handlePasswordLogin = async () => {
   if (!passwordForm.value.mobile) { ElMessage.warning('请输入用户名或手机号'); return }
   if (!passwordForm.value.password) { ElMessage.warning('请输入密码'); return }
+  if (captchaRequired.value && !passwordForm.value.verCode) {
+    ElMessage.warning('请输入图形验证码')
+    return
+  }
 
   loading.value = true
   try {
@@ -73,7 +98,10 @@ const handlePasswordLogin = async () => {
     const loginData = {
       mobile: passwordForm.value.mobile,
       password: passwordForm.value.password,
-      userType: expectedUserType
+      userType: expectedUserType,
+      verToken: passwordForm.value.verToken,
+      verCode: passwordForm.value.verCode,
+      honeypot: passwordForm.value.honeypot
     }
     const res = await post('/user/api/users/login/simple', loginData)
     if (res.code === 200) {
@@ -81,8 +109,13 @@ const handlePasswordLogin = async () => {
       userStore.fetchNickname()
       ElMessage.success('登录成功')
       router.push(route.query.redirect || '/')
+    } else if (res.msg === 'CAPTCHA_REQUIRED') {
+      captchaRequired.value = true
+      await loadCaptcha()
+      ElMessage.warning('多次失败, 请完成图形验证码')
     } else {
       ElMessage.error(res.msg || '登录失败')
+      if (captchaRequired.value) await loadCaptcha()
     }
   } catch (e) {
     ElMessage.error('网络错误')

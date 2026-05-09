@@ -37,13 +37,15 @@
           <el-form-item label="安全答案">
             <el-input v-model="form.securityAnswer" placeholder="请填写答案（不区分大小写，请记牢）" size="large" />
           </el-form-item>
-          <el-form-item label="图形验证码">
+          <el-form-item v-if="captchaRequired" label="图形验证码">
             <div style="display:flex;gap:8px;width:100%">
               <el-input v-model="form.verCode" placeholder="请输入右图字符" size="large" style="flex:1" />
               <img v-if="captchaImg" :src="captchaImg" alt="captcha" @click="loadCaptcha" style="height:40px;cursor:pointer;border-radius:6px" title="点击刷新" />
               <el-button v-else size="large" @click="loadCaptcha">获取验证码</el-button>
             </div>
           </el-form-item>
+          <!-- Honeypot: 人类不会看到, 机器全部填. autocomplete=off + tabindex=-1 防辅助技术 -->
+          <input v-model="form.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
           <el-form-item>
             <div class="agreement-check" :class="{ 'agreement-check--error': showAgreementError && !form.agreed }">
               <el-checkbox v-model="form.agreed" @change="showAgreementError = false" />
@@ -80,6 +82,7 @@ const formRef = ref(null)
 const submitting = ref(false)
 const showAgreementError = ref(false)
 const captchaImg = ref('')
+const captchaRequired = ref(false)  // 默认不要 captcha; 后端要求时翻 true
 
 const form = ref({
   mobile: '',
@@ -90,6 +93,7 @@ const form = ref({
   securityAnswer: '',
   verToken: '',
   verCode: '',
+  honeypot: '',  // 蜜罐字段, 真人不会填
   agreed: false
 })
 
@@ -103,8 +107,6 @@ const loadCaptcha = async () => {
     }
   } catch (e) { ElMessage.error('图形码获取失败, 请刷新页面') }
 }
-
-onMounted(() => loadCaptcha())
 
 const handleSubmit = async () => {
   if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
@@ -127,7 +129,7 @@ const handleSubmit = async () => {
     ElMessage.warning('请选择安全问题并填写答案（用于忘记密码后找回）')
     return
   }
-  if (!form.value.verCode) {
+  if (captchaRequired.value && !form.value.verCode) {
     ElMessage.warning('请输入图形验证码')
     return
   }
@@ -147,14 +149,21 @@ const handleSubmit = async () => {
       securityQuestion: form.value.securityQuestion,
       securityAnswer: form.value.securityAnswer,
       verToken: form.value.verToken,
-      verCode: form.value.verCode
+      verCode: form.value.verCode,
+      honeypot: form.value.honeypot
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')
       router.push('/login?type=student')
+    } else if (res.msg === 'CAPTCHA_REQUIRED') {
+      // 后端识别为可疑, 升级到 captcha
+      captchaRequired.value = true
+      await loadCaptcha()
+      ElMessage.warning('请完成图形验证码后重试')
     } else {
       ElMessage.error(res.msg || '注册失败')
-      loadCaptcha()  // 验证码消耗后必须刷新
+      // 失败超过一定次数后端会要求 captcha; 先刷新图防止 token 浪费
+      if (captchaRequired.value) await loadCaptcha()
     }
   } catch (e) {
     ElMessage.error('网络错误')
