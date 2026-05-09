@@ -28,33 +28,15 @@
           <span>&larr;</span> 返回选择
         </div>
         <h2 class="login-title">{{ selectedRole === 'student' ? '家长/学员登录' : '教员登录' }}</h2>
-        <el-tabs v-model="activeTab" stretch>
-          <el-tab-pane label="账号登录" name="password">
-            <el-form :model="passwordForm" @keyup.enter="handlePasswordLogin">
-              <el-form-item>
-                <el-input v-model="passwordForm.mobile" placeholder="请输入用户名或手机号" size="large" />
-              </el-form-item>
-              <el-form-item>
-                <el-input v-model="passwordForm.password" type="password" placeholder="请输入密码" size="large" show-password />
-              </el-form-item>
-              <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handlePasswordLogin">登录</el-button>
-            </el-form>
-          </el-tab-pane>
-          <el-tab-pane label="短信登录" name="sms">
-            <el-form :model="smsForm">
-              <el-form-item>
-                <el-input v-model="smsForm.mobile" placeholder="请输入手机号" size="large" />
-              </el-form-item>
-              <el-form-item>
-                <div style="display:flex;gap:8px">
-                  <el-input v-model="smsForm.code" placeholder="请输入短信验证码" size="large" style="flex:1" />
-                  <el-button size="large" :disabled="countdown > 0" @click="sendSmsCode">{{ countdownText }}</el-button>
-                </div>
-              </el-form-item>
-              <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handleSmsLogin">登录</el-button>
-            </el-form>
-          </el-tab-pane>
-        </el-tabs>
+        <el-form :model="passwordForm" @keyup.enter="handlePasswordLogin" class="login-form">
+          <el-form-item>
+            <el-input v-model="passwordForm.mobile" placeholder="请输入用户名或手机号" size="large" />
+          </el-form-item>
+          <el-form-item>
+            <el-input v-model="passwordForm.password" type="password" placeholder="请输入密码" size="large" show-password />
+          </el-form-item>
+          <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handlePasswordLogin">登录</el-button>
+        </el-form>
         <div class="login-footer">
           <NuxtLink to="/forgot-password">找回密码</NuxtLink>
           <NuxtLink :to="selectedRole === 'student' ? '/register/student' : '/register/teacher'">我要注册</NuxtLink>
@@ -66,43 +48,19 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
 
 const selectedRole = ref(null)
-const activeTab = ref('password')
 const passwordForm = ref({ mobile: '', password: '' })
-const smsForm = ref({ mobile: '', code: '' })
 const loading = ref(false)
-const countdown = ref(0)
 const userStore = useUserStore()
 const router = useRouter()
 const { post } = useApi()
 const route = useRoute()
 
-const countdownText = computed(() => countdown.value > 0 ? countdown.value + '秒' : '发送验证码')
-
 if (route.query.type === 'student' || route.query.type === 'teacher') {
   selectedRole.value = route.query.type
-}
-
-const sendSmsCode = async () => {
-  if (!smsForm.value.mobile || !/^1[3-9]\d{9}$/.test(smsForm.value.mobile)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  try {
-    const res = await post('/user/api/sms/send-login', { mobile: smsForm.value.mobile })
-    if (res.code === 200) {
-      ElMessage.success('验证码已发送')
-      countdown.value = 60
-      const timer = setInterval(() => { if (--countdown.value <= 0) clearInterval(timer) }, 1000)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e) {
-    ElMessage.error('发送失败')
-  }
 }
 
 const handlePasswordLogin = async () => {
@@ -118,31 +76,6 @@ const handlePasswordLogin = async () => {
       userType: expectedUserType
     }
     const res = await post('/user/api/users/login/simple', loginData)
-    if (res.code === 200) {
-      userStore.saveLogin(res.data)
-      userStore.fetchNickname()
-      ElMessage.success('登录成功')
-      router.push(route.query.redirect || '/')
-    } else {
-      ElMessage.error(res.msg || '登录失败')
-    }
-  } catch (e) {
-    ElMessage.error('网络错误')
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleSmsLogin = async () => {
-  if (!smsForm.value.mobile || !/^1[3-9]\d{9}$/.test(smsForm.value.mobile)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-  if (!smsForm.value.code) { ElMessage.warning('请输入验证码'); return }
-  loading.value = true
-  try {
-    const loginData = { ...smsForm.value, userType: selectedRole.value === 'teacher' ? 1 : 2 }
-    const res = await post('/user/api/login/sms', loginData)
     if (res.code === 200) {
       userStore.saveLogin(res.data)
       userStore.fetchNickname()
