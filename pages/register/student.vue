@@ -77,10 +77,12 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
+import { useFingerprint } from '~/composables/useFingerprint'
 
 const cityStore = useCityStore()
 const router = useRouter()
 const { post, get } = useApi()
+const { get: getFingerprint } = useFingerprint()
 const formRef = ref(null)
 const submitting = ref(false)
 const showAgreementError = ref(false)
@@ -144,6 +146,7 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
+    const visitorId = await getFingerprint()
     const res = await post('/user/api/users/register/simple', {
       mobile: form.value.mobile,
       password: form.value.password,
@@ -153,7 +156,8 @@ const handleSubmit = async () => {
       securityAnswer: form.value.securityAnswer,
       verToken: form.value.verToken,
       verCode: form.value.verCode,
-      honeypot: form.value.honeypot
+      honeypot: form.value.honeypot,
+      visitorId
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')

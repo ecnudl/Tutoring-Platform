@@ -333,11 +333,13 @@ import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 import { CITY_LIST, navigateToCity, PINYIN_TO_CITY } from '~/composables/useCityMap'
 import { SUBJECT_NAMES } from '~/composables/subjectList'
+import { useFingerprint } from '~/composables/useFingerprint'
 
 const cityStore = useCityStore()
 const { districts } = useCityData()
 const router = useRouter()
 const { post, get } = useApi()
+const { get: getFingerprint } = useFingerprint()
 const config = useRuntimeConfig()
 
 const currentStep = ref(1)
@@ -521,6 +523,7 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
+    const visitorId = await getFingerprint()
     // 1. 注册账号
     const regRes = await post('/user/api/users/register/simple', {
       mobile: step1.mobile,
@@ -531,7 +534,8 @@ const handleSubmit = async () => {
       securityAnswer: step1.securityAnswer,
       verToken: step1.verToken,
       verCode: step1.verCode,
-      honeypot: step1.honeypot
+      honeypot: step1.honeypot,
+      visitorId
     })
     if (regRes.code !== 200) {
       submitting.value = false

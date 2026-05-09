@@ -61,7 +61,9 @@
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import { useUserStore } from '~/stores/user'
+import { useFingerprint } from '~/composables/useFingerprint'
 
+const { get: getFingerprint } = useFingerprint()
 const selectedRole = ref(null)
 const passwordForm = ref({ mobile: '', password: '', verToken: '', verCode: '', honeypot: '' })
 const loading = ref(false)
@@ -97,6 +99,7 @@ const handlePasswordLogin = async () => {
 
   loading.value = true
   try {
+    const visitorId = await getFingerprint()
     const expectedUserType = selectedRole.value === 'teacher' ? 1 : 2
     const loginData = {
       mobile: passwordForm.value.mobile,
@@ -104,7 +107,8 @@ const handlePasswordLogin = async () => {
       userType: expectedUserType,
       verToken: passwordForm.value.verToken,
       verCode: passwordForm.value.verCode,
-      honeypot: passwordForm.value.honeypot
+      honeypot: passwordForm.value.honeypot,
+      visitorId
     }
     const res = await post('/user/api/users/login/simple', loginData)
     if (res.code === 200) {
