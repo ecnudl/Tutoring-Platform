@@ -80,6 +80,14 @@
             <el-input v-model="step1.securityAnswer" placeholder="不区分大小写，请记牢；忘记密码时需要回答" />
           </el-form-item>
 
+          <el-form-item label="图形验证码" prop="verCode" required>
+            <div style="display:flex;gap:8px;width:100%">
+              <el-input v-model="step1.verCode" placeholder="请输入右图字符" style="flex:1" />
+              <img v-if="captchaImg" :src="captchaImg" alt="captcha" @click="loadCaptcha" style="height:40px;cursor:pointer;border-radius:6px" title="点击刷新" />
+              <el-button v-else @click="loadCaptcha">获取验证码</el-button>
+            </div>
+          </el-form-item>
+
           <div class="agreement-box" :class="{ error: agreementError }">
             <el-checkbox v-model="step1.agreed" @change="agreementError = false">
               我已阅读并同意
@@ -325,7 +333,7 @@ import { SUBJECT_NAMES } from '~/composables/subjectList'
 const cityStore = useCityStore()
 const { districts } = useCityData()
 const router = useRouter()
-const { post } = useApi()
+const { post, get } = useApi()
 const config = useRuntimeConfig()
 
 const currentStep = ref(1)
@@ -346,8 +354,22 @@ const step1 = reactive({
   confirmPassword: '',
   securityQuestion: '',
   securityAnswer: '',
+  verToken: '',
+  verCode: '',
   agreed: false
 })
+
+const captchaImg = ref('')
+const loadCaptcha = async () => {
+  try {
+    const r = await get('/system/api/common/code')
+    if (r?.code === 200 && r.data) {
+      step1.verToken = r.data.verToken
+      captchaImg.value = r.data.img
+      step1.verCode = ''
+    }
+  } catch (e) { ElMessage.error('图形码获取失败, 请刷新页面') }
+}
 
 const step1Rules = {
   cityId: [{ required: true, message: '请选择城市', trigger: 'change' }],
@@ -364,7 +386,8 @@ const step1Rules = {
     { validator: (_, v, cb) => v === step1.password ? cb() : cb(new Error('两次密码不一致')), trigger: 'blur' }
   ],
   securityQuestion: [{ required: true, message: '请选择安全问题', trigger: 'change' }],
-  securityAnswer: [{ required: true, message: '请填写安全答案', trigger: 'blur' }]
+  securityAnswer: [{ required: true, message: '请填写安全答案', trigger: 'blur' }],
+  verCode: [{ required: true, message: '请输入图形验证码', trigger: 'blur' }]
 }
 
 const onCityChange = (newId) => {
@@ -499,12 +522,15 @@ const handleSubmit = async () => {
       userType: 1,
       realName: step2.realName,
       securityQuestion: step1.securityQuestion,
-      securityAnswer: step1.securityAnswer
+      securityAnswer: step1.securityAnswer,
+      verToken: step1.verToken,
+      verCode: step1.verCode
     })
     if (regRes.code !== 200) {
       ElMessage.error(regRes.msg || '注册失败')
       submitting.value = false
       currentStep.value = 1
+      loadCaptcha()  // 验证码消耗后必须刷新
       return
     }
 
@@ -604,6 +630,7 @@ function mapDegreeForBackend(val) {
 
 onMounted(() => {
   step1.cityId = cityStore.cityId
+  loadCaptcha()
 })
 </script>
 

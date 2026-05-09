@@ -37,6 +37,13 @@
           <el-form-item label="安全答案">
             <el-input v-model="form.securityAnswer" placeholder="请填写答案（不区分大小写，请记牢）" size="large" />
           </el-form-item>
+          <el-form-item label="图形验证码">
+            <div style="display:flex;gap:8px;width:100%">
+              <el-input v-model="form.verCode" placeholder="请输入右图字符" size="large" style="flex:1" />
+              <img v-if="captchaImg" :src="captchaImg" alt="captcha" @click="loadCaptcha" style="height:40px;cursor:pointer;border-radius:6px" title="点击刷新" />
+              <el-button v-else size="large" @click="loadCaptcha">获取验证码</el-button>
+            </div>
+          </el-form-item>
           <el-form-item>
             <div class="agreement-check" :class="{ 'agreement-check--error': showAgreementError && !form.agreed }">
               <el-checkbox v-model="form.agreed" @change="showAgreementError = false" />
@@ -62,16 +69,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useCityStore } from '~/stores/city'
 
 const cityStore = useCityStore()
 const router = useRouter()
-const { post } = useApi()
+const { post, get } = useApi()
 const formRef = ref(null)
 const submitting = ref(false)
 const showAgreementError = ref(false)
+const captchaImg = ref('')
 
 const form = ref({
   mobile: '',
@@ -80,8 +88,23 @@ const form = ref({
   confirmPassword: '',
   securityQuestion: '',
   securityAnswer: '',
+  verToken: '',
+  verCode: '',
   agreed: false
 })
+
+const loadCaptcha = async () => {
+  try {
+    const r = await get('/system/api/common/code')
+    if (r?.code === 200 && r.data) {
+      form.value.verToken = r.data.verToken
+      captchaImg.value = r.data.img
+      form.value.verCode = ''
+    }
+  } catch (e) { ElMessage.error('图形码获取失败, 请刷新页面') }
+}
+
+onMounted(() => loadCaptcha())
 
 const handleSubmit = async () => {
   if (!form.value.mobile || !/^1[3-9]\d{9}$/.test(form.value.mobile)) {
@@ -104,6 +127,10 @@ const handleSubmit = async () => {
     ElMessage.warning('请选择安全问题并填写答案（用于忘记密码后找回）')
     return
   }
+  if (!form.value.verCode) {
+    ElMessage.warning('请输入图形验证码')
+    return
+  }
   if (!form.value.agreed) {
     showAgreementError.value = true
     ElMessage.warning('请先阅读并同意用户协议、免责声明和隐私保护政策')
@@ -118,13 +145,16 @@ const handleSubmit = async () => {
       userType: 2,
       realName: form.value.realName,
       securityQuestion: form.value.securityQuestion,
-      securityAnswer: form.value.securityAnswer
+      securityAnswer: form.value.securityAnswer,
+      verToken: form.value.verToken,
+      verCode: form.value.verCode
     })
     if (res.code === 200) {
       ElMessage.success('注册成功！')
       router.push('/login?type=student')
     } else {
       ElMessage.error(res.msg || '注册失败')
+      loadCaptcha()  // 验证码消耗后必须刷新
     }
   } catch (e) {
     ElMessage.error('网络错误')
