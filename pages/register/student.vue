@@ -45,7 +45,10 @@
             </div>
           </el-form-item>
           <!-- Honeypot: 人类不会看到, 机器全部填. autocomplete=off + tabindex=-1 防辅助技术 -->
-          <input v-model="form.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+          <label aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+            如果您是真人请勿填写
+            <input v-model="form.honeypot" type="text" name="hp_zxq3" autocomplete="off" tabindex="-1" />
+          </label>
           <el-form-item>
             <div class="agreement-check" :class="{ 'agreement-check--error': showAgreementError && !form.agreed }">
               <el-checkbox v-model="form.agreed" @change="showAgreementError = false" />

@@ -87,7 +87,10 @@
               <el-button v-else @click="loadCaptcha">获取验证码</el-button>
             </div>
           </el-form-item>
-          <input v-model="step1.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+          <label aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+            如果您是真人请勿填写
+            <input v-model="step1.honeypot" type="text" name="hp_zxq3" autocomplete="off" tabindex="-1" />
+          </label>
 
           <div class="agreement-box" :class="{ error: agreementError }">
             <el-checkbox v-model="step1.agreed" @change="agreementError = false">

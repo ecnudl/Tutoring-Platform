@@ -42,7 +42,10 @@
               <el-button v-else size="large" @click="loadCaptcha">获取验证码</el-button>
             </div>
           </el-form-item>
-          <input v-model="passwordForm.honeypot" type="text" name="company_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+          <label aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+            如果您是真人请勿填写
+            <input v-model="passwordForm.honeypot" type="text" name="hp_zxq3" autocomplete="off" tabindex="-1" />
+          </label>
           <el-button type="primary" size="large" style="width:100%" :loading="loading" @click="handlePasswordLogin">登录</el-button>
         </el-form>
         <div class="login-footer">
