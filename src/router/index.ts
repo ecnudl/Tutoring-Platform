@@ -12,7 +12,6 @@ const routes = [
     { path: 'requirement/audit', component: () => import('@/views/requirement/RequirementAudit.vue') },
     { path: 'requirement/list', component: () => import('@/views/requirement/RequirementList.vue') },
     { path: 'reservation/list', component: () => import('@/views/reservation/ReservationList.vue') },
-    { path: 'application/list', component: () => import('@/views/application/ApplicationList.vue') },
     { path: 'student/list', component: () => import('@/views/student/StudentList.vue') },
     { path: 'feedback/list', component: () => import('@/views/feedback/FeedbackList.vue') },
     { path: 'content/banner', component: () => import('@/views/content/BannerList.vue') },

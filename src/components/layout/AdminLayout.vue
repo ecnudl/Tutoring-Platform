@@ -11,7 +11,6 @@
         <el-sub-menu index="requirement"><template #title><el-icon><Document /></el-icon><span>需求管理</span></template>
           <el-menu-item index="/requirement/audit">需求审核</el-menu-item><el-menu-item index="/requirement/list">需求列表</el-menu-item></el-sub-menu>
         <el-menu-item index="/reservation/list"><el-icon><Clock /></el-icon><span>预约管理</span></el-menu-item>
-        <el-menu-item index="/application/list"><el-icon><List /></el-icon><span>申请管理</span></el-menu-item>
         <el-menu-item index="/student/list"><el-icon><UserFilled /></el-icon><span>学员管理</span></el-menu-item>
         <el-menu-item index="/feedback/list"><el-icon><ChatDotRound /></el-icon><span>反馈管理</span></el-menu-item>
         <el-sub-menu index="content"><template #title><el-icon><Notebook /></el-icon><span>内容管理</span></template>
@@ -32,7 +31,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { House, User, UserFilled, Document, Clock, List, ChatDotRound, Fold, ArrowDown, Notebook } from '@element-plus/icons-vue'
+import { House, User, UserFilled, Document, Clock, ChatDotRound, Fold, ArrowDown, Notebook } from '@element-plus/icons-vue'
 const isCollapse = ref(false)
 const router = useRouter()
 const logout = () => { localStorage.removeItem('admin_token'); router.push('/login') }
