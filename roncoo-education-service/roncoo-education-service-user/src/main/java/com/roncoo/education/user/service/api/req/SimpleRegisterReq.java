@@ -43,4 +43,7 @@ public class SimpleRegisterReq implements Serializable {
 
     @ApiModelProperty(value = "安全答案(明文,存储时SHA1+salt哈希)")
     private String securityAnswer;
+
+    @ApiModelProperty(value = "浏览器指纹 (FingerprintJS visitorId, 识别同设备多账号)")
+    private String visitorId;
 }

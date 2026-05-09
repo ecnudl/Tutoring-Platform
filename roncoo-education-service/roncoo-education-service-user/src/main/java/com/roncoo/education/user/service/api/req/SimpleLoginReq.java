@@ -31,4 +31,7 @@ public class SimpleLoginReq implements Serializable {
 
     @ApiModelProperty(value = "蜜罐字段 (隐藏, 真人不应该填)")
     private String honeypot;
+
+    @ApiModelProperty(value = "浏览器指纹 (FingerprintJS visitorId)")
+    private String visitorId;
 }

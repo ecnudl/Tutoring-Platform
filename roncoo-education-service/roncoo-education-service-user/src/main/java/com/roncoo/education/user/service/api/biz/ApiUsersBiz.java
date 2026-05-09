@@ -321,6 +321,18 @@ public class ApiUsersBiz extends BaseBiz {
             return Result.error("该手机号已经注册，请更换手机号");
         }
 
+        // 浏览器指纹去重 (FingerprintJS): 同设备 24 小时内最多 3 次注册
+        // visitorId 为空时跳过 (老客户端 / curl 直接打)
+        if (StringUtils.hasText(req.getVisitorId()) && req.getVisitorId().length() <= 64) {
+            String fpKey = "fp:reg:" + req.getVisitorId();
+            long fpCount = atomicBump(fpKey, 24 * 3600);
+            if (fpCount > 3) {
+                bumpFail(failKey);
+                log.warn("[fingerprint] 同设备多账号注册阻断, fp={}, mobile={}", req.getVisitorId(), req.getMobile());
+                return Result.error("同设备已注册多个账号, 如有疑问请联系客服");
+            }
+        }
+
         // 注册成功 — 清失败计数
         cacheRedis.delete(failKey);
         Users user = register(req.getMobile(), req.getPassword(), 1, null, null, req.getUserType());
