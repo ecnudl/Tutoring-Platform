@@ -39,14 +39,23 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: '591家教网',
+      title: '591家教网 - 名校名师优质家教平台 / 全国 17 城上门家教 / 在线辅导',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: '591家教网 - 找家教、做家教、一站式服务平台' }
+        { name: 'description', content: '591家教网 — 全国 17 城 (北京/上海/广州/南京/苏州/杭州等) 优质家教平台, 名校教员严选审核, 一对一上门或在线辅导, 涵盖语文/数学/英语/物理/化学/钢琴/美术/雅思/托福/GRE 等 30+ 科目。' },
+        { name: 'keywords', content: '家教,家教网,591家教,上门家教,在线家教,大学生家教,北京家教,上海家教,广州家教,南京家教,杭州家教,苏州家教,武汉家教,西安家教,成都家教,数学家教,英语家教,物理家教,化学家教,钢琴家教,雅思,托福,GRE' },
+        { name: 'author', content: '591家教网' },
+        { name: 'robots', content: 'index,follow' },
+        { property: 'og:title', content: '591家教网 - 名校名师优质家教平台' },
+        { property: 'og:description', content: '全国 17 城优质家教, 名校教员严选, 一对一上门或在线辅导。' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:locale', content: 'zh_CN' }
       ],
       link: dnsPrefetch
-    }
+    },
+    // SPA 壳子里塞 SEO 静态 HTML — 蜘蛛 (不执行 JS) 看到这段, JS 加载后 Vue 替换
+    spaLoadingTemplate: 'app/spa-loading-template.html'
   },
   vite: {
     plugins: [

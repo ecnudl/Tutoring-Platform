@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /center/
+Disallow: /login
+Disallow: /register/
+Disallow: /forgot-password
+Disallow: /api/
+Disallow: /user/api/
+Disallow: /user/auth/
+Disallow: /system/api/
+
+# 百度专属
+User-agent: Baiduspider
+Allow: /
+Disallow: /admin/
+Disallow: /center/
+Disallow: /login
+Disallow: /register/
+
+Sitemap: https://591jiajiao.cn/sitemap.xml
+Sitemap: https://www.591jiajiao.cn/sitemap.xml
