@@ -39,7 +39,7 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="需求详情" width="720px" top="6vh">
+    <el-dialog v-model="detailVisible" title="需求详情" width="900px" top="4vh">
       <el-descriptions :column="2" border v-if="detail">
         <el-descriptions-item label="标题" :span="2">{{ detail.title || '-' }}</el-descriptions-item>
         <el-descriptions-item label="联系人">{{ detail.contactName || '-' }}</el-descriptions-item>
@@ -63,6 +63,58 @@
         </el-descriptions-item>
         <el-descriptions-item label="审核备注">{{ detail.auditRemark || '-' }}</el-descriptions-item>
       </el-descriptions>
+
+      <!-- 教员申请列表 -->
+      <div v-if="detail" class="apps-section">
+        <div class="apps-title">
+          教员申请 <span class="apps-count">{{ apps.length }}</span>
+        </div>
+        <el-table v-if="apps.length" :data="apps" border size="small" stripe>
+          <el-table-column label="教员 ID" width="190">
+            <template #default="{ row }">
+              <span class="mono">T{{ row.tutorDisplayNo || row.tutorId }}</span>
+              <el-button size="small" link type="primary" @click="copy(row.tutorDisplayNo ? 'T'+row.tutorDisplayNo : String(row.tutorId))" style="margin-left:6px">复制</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="姓名" width="80">
+            <template #default="{ row }">{{ row.tutorRealName || '-' }}</template>
+          </el-table-column>
+          <el-table-column label="学校" min-width="140">
+            <template #default="{ row }">{{ row.tutorUniversity || '-' }}</template>
+          </el-table-column>
+          <el-table-column label="联系电话" width="120">
+            <template #default="{ row }">{{ row.mobile || '-' }}</template>
+          </el-table-column>
+          <el-table-column label="申请说明" min-width="220">
+            <template #default="{ row }">
+              <span :title="row.applyMessage" class="apply-msg">{{ truncate(row.applyMessage, 40) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="80">
+            <template #default="{ row }">
+              <el-tag size="small" :type="appStatusTag(row.appStatus)">{{ appStatusLabel(row.appStatus) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="160" fixed="right">
+            <template #default="{ row }">
+              <template v-if="row.appStatus === 0 || row.appStatus === 1">
+                <el-popconfirm title="将此教员匹配该需求? 同时驳回其他申请, 创建预约关联." confirm-button-text="确认匹配" @confirm="handleMatchApp(row)">
+                  <template #reference>
+                    <el-button size="small" type="primary">匹配</el-button>
+                  </template>
+                </el-popconfirm>
+                <el-popconfirm title="确认驳回该申请?" confirm-button-text="驳回" @confirm="handleRejectApp(row)">
+                  <template #reference>
+                    <el-button size="small" type="danger" plain>驳回</el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
+              <span v-else style="color:#94a3b8">—</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div v-else class="apps-empty">暂无教员申请</div>
+      </div>
     </el-dialog>
 
     <!-- 审核弹窗 -->
@@ -95,6 +147,7 @@ const loading = ref(false)
 
 const detailVisible = ref(false)
 const detail = ref<any>(null)
+const apps = ref<any[]>([])
 const auditVisible = ref(false)
 const auditAction = ref('')
 const auditRemark = ref('')
@@ -103,6 +156,23 @@ const submitting = ref(false)
 
 const statusLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已发布', 3: '已接单', 5: '已关闭', 6: '已驳回' }[s] || '未知')
 const statusTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'warning', 5: 'info', 6: 'danger' }[s] || 'info')
+
+const appStatusLabel = (s: number) => ({ 0: '已申请', 1: '入围', 2: '已录用', 3: '已驳回' }[s] || '未知')
+const appStatusTag = (s: number) => ({ 0: 'warning', 1: 'primary', 2: 'success', 3: 'danger' }[s] || 'info')
+
+const truncate = (s: string, n: number) => {
+  if (!s) return ''
+  return s.length > n ? s.slice(0, n) + '…' : s
+}
+
+const copy = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    ElMessage.success('已复制: ' + text)
+  } catch {
+    ElMessage.warning('复制失败, 请手动选择文本')
+  }
+}
 
 const search = async () => {
   loading.value = true
@@ -123,8 +193,49 @@ const search = async () => {
 const viewDetail = async (row: any) => {
   try {
     const res = await get('/user/admin/requirement-audit/view', { id: row.id })
-    if (res.code === 200) { detail.value = res.data; detailVisible.value = true }
+    if (res.code === 200) {
+      detail.value = res.data
+      detailVisible.value = true
+      apps.value = []
+      // 拉取此需求的教员申请列表
+      try {
+        const ar = await post('/user/admin/application/page', {
+          pageCurrent: 1, pageSize: 50, requirementId: row.id
+        })
+        if (ar.code === 200 && ar.data) apps.value = ar.data.list || []
+      } catch (e) { console.error('load apps failed', e) }
+    }
   } catch (e) { console.error(e) }
+}
+
+const handleMatchApp = async (row: any) => {
+  try {
+    const res = await put(`/user/admin/application/match?id=${row.id}`)
+    if (res.code === 200) {
+      ElMessage.success(res.data || '匹配成功')
+      // 刷新需求列表 + 关闭详情
+      await search()
+      detailVisible.value = false
+    } else {
+      ElMessage.error(res.msg || '匹配失败')
+    }
+  } catch { ElMessage.error('网络错误') }
+}
+
+const handleRejectApp = async (row: any) => {
+  try {
+    const res = await put(`/user/admin/application/reject?id=${row.id}`)
+    if (res.code === 200) {
+      ElMessage.success(res.data || '已驳回')
+      // 重新拉取本需求的申请列表
+      const ar = await post('/user/admin/application/page', {
+        pageCurrent: 1, pageSize: 50, requirementId: detail.value?.id
+      })
+      if (ar.code === 200 && ar.data) apps.value = ar.data.list || []
+    } else {
+      ElMessage.error(res.msg || '驳回失败')
+    }
+  } catch { ElMessage.error('网络错误') }
 }
 
 const handleAudit = (row: any, action: string) => {
@@ -175,5 +286,43 @@ const handleMatch = async (row: any) => {
   font-size: 13px;
   max-height: 240px;
   overflow-y: auto;
+}
+.apps-section { margin-top: 18px; }
+.apps-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #f1f5f9;
+}
+.apps-count {
+  display: inline-block;
+  background: #163B6B;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+.apps-section :deep(.mono) {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12.5px;
+  color: #163B6B;
+  font-weight: 500;
+}
+.apps-section :deep(.apply-msg) {
+  font-size: 12.5px;
+  color: #4b5563;
+  display: inline-block;
+  max-width: 100%;
+}
+.apps-empty {
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 13px;
 }
 </style>
