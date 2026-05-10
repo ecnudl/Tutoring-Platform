@@ -26,6 +26,8 @@ public class AdminRequirementAuditBiz extends BaseBiz {
     private final TutorRequirementDao tutorRequirementDao;
     @NotNull
     private final TutorRequirementAuditDao tutorRequirementAuditDao;
+    @NotNull
+    private final com.roncoo.education.user.dao.TutorApplicationDao tutorApplicationDao;
 
     /**
      * 需求审核分页列表
@@ -45,6 +47,21 @@ public class AdminRequirementAuditBiz extends BaseBiz {
         }
         example.setOrderByClause("gmt_create desc");
         Page<TutorRequirement> page = tutorRequirementDao.page(pageCurrent, pageSize, example);
+
+        // 实时计算每条需求的活跃申请数 (排除 REJECTED, 让 admin 看到"待处理")
+        if (page.getList() != null) {
+            for (TutorRequirement r : page.getList()) {
+                java.util.List<com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication> apps =
+                        tutorApplicationDao.listByRequirementId(r.getId());
+                int active = 0;
+                for (com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication a : apps) {
+                    Integer s = a.getAppStatus();
+                    // 0=已申请, 1=入围, 2=已录用 都算"有申请", 3=已驳回 不算
+                    if (s != null && s != 3) active++;
+                }
+                r.setApplicationCount(active);
+            }
+        }
         return Result.success(page);
     }
 

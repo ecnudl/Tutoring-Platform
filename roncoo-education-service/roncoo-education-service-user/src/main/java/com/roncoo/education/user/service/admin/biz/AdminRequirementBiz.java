@@ -44,6 +44,8 @@ public class AdminRequirementBiz extends BaseBiz {
     @NotNull
     private final com.roncoo.education.user.dao.UsersDao usersDao;
     @NotNull
+    private final com.roncoo.education.user.dao.TutorProfileDao tutorProfileDao;
+    @NotNull
     private final MsgDao msgDao;
     @NotNull
     private final MsgUserDao msgUserDao;
@@ -144,11 +146,24 @@ public class AdminRequirementBiz extends BaseBiz {
     public Result<?> confirmMatch(Map<String, Object> req) {
         if (req.get("requirementId") == null) return Result.error("缺少 requirementId");
         Long reqId = Long.parseLong(req.get("requirementId").toString());
-        // tutorUserId 可选: 留空表示 admin 已电话协商, 不绑定具体教员账号 (例如教员还没注册)
+
+        // 教员标识: 优先 tutorDisplayNo (T 编号, admin 易用), 其次 tutorUserId (老 API 兼容);
+        // 都留空表示电话协商不绑定账号
         Long tutorUserId = null;
-        Object tu = req.get("tutorUserId");
-        if (tu != null && !tu.toString().isEmpty() && !"0".equals(tu.toString())) {
-            tutorUserId = Long.parseLong(tu.toString());
+        Object tdn = req.get("tutorDisplayNo");
+        if (tdn != null && !tdn.toString().trim().isEmpty()) {
+            String displayNo = tdn.toString().trim();
+            // 容错: T123456 / t123456 / 123456 都接受
+            if (!displayNo.regionMatches(true, 0, "T", 0, 1)) displayNo = "T" + displayNo;
+            displayNo = displayNo.substring(0, 1).toUpperCase() + displayNo.substring(1);
+            com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile tp = tutorProfileDao.getByDisplayNo(displayNo);
+            if (tp == null) return Result.error("教员编号 " + displayNo + " 不存在");
+            tutorUserId = tp.getUserId();
+        } else {
+            Object tu = req.get("tutorUserId");
+            if (tu != null && !tu.toString().isEmpty() && !"0".equals(tu.toString())) {
+                tutorUserId = Long.parseLong(tu.toString());
+            }
         }
         String remark = req.get("remark") != null ? req.get("remark").toString() : null;
 
