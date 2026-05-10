@@ -9,6 +9,10 @@ const FEMALE = '/avatar-default-female.png'
 
 export const tutorAvatarUrl = (tutor: any): string => {
   const a = tutor?.avatar
-  if (a && typeof a === 'string' && a.trim().length > 0) return a
-  return tutor?.gender === 2 ? FEMALE : MALE
+  if (a && typeof a === 'string') {
+    const trimmed = a.trim()
+    if (trimmed.length > 0) return trimmed
+  }
+  // gender: API 可能返回 number 或 string ("2"), 都按数字比较
+  return Number(tutor?.gender) === 2 ? FEMALE : MALE
 }
