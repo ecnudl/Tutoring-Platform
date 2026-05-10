@@ -52,6 +52,8 @@ public class AdminApplicationBiz extends BaseBiz {
 
         TutorApplicationExample example = new TutorApplicationExample();
         TutorApplicationExample.Criteria c = example.createCriteria();
+        // 过滤教员主动取消的软删行 (status_id=0), admin 不看
+        c.andStatusIdEqualTo(1);
         if (appStatus != null) {
             c.andAppStatusEqualTo(appStatus);
         }

@@ -52,7 +52,8 @@ public class AuthApplicationBiz extends BaseBiz {
         int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
         int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
         TutorApplicationExample example = new TutorApplicationExample();
-        example.createCriteria().andUserIdEqualTo(userId);
+        // 过滤软删 (cancel 后 status_id=0), 教员看不到自己取消的
+        example.createCriteria().andUserIdEqualTo(userId).andStatusIdEqualTo(1);
         example.setOrderByClause("gmt_create desc");
         return Result.success(tutorApplicationDao.page(pageCurrent, pageSize, example));
     }
@@ -201,10 +202,12 @@ public class AuthApplicationBiz extends BaseBiz {
         if (!ApplicationStatusEnum.APPLIED.getCode().equals(application.getAppStatus())) {
             return Result.error("当前状态不允许取消");
         }
-        // 软取消: 用 status_id=0 标记 (保留行用于 daily-limit 计数, 防止 cancel-then-reapply 绕过)
+        // 软取消: status_id=0 软删 (查询过滤) + appStatus=REJECTED 业务态终结;
+        // 教员/admin 视图都隐藏, 但记录保留用于反作弊 (cancel-then-reapply 仍计入每日额度).
         TutorApplication update = new TutorApplication();
         update.setId(id);
         update.setStatusId(0);
+        update.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());
         tutorApplicationDao.updateById(update);
         return Result.success("取消成功");
     }

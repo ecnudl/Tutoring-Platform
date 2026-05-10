@@ -56,8 +56,9 @@ public class AdminRequirementAuditBiz extends BaseBiz {
                 int active = 0;
                 for (com.roncoo.education.user.dao.impl.mapper.entity.TutorApplication a : apps) {
                     Integer s = a.getAppStatus();
-                    // 0=已申请, 1=入围, 2=已录用 都算"有申请", 3=已驳回 不算
-                    if (s != null && s != 3) active++;
+                    Integer st = a.getStatusId();
+                    // status_id=0 (教员主动取消) 不算; 0=已申请, 1=入围, 2=已录用 算; 3=已驳回 不算
+                    if (st != null && st == 1 && s != null && s != 3) active++;
                 }
                 r.setApplicationCount(active);
             }
