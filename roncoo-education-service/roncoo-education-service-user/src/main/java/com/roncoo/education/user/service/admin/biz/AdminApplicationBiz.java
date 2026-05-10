@@ -60,7 +60,39 @@ public class AdminApplicationBiz extends BaseBiz {
         }
         example.setOrderByClause("gmt_create desc");
         Page<TutorApplication> page = tutorApplicationDao.page(pageCurrent, pageSize, example);
-        return Result.success(page);
+
+        // 富化: 把教员资料 (姓名/学校/学历/性别/displayNo) 一起带回, admin 审核不需要再点开教员看
+        java.util.List<java.util.Map<String, Object>> enriched = new java.util.ArrayList<>();
+        if (page.getList() != null) {
+            for (TutorApplication app : page.getList()) {
+                java.util.Map<String, Object> row = new java.util.HashMap<>();
+                row.put("id", app.getId());
+                row.put("requirementId", app.getRequirementId());
+                row.put("tutorId", app.getTutorId());
+                row.put("userId", app.getUserId());
+                row.put("mobile", app.getMobile());
+                row.put("applyMessage", app.getApplyMessage());
+                row.put("appStatus", app.getAppStatus());
+                row.put("gmtCreate", app.getGmtCreate());
+                if (app.getTutorId() != null) {
+                    TutorProfile tp = tutorProfileDao.getById(app.getTutorId());
+                    if (tp != null) {
+                        row.put("tutorRealName", tp.getRealName());
+                        row.put("tutorUniversity", tp.getUniversity());
+                        row.put("tutorDegree", tp.getDegree());
+                        row.put("tutorGender", tp.getGender());
+                        row.put("tutorDisplayNo", tp.getDisplayNo());
+                    }
+                }
+                enriched.add(row);
+            }
+        }
+        java.util.Map<String, Object> resp = new java.util.HashMap<>();
+        resp.put("list", enriched);
+        resp.put("totalCount", page.getTotalCount());
+        resp.put("pageCurrent", page.getPageCurrent());
+        resp.put("pageSize", page.getPageSize());
+        return Result.success(resp);
     }
 
     public Result<?> view(Long id) {
