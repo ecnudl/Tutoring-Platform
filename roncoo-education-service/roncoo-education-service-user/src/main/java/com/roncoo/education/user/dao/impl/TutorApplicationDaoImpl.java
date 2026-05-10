@@ -43,6 +43,13 @@ public class TutorApplicationDaoImpl extends AbstractBaseJdbc implements TutorAp
     }
 
     @Override
+    public int updateByExampleSelective(TutorApplication record, TutorApplicationExample example) {
+        record.setGmtCreate(null);
+        record.setGmtModified(null);
+        return this.tutorApplicationMapper.updateByExampleSelective(record, example);
+    }
+
+    @Override
     public TutorApplication getById(Long id) {
         return this.tutorApplicationMapper.selectByPrimaryKey(id);
     }

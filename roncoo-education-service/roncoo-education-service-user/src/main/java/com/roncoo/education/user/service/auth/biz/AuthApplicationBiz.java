@@ -202,13 +202,21 @@ public class AuthApplicationBiz extends BaseBiz {
         if (!ApplicationStatusEnum.APPLIED.getCode().equals(application.getAppStatus())) {
             return Result.error("当前状态不允许取消");
         }
-        // 软取消: status_id=0 软删 (查询过滤) + appStatus=REJECTED 业务态终结;
-        // 教员/admin 视图都隐藏, 但记录保留用于反作弊 (cancel-then-reapply 仍计入每日额度).
+        // 软取消 — 条件更新乐观并发: WHERE id=? AND user_id=? AND status_id=1 AND app_status=APPLIED
+        // 防止 admin 同步 match() 把 ACCEPTED 写入后我们再误覆盖 (codex review HIGH).
         TutorApplication update = new TutorApplication();
-        update.setId(id);
-        update.setStatusId(0);
-        update.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());
-        tutorApplicationDao.updateById(update);
+        update.setStatusId(0);  // 软删, 查询过滤
+        update.setAppStatus(ApplicationStatusEnum.REJECTED.getCode());  // 业务态终结
+        TutorApplicationExample ex = new TutorApplicationExample();
+        ex.createCriteria()
+                .andIdEqualTo(id)
+                .andUserIdEqualTo(userId)
+                .andStatusIdEqualTo(1)
+                .andAppStatusEqualTo(ApplicationStatusEnum.APPLIED.getCode());
+        int affected = tutorApplicationDao.updateByExampleSelective(update, ex);
+        if (affected == 0) {
+            return Result.error("申请状态已变更, 取消失败 (可能已被 admin 录用或驳回)");
+        }
         return Result.success("取消成功");
     }
 
