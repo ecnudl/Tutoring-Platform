@@ -21,7 +21,7 @@
             <div v-for="t in shortlist" :key="t.id" class="tutor-row">
               <el-checkbox v-model="t.checked" />
               <NuxtLink :to="'/jy/t' + (t.displayNo || '').replace(/^T/i,'')" class="row-avatar">
-                <img :src="t.avatar || '/placeholder/avatar.png'" alt="头像" />
+                <img :src="tutorAvatarUrl(t)" alt="头像" />
               </NuxtLink>
               <NuxtLink :to="'/jy/t' + (t.displayNo || '').replace(/^T/i,'')" class="row-info">
                 <div class="row-name">{{ t.realName ? t.realName.charAt(0) + '教员' : '教员' }} <span class="row-no">{{ t.displayNo }}</span></div>
@@ -100,6 +100,7 @@ import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 import { useSiteConfig } from '~/composables/useSiteConfig'
+import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
 
 definePageMeta({ middleware: 'auth' })
 

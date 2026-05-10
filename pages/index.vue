@@ -155,9 +155,9 @@
           <NuxtLink to="/jy" class="more-link">查看更多 &rarr;</NuxtLink>
         </div>
         <div v-if="tutors.length" class="tutor-grid">
-          <NuxtLink v-for="t in tutors" :key="t.id" :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)" class="tutor-card">
+          <NuxtLink v-for="t in tutors.slice(0, 18)" :key="t.id" :to="'/jy/t' + (t.displayNo ? t.displayNo.replace(/^T/i, '') : t.id)" class="tutor-card">
             <div class="tutor-avatar-wrap">
-              <el-avatar :size="76" :src="t.avatar" />
+              <el-avatar :size="76" :src="tutorAvatarUrl(t)" />
             </div>
             <div class="tutor-name-row">
               <span class="tutor-name">{{ getTutorDisplayName(t) }}</span>
@@ -165,6 +165,9 @@
             </div>
             <div class="tutor-school">{{ t.university || '未填写' }}</div>
           </NuxtLink>
+        </div>
+        <div v-if="tutors.length" class="tutor-more-wrap">
+          <NuxtLink to="/jy" class="tutor-more-btn">显示更多教员 →</NuxtLink>
         </div>
         <el-empty v-else description="暂无教员数据" />
       </div>
@@ -289,6 +292,7 @@ import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 import { CITY_LIST, buildCityUrl, navigateToCity } from '~/composables/useCityMap'
 import { useSiteConfig } from '~/composables/useSiteConfig'
+import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
 
 const userStore = useUserStore()
 const cityStore = useCityStore()
@@ -991,6 +995,29 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 14px;
+}
+
+.tutor-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+.tutor-more-btn {
+  display: inline-block;
+  padding: 10px 28px;
+  background: #fff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-light);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+.tutor-more-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(31, 78, 140, 0.18);
 }
 
 .tutor-card {

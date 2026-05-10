@@ -11,7 +11,7 @@
     <div v-if="list.length" class="card-grid">
       <el-card v-for="item in list" :key="item.id" shadow="hover">
         <div style="display:flex;gap:12px">
-          <el-avatar :size="60" :src="item.tutor?.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
+          <el-avatar :size="60" :src="tutorAvatarUrl(item.tutor || {})" />
           <div style="flex:1">
             <h3 style="margin-bottom:4px">{{ item.tutor?.realName || '教员' }}</h3>
             <p style="color:#999;font-size:13px">{{ item.tutor?.university || '' }} {{ item.tutor?.major ? '· ' + item.tutor?.major : '' }}</p>
@@ -40,6 +40,7 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
+import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
 import { Loading } from '@element-plus/icons-vue'
 
 definePageMeta({

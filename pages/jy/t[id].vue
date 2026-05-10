@@ -16,7 +16,7 @@
         <!-- ========== 顶部 HERO 卡 ========== -->
         <div class="tt-hero">
           <div class="tt-hero-photo">
-            <img :src="tutor.avatar || '/placeholder/avatar.png'" alt="教员头像" />
+            <img :src="tutorAvatarUrl(tutor)" alt="教员头像" />
           </div>
 
           <div class="tt-hero-info">
@@ -238,6 +238,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '~/stores/user'
+import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
 
 const userStore = useUserStore()
 const route = useRoute()

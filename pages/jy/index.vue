@@ -102,7 +102,7 @@
       <div class="tutor-list">
         <div v-for="t in tutors" :key="t.id" class="tutor-card-h">
           <div class="tutor-avatar">
-            <el-avatar :size="64" :src="t.avatar || '/placeholder/avatar.png'" />
+            <el-avatar :size="64" :src="tutorAvatarUrl(t)" />
           </div>
           <div class="tutor-body">
             <div class="tutor-top">
@@ -155,6 +155,7 @@ import { Loading, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { useCityStore } from '~/stores/city'
 import { useCityData } from '~/composables/useCityData'
 import { SUBJECT_OBJECTS as allSubjects } from '~/composables/subjectList'
+import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
 
 const cityStore = useCityStore()
 const route = useRoute()
