@@ -40,9 +40,9 @@
           <div class="ap-counter">{{ text.length }} / 1000</div>
 
           <label class="ap-label">联系手机号 <span class="req">*</span></label>
-          <input v-model="mobile" class="ap-input" maxlength="11" placeholder="11 位手机号, 客服会拨打此号码与您联系" />
+          <input v-model="mobile" @input="userTouched = true" class="ap-input" maxlength="11" placeholder="11 位手机号, 客服会拨打此号码与您联系" />
           <div v-if="mobile && !isValidMobile" class="ap-hint err">请输入正确的 11 位手机号</div>
-          <div v-else-if="prefilled && mobile === userStore.mobile" class="ap-hint">已自动填入您的注册手机号, 如需更改请直接编辑</div>
+          <div v-else-if="!userTouched && mobile && mobile === userStore.mobile" class="ap-hint">当前使用您的注册手机号, 如需更改请直接编辑</div>
 
           <label class="ap-label">微信号（选填）</label>
           <input v-model="wx" class="ap-input" maxlength="50" placeholder="方便客服快速联系" />
@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '~/stores/user'
 
@@ -95,10 +95,16 @@ const displayNoNum = computed(() => String(displayNo || '').replace(/^S/i, ''))
 const text = ref('')
 // 自动 pre-fill 登录教员的手机号 (大多数情况这就是教员的联系方式), 教员可手动改
 const mobile = ref(userStore.mobile || '')
-const prefilled = ref(!!userStore.mobile)
+const userTouched = ref(false)
 const wx = ref('')
 const submitting = ref(false)
 const requirementId = ref(null)
+
+// 处理 store 后水合 (Pinia + Nuxt SPA 模式下 userStore.mobile 可能在挂载后才落地);
+// 用户没编辑过且当前空 → 同步 store 值
+watch(() => userStore.mobile, (m) => {
+  if (m && !userTouched.value && !mobile.value) mobile.value = m
+})
 
 const isValidMobile = computed(() => /^1[3-9]\d{9}$/.test(mobile.value.trim()))
 const canSubmit = computed(() => text.value.trim().length >= 10 && isValidMobile.value)
