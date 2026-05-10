@@ -29,7 +29,7 @@
       <!-- 表单 -->
       <section class="ap-form-card">
         <div class="ap-form">
-          <label class="ap-label">您接这单的优势 <span class="req">*</span></label>
+          <label class="ap-label">您接这单的优势 <span class="req">*</span> <span class="ap-label-hint">(至少 10 字)</span></label>
           <textarea
             v-model="text"
             class="ap-textarea"
@@ -37,7 +37,11 @@
             maxlength="1000"
             placeholder="请简短说明您的教学水平、相关经验，并确认时间、地址、报酬都可接受。"
           ></textarea>
-          <div class="ap-counter">{{ text.length }} / 1000</div>
+          <div class="ap-row">
+            <span v-if="text && text.trim().length < 10" class="ap-hint err">还需 {{ 10 - text.trim().length }} 字</span>
+            <span v-else></span>
+            <span class="ap-counter">{{ text.length }} / 1000</span>
+          </div>
 
           <label class="ap-label">联系手机号 <span class="req">*</span></label>
           <input v-model="mobile" @input="userTouched = true" class="ap-input" maxlength="11" placeholder="11 位手机号, 客服会拨打此号码与您联系" />
@@ -272,11 +276,16 @@ onMounted(() => {
   background: #fff;
 }
 .ap-counter {
-  text-align: right; font-size: 12px; color: #94a3b8;
-  margin-top: 4px; letter-spacing: 0.3px;
+  font-size: 12px; color: #94a3b8;
+  letter-spacing: 0.3px;
+}
+.ap-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 4px;
 }
 .ap-hint { font-size: 12px; margin-top: 6px; color: #94a3b8; }
 .ap-hint.err { color: #dc2626; }
+.ap-label-hint { font-size: 12px; color: #94a3b8; font-weight: 400; margin-left: 4px; }
 .ap-submit {
   margin-top: 24px;
   background: var(--color-primary, #163B6B);
