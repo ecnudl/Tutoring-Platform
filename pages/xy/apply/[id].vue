@@ -39,6 +39,11 @@
           ></textarea>
           <div class="ap-counter">{{ text.length }} / 1000</div>
 
+          <label class="ap-label">联系手机号 <span class="req">*</span></label>
+          <input v-model="mobile" class="ap-input" maxlength="11" placeholder="11 位手机号, 客服会拨打此号码与您联系" />
+          <div v-if="mobile && !isValidMobile" class="ap-hint err">请输入正确的 11 位手机号</div>
+          <div v-else-if="prefilled && mobile === userStore.mobile" class="ap-hint">已自动填入您的注册手机号, 如需更改请直接编辑</div>
+
           <label class="ap-label">微信号（选填）</label>
           <input v-model="wx" class="ap-input" maxlength="50" placeholder="方便客服快速联系" />
 
@@ -88,7 +93,9 @@ const displayNo = route.params.id || route.params.displayNo
 const displayNoNum = computed(() => String(displayNo || '').replace(/^S/i, ''))
 
 const text = ref('')
-const mobile = ref('')
+// 自动 pre-fill 登录教员的手机号 (大多数情况这就是教员的联系方式), 教员可手动改
+const mobile = ref(userStore.mobile || '')
+const prefilled = ref(!!userStore.mobile)
 const wx = ref('')
 const submitting = ref(false)
 const requirementId = ref(null)
@@ -262,6 +269,8 @@ onMounted(() => {
   text-align: right; font-size: 12px; color: #94a3b8;
   margin-top: 4px; letter-spacing: 0.3px;
 }
+.ap-hint { font-size: 12px; margin-top: 6px; color: #94a3b8; }
+.ap-hint.err { color: #dc2626; }
 .ap-submit {
   margin-top: 24px;
   background: var(--color-primary, #163B6B);
