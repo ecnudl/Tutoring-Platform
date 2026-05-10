@@ -234,11 +234,11 @@
         <el-form-item label="需求编号">
           <span>{{ matchTarget?.displayNo }} · {{ matchTarget?.title }}</span>
         </el-form-item>
-        <el-form-item label="教员 user_id">
-          <el-input-number v-model="matchForm.tutorUserId" :min="0" controls-position="right" style="width:100%" />
+        <el-form-item label="教员 ID">
+          <el-input v-model="matchForm.tutorDisplayNo" placeholder="如 T572832 (admin/教员/家长全站可见的 T 编号)" maxlength="20" style="width:100%" />
           <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-top:4px">
-            选填: 已知接单教员的账号则填, 系统会自动同步该教员申请状态 + 发送站内信。<br>
-            留空 (= 0) 表示已通过电话协商, 不绑定具体账号 — 仅把订单标为已接单。
+            选填: 直接填教员 T 编号 (T+6位数字, 如 T572832); 系统自动 resolve, 同步该教员申请状态 + 发送站内信。<br>
+            留空表示已通过电话协商, 不绑定具体账号 — 仅把订单标为已接单。
           </div>
         </el-form-item>
         <el-form-item label="备注">
@@ -273,7 +273,7 @@ const form = ref<any>(emptyForm())
 
 const matchVisible = ref(false)
 const matchTarget = ref<any>(null)
-const matchForm = ref<any>({ tutorUserId: 0, remark: '' })
+const matchForm = ref<any>({ tutorDisplayNo: '', remark: '' })
 
 // 与 dict_subject 表新 30 项 (id 3000~3029) 对齐. 顺序与 /xy 学员库 chip 一致.
 const SUBJECT_OPTIONS = [
@@ -470,7 +470,7 @@ const unmatchOne = async (row: any) => {
 
 const openMatch = (row: any) => {
   matchTarget.value = row
-  matchForm.value = { tutorUserId: 0, remark: '' }
+  matchForm.value = { tutorDisplayNo: '', remark: '' }
   matchVisible.value = true
 }
 
@@ -479,7 +479,7 @@ const submitMatch = async () => {
   try {
     const res = await put('/user/admin/requirement/confirm-match', {
       requirementId: matchTarget.value.id,
-      tutorUserId: matchForm.value.tutorUserId || 0,
+      tutorDisplayNo: matchForm.value.tutorDisplayNo || '',
       remark: matchForm.value.remark
     })
     if (res.code === 200) {

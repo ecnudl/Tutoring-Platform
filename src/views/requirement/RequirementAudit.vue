@@ -22,6 +22,12 @@
           <el-tag :type="statusTagType(row.reqStatus)" size="small">{{ statusLabel(row.reqStatus) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="申请数" width="80" align="center">
+        <template #default="{ row }">
+          <el-badge v-if="row.applicationCount && row.applicationCount > 0" :value="row.applicationCount" :max="99" type="warning" />
+          <span v-else style="color:#94a3b8">—</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="gmtCreate" label="创建时间" width="170" />
       <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
@@ -139,7 +145,7 @@ import { post, get, put } from '@/api/index'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const keyword = ref('')
-const reqStatus = ref(1)
+const reqStatus = ref(null)  // 默认全部 — 既看待审核, 也看已发布(有教员申请的)
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
