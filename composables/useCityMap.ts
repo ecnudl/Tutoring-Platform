@@ -190,3 +190,13 @@ function showNavigationOverlay(cityName: string) {
 
   document.body.appendChild(overlay)
 }
+
+// BFCache 修复: 用户跳到子站后按浏览器"返回", 浏览器从 BFCache 恢复主站页面 (含残留 #city-nav-overlay),
+// JS 不重新执行 — overlay 不会自然消失, 用户卡在 "正在切换到 X 站..." 蒙层下.
+// 监听 pageshow (BFCache 恢复 + 正常加载都触发) 主动清理.
+if (typeof window !== 'undefined') {
+  window.addEventListener('pageshow', () => {
+    const ov = document.getElementById('city-nav-overlay')
+    if (ov) ov.remove()
+  })
+}
