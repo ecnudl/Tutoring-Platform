@@ -1,64 +1,56 @@
-<div>
-    <img src="distribution/images/logo.jpg" alt="领课教育系统-开源版"/>
-    <div>
-        <a href="http://spring.io/projects/spring-boot">
-            <img src="https://img.shields.io/badge/spring--boot-3.2.4-blue.svg" alt="spring-boot">
-        </a>
-        <a href="https://spring.io/projects/spring-cloud-alibaba">
-            <img src="https://img.shields.io/badge/spring--cloud--alibaba-2023.0.1.0-blue.svg" alt="spring-cloud-alibaba">
-        </a> 
-        <a href="https://cn.vuejs.org/">
-            <img src="https://img.shields.io/badge/vue-3.5.20-blue.svg" alt="vue">
-        </a> 
-        <a href="https://element-plus.org/">
-            <img src="https://img.shields.io/badge/element--plus-2.9.9-blue.svg" alt="element-plus">
-        </a> 
-    </div>
-</div>
+# 591-education · 591家教网
 
-### 使用须知
+> 全国 17 城家教撮合服务平台 — 名校教员 / 一对一上门 + 在线辅导 / 严选审核
 
-1. 允许用于个人学习、毕业设计、教学案例、公益事业等。
-2. 限制商用，若需要商业使用请咨询作者：18302045627（微信可加）。
-3. 禁止将本项目的相关代码和相关资料进行任何形式任何名义的出售。
+[![Spring Boot](https://img.shields.io/badge/spring--boot-3.2.4-blue.svg)](https://spring.io/projects/spring-boot)
+[![Vue 3](https://img.shields.io/badge/vue-3.x-brightgreen.svg)](https://vuejs.org/)
+[![Nuxt 3](https://img.shields.io/badge/nuxt-3.x-00DC82.svg)](https://nuxt.com/)
+[![Java](https://img.shields.io/badge/java-17-orange.svg)](https://openjdk.org/)
+[![MySQL](https://img.shields.io/badge/mysql-8.0-blue.svg)](https://www.mysql.com/)
 
-### 项目介绍
+## 项目说明
 
-领课教育系统（roncoo-education）是基于领课网络多年的在线教育平台开发和运营经验打造出来的产品，致力于打造一个各行业都适用的分布式在线教育系统。系统采用前后端分离模式，前台采用vue.js为核心框架，后台采用Spring
-Cloud为核心框架。系统目前主要功能有课程点播功能，支持多家视频云的接入，课程附件管理功能，支持多家存储云的接入，可以帮助个人或者企业快速搭建一个轻量级的在线教育平台。
+591-education 是一个为家长 / 教员双向撮合的家教服务平台, 覆盖北京 / 上海 / 广州 / 南京 / 苏州 / 杭州 / 合肥 / 福州 / 南昌 / 济南 / 天津 / 武汉 / 郑州 / 重庆 / 西安 / 成都 / 长沙 共 17 个城市。
 
-<table>
-  <tr>
-    <td><img src="distribution/images/web1.png"/></td>
-    <td><img src="distribution/images/web2.png"/></td>
-  </tr>
-  <tr>
-    <td><img src="distribution/images/web3.png"/></td>
-    <td><img src="distribution/images/web4.png"/></td>
-  </tr>
-  <tr>
-    <td><img src="distribution/images/admin1.png"/></td>
-    <td><img src="distribution/images/admin2.png"/></td>
-  </tr>
-  <tr>
-    <td><img src="distribution/images/admin3.png"/></td>
-    <td><img src="distribution/images/admin4.png"/></td>
-  </tr>
-</table>
+- 🏠 **官方站点**: <https://591jiajiao.cn>
+- 📧 **客服邮箱**: jiajiao591@126.com
 
-### 演示地址
+## 技术栈
 
-* 门户系统：[https://eduos.roncoos.com/](https://eduos.roncoos.com/)
-* 管理系统：[https://eduos.roncoos.com/admin/](https://eduos.roncoos.com/admin/)
-* 前端技术体系：Vue3 + Nuxt3 + Vite6 + Vue-Router + Element-Plus + Pinia + Axios
-* 后端技术体系：Spring Cloud Alibaba2023 + MySQL8 + Nacos + Seata + Mybatis + Druid
+| 层 | 技术 |
+|---|---|
+| 后端 | Spring Boot 3 / Spring Cloud Gateway / Java 17 / MyBatis / MySQL 8 / Redis / Nacos / MinIO |
+| 学员/教员 web | Nuxt 3 + Vue 3 + Element Plus + Pinia |
+| 管理后台 | Vue 3 + Element Plus + Vite |
+| 安全 | fail2ban + 应用层智能 captcha + Honeypot + FingerprintJS + Redis 限流 |
 
-### 源码地址
+## 仓库结构 (单 GitHub repo, 多分支)
 
-* 后端系统：roncoo-education（核心框架：Spring Cloud Alibaba）：[码云](https://gitee.com/roncoocom/roncoo-education) | [Github](https://github.com/roncoo/roncoo-education) | [Gitcode](https://gitcode.com/roncoocom/roncoo-education)
-* 门户系统：roncoo-education-web（核心框架：Nuxt3）：[码云](https://gitee.com/roncoocom/roncoo-education-web) | [Github](https://github.com/roncoo/roncoo-education-web) | [Gitcode](https://gitcode.com/roncoocom/roncoo-education-web)
-* 管理系统：roncoo-education-admin（核心框架：Vue3）：[码云](https://gitee.com/roncoocom/roncoo-education-admin) | [Github](https://github.com/roncoo/roncoo-education-admin) | [Gitcode](https://gitcode.com/roncoocom/roncoo-education-admin)
+| 分支 | 内容 |
+|---|---|
+| `master` | 学员/教员前端 (Nuxt 3, `591-education-web`) |
+| `backend` | Java 微服务后端 (`591-education-service-*`) |
+| `admin` | 管理后台前端 (Vue 3, `591-education-admin`) |
 
----
-<div>关注微信公众号可获取更多学习资料（SQL脚本、部署教程、常见问题等）</div>
-<img src="distribution/images/gzh.png" alt="领课开源-微信公众号" width="600"/>
+## 核心特性
+
+- 17 城子域名同源部署 (`*.591jiajiao.cn`), 统一后端 + cookie/SSO
+- 教员严审: 身份证 / 学历 / 教师资格 / 学校 / 自我介绍 多维校验
+- 30 + 科目扁平字典, 跨学段统一搜索
+- 学员订单结构化采集: 学生情况 / 教员要求 / 交通信息
+- 智能反爬: 阶梯 captcha (失败 3 次后触发) + 蜜罐 + IP/账号/指纹多维限流 + fail2ban
+- SEO 友好: `spaLoadingTemplate` 注入静态 SEO HTML, robots/sitemap, 17 城子域 sitemap
+
+## 开发文档
+
+- [本地开发环境指南](./README-dev.md)
+- [服务器迁移部署指南](./README-deploy.md)
+- [家教平台改造说明](./README-家教平台改造说明.md)
+
+## 项目来源
+
+基于 [roncoo-education](https://github.com/roncoo/roncoo-education) 在线教育开源系统二次开发, 已对教学/订单/审核/匹配/防护等核心功能做了大量重写与扩展, 改造为家教撮合场景。
+
+## License
+
+继承上游开源协议。
