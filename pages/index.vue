@@ -95,8 +95,8 @@
             <div class="notice-body">
               <NuxtLink v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" :to="item.linkUrl || ('/notice/' + item.id)" class="notice-item">
                 <span class="notice-dot"></span>
-                <span class="notice-text">{{ item.title }}</span>
                 <span v-if="isWithinDays(item.gmtCreate, 3)" class="new-badge">新</span>
+                <span class="notice-text">{{ item.title }}</span>
               </NuxtLink>
             </div>
           </div>
@@ -831,7 +831,7 @@ onMounted(async () => {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 8px;
-  margin-left: 6px;
+  margin-right: 6px;
   vertical-align: middle;
   letter-spacing: 0;
   line-height: 1.4;

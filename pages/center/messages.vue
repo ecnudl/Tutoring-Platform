@@ -43,8 +43,8 @@
       <div class="tag tag-notice">告</div>
       <div class="body">
         <div class="text">
-          {{ n.title }}
           <span v-if="isWithinDays(n.gmtCreate, 3)" class="new-badge">新</span>
+          {{ n.title }}
         </div>
         <div class="time">{{ formatTime(n.gmtCreate) }}</div>
       </div>
@@ -301,7 +301,7 @@ onMounted(async () => {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 8px;
-  margin-left: 6px;
+  margin-right: 6px;
   vertical-align: middle;
   letter-spacing: 0;
   line-height: 1.4;
