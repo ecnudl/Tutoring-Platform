@@ -42,7 +42,10 @@
     <div v-for="n in notices" :key="n.id" class="msg-item" @click="openNotice(n)" style="cursor:pointer">
       <div class="tag tag-notice">告</div>
       <div class="body">
-        <div class="text">{{ n.title }}</div>
+        <div class="text">
+          {{ n.title }}
+          <span v-if="isWithinDays(n.gmtCreate, 3)" class="new-badge">新</span>
+        </div>
         <div class="time">{{ formatTime(n.gmtCreate) }}</div>
       </div>
       <span class="more">详情 ›</span>
@@ -68,6 +71,7 @@
 definePageMeta({ layout: 'center', middleware: 'auth' })
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '~/stores/user'
+import { isWithinDays } from '~/composables/useNewBadge'
 
 const userStore = useUserStore()
 const { get, post } = useApi()
@@ -288,6 +292,19 @@ onMounted(async () => {
   color: #334155;
   line-height: 1.7;
   margin-bottom: 6px;
+}
+.new-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0;
+  line-height: 1.4;
 }
 .time {
   display: inline-block;

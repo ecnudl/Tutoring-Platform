@@ -96,6 +96,7 @@
               <NuxtLink v-for="(item, i) in noticeTabs[activeNoticeTab].items" :key="i" :to="item.linkUrl || ('/notice/' + item.id)" class="notice-item">
                 <span class="notice-dot"></span>
                 <span class="notice-text">{{ item.title }}</span>
+                <span v-if="isWithinDays(item.gmtCreate, 3)" class="new-badge">新</span>
               </NuxtLink>
             </div>
           </div>
@@ -293,6 +294,7 @@ import { useCityData } from '~/composables/useCityData'
 import { CITY_LIST, buildCityUrl, navigateToCity } from '~/composables/useCityMap'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 import { tutorAvatarUrl } from '~/composables/useTutorAvatar'
+import { isWithinDays } from '~/composables/useNewBadge'
 
 const userStore = useUserStore()
 const cityStore = useCityStore()
@@ -343,7 +345,8 @@ const loadAnnouncements = async () => {
         noticeTabs.value[idx].items = res.data.map(a => ({
           id: a.linkUrl ? a.linkUrl.replace(/^\/notice\//, '') : a.id,
           title: a.title,
-          linkUrl: a.linkUrl || ''
+          linkUrl: a.linkUrl || '',
+          gmtCreate: a.gmtCreate || a.gmt_create || null
         }))
       }
     } catch (e) { console.warn('[announcement]', c.key, e) }
@@ -818,6 +821,21 @@ onMounted(async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.new-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0;
+  line-height: 1.4;
+  flex-shrink: 0;
 }
 
 /* ============================================
