@@ -299,9 +299,9 @@ onMounted(async () => {
   color: #fff;
   font-size: 10px;
   font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 8px;
-  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  margin-right: 4px;
   vertical-align: middle;
   letter-spacing: 0;
   line-height: 1.4;
