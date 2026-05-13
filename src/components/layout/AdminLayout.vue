@@ -14,7 +14,7 @@
         <el-menu-item index="/student/list"><el-icon><UserFilled /></el-icon><span>学员管理</span></el-menu-item>
         <el-menu-item index="/feedback/list"><el-icon><ChatDotRound /></el-icon><span>反馈管理</span></el-menu-item>
         <el-sub-menu index="content"><template #title><el-icon><Notebook /></el-icon><span>内容管理</span></template>
-          <el-menu-item index="/content/banner">轮播图</el-menu-item><el-menu-item index="/content/announcement">公告</el-menu-item><el-menu-item index="/content/faq">FAQ 帮助</el-menu-item><el-menu-item index="/content/tutor-group-qr">教员接单群二维码</el-menu-item><el-menu-item index="/content/friend-links">友情链接</el-menu-item><el-menu-item index="/content/footer-menus">页脚菜单</el-menu-item></el-sub-menu>
+          <el-menu-item index="/content/banner">轮播图</el-menu-item><el-menu-item index="/content/announcement">公告</el-menu-item><el-menu-item index="/content/faq">FAQ 帮助</el-menu-item><el-menu-item index="/content/tutor-group-qr">教员接单群二维码</el-menu-item><el-menu-item index="/content/friend-links">友情链接</el-menu-item><el-menu-item index="/content/footer-menus">页脚菜单</el-menu-item><el-menu-item index="/content/pages">页面内容</el-menu-item></el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>

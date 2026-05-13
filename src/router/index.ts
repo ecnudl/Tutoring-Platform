@@ -20,6 +20,7 @@ const routes = [
     { path: 'content/faq', component: () => import('@/views/content/FaqList.vue') },
     { path: 'content/friend-links', component: () => import('@/views/content/FriendLinks.vue') },
     { path: 'content/footer-menus', component: () => import('@/views/content/FooterMenus.vue') },
+    { path: 'content/pages', component: () => import('@/views/content/PageContent.vue') },
   ]}
 ]
 const router = createRouter({ history: createWebHistory('/admin/'), routes })
