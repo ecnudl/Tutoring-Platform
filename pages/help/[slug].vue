@@ -22,73 +22,10 @@
         <NuxtLink to="/help" class="btn-primary">返回帮助中心</NuxtLink>
       </div>
 
-      <!-- 正文 -->
+      <!-- 正文 — Markdown 渲染. admin sys_config 有值优先 admin's, 否则用 helpArticlesMd 内置默认源 -->
       <div v-else class="hp-body">
         <article class="hp-article">
-          <!-- admin 富文本优先 -->
-          <div v-if="overrideHtml" class="hp-content hp-html" v-html="overrideHtml"></div>
-
-          <!-- 内置默认版本 -->
-          <div v-else class="hp-content">
-            <h1 class="hp-title">{{ article.title }}</h1>
-            <p class="hp-lead" v-if="article.lead" v-html="article.lead"></p>
-
-            <!-- 步骤型 -->
-            <div v-if="article.steps" class="steps">
-              <div class="step" v-for="(s, i) in article.steps" :key="i">
-                <div class="step-num">{{ i + 1 }}</div>
-                <div class="step-body">
-                  <h3>{{ s.title }}</h3>
-                  <p>{{ s.desc }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- 通用段落 -->
-            <template v-if="article.sections">
-              <section v-for="(sec, i) in article.sections" :key="i">
-                <h2 class="hp-h2">{{ sec.title }}</h2>
-                <p v-if="sec.intro" class="sec-intro">{{ sec.intro }}</p>
-                <ul v-if="sec.list" class="hp-list">
-                  <li v-for="(it, j) in sec.list" :key="j">
-                    <strong v-if="it.includes('：')">{{ it.split('：')[0] }}：</strong>{{ it.includes('：') ? it.split('：').slice(1).join('：') : it }}
-                  </li>
-                </ul>
-                <dl v-if="sec.qa" class="hp-qa">
-                  <template v-for="(qa, k) in sec.qa" :key="k">
-                    <dt>Q：{{ qa.q }}</dt>
-                    <dd>{{ qa.a }}</dd>
-                  </template>
-                </dl>
-              </section>
-            </template>
-
-            <!-- 价格表 -->
-            <div v-if="article.priceTable" class="hp-pricetable">
-              <table>
-                <thead>
-                  <tr>
-                    <th v-for="h in article.priceTable.headers" :key="h">{{ h }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(row, i) in article.priceTable.rows" :key="i">
-                    <td v-for="(c, j) in row" :key="j">{{ c }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- CTA 区 -->
-            <div class="hp-cta" v-if="article.ctaText">
-              <p v-html="article.ctaText"></p>
-            </div>
-
-            <div class="hp-actions" v-if="article.actions">
-              <NuxtLink v-for="a in article.actions" :key="a.href" :to="a.href"
-                :class="a.primary ? 'btn-primary' : 'btn-secondary'">{{ a.label }}</NuxtLink>
-            </div>
-          </div>
+          <div class="hp-content hp-html" v-html="renderedHtml"></div>
         </article>
 
         <!-- 右侧 -->
@@ -117,6 +54,8 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 import { HELP_ARTICLES, HELP_SIDE_LINKS } from '~/composables/helpArticles'
+import { HELP_ARTICLES_MD } from '~/composables/helpArticlesMd'
+import { renderMarkdown } from '~/composables/useMarkdown'
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug || ''))
@@ -125,11 +64,15 @@ const { config, load } = useSiteConfig()
 
 const article = computed(() => HELP_ARTICLES[slug.value] || null)
 
-const overrideHtml = computed(() => {
+// Markdown 源: admin sys_config 有值优先 admin's, 否则用内置默认 markdown
+const markdownSource = computed(() => {
   if (!article.value) return ''
   const key = article.value.configKey
-  return ((config.value)[key] || '').trim()
+  const adminMd = ((config.value)[key] || '').trim()
+  return adminMd || HELP_ARTICLES_MD[key] || ''
 })
+
+const renderedHtml = computed(() => renderMarkdown(markdownSource.value))
 
 const hotline = computed(() => config.value.siteHotline || '13795420591')
 const workTime = computed(() => config.value.siteWorkTime || '周一至周日 9:00-21:00')
@@ -271,6 +214,13 @@ onMounted(() => { load() })
 .hp-html :deep(ul), .hp-html :deep(ol) { padding-left: 24px; }
 .hp-html :deep(li) { font-size: 14px; line-height: 1.8; color: #475569; margin: 4px 0; }
 .hp-html :deep(strong) { color: #111827; }
+.hp-html :deep(a) { color: var(--color-primary, #163B6B); text-decoration: underline; }
+.hp-html :deep(blockquote) { border-left: 3px solid var(--color-primary, #163B6B); padding: 8px 16px; margin: 14px 0; background: #f8fafc; color: #475569; }
+.hp-html :deep(hr) { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+.hp-html :deep(code) { background: #f1f5f9; padding: 1px 6px; border-radius: 3px; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 13px; color: #163B6B; }
+.hp-html :deep(table) { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 13px; }
+.hp-html :deep(th), .hp-html :deep(td) { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: center; }
+.hp-html :deep(th) { background: #f8fafc; font-weight: 600; color: #1F2937; }
 
 @media (max-width: 768px) {
   .hp-body { grid-template-columns: 1fr; }

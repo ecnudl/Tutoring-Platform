@@ -13,43 +13,16 @@
   </div>
 
   <article class="about-card">
-    <!-- admin 富文本优先 -->
-    <div v-if="overrideHtml" class="about-body about-html" v-html="overrideHtml"></div>
+    <!-- Markdown 渲染: admin sys_config 有值优先 admin's, 否则用内置默认 markdown -->
+    <div class="about-body about-html" v-html="renderedHtml"></div>
 
-    <!-- 默认模板（admin 未填写时显示） -->
-    <div v-else class="about-body">
-      <h1 class="about-title">公司简介</h1>
-
-      <p class="about-lead">
-        {{ siteBrand }} 是一家专注于<strong>一对一家教信息撮合</strong>的互联网服务平台，致力于为家长/学员和优质教员提供高效、可信、售后有保障的对接服务。
-      </p>
-
-      <h2>我们的服务</h2>
-      <ul>
-        <li>海量经过实名与学历审核的大学生、在职教师、专职教员资源</li>
-        <li>按城市、区域、学段、科目多维度精准匹配</li>
-        <li>家长发布需求后，系统自动推送符合条件的教员</li>
-      </ul>
-
-      <h2>我们的承诺</h2>
-      <ul>
-        <li><strong>透明中介费</strong>：一次性收取，规则公开（家长 100 / 教员首单课时费），续单 100% 归教员</li>
-        <li><strong>真实资料</strong>：教员需提交学生证/教师资格证等证件，审核通过才能上线</li>
-        <li><strong>响应迅速</strong>：常规需求发布后 30 分钟内匹配推荐</li>
-        <li><strong>隐私保护</strong>：联系方式仅在双方确认意向后互相可见</li>
-      </ul>
-
-      <h2>联系我们</h2>
-      <div class="contact">
-        <div><strong>客服热线：</strong>{{ hotline }}</div>
-        <div v-if="csEmail"><strong>客服邮箱：</strong>{{ csEmail }}</div>
-        <div v-if="csWechat"><strong>客服微信：</strong>{{ csWechat }}</div>
-        <div v-if="workTime"><strong>工作时间：</strong>{{ workTime }}</div>
-      </div>
-
-      <p class="about-footnote">
-        本页内容由网站管理员维护，可在 admin 后台修改 <code>siteAboutIntroHtml</code> 字段为 HTML 内容以覆盖本默认模板。
-      </p>
+    <!-- 联系方式 — 始终用 sys_config 动态值, 不进 markdown (单一来源) -->
+    <h2 class="contact-title">联系我们</h2>
+    <div class="contact">
+      <div><strong>客服热线：</strong>{{ hotline }}</div>
+      <div v-if="csEmail"><strong>客服邮箱：</strong>{{ csEmail }}</div>
+      <div v-if="csWechat"><strong>客服微信：</strong>{{ csWechat }}</div>
+      <div v-if="workTime"><strong>工作时间：</strong>{{ workTime }}</div>
     </div>
   </article>
 </div>
@@ -59,9 +32,15 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
+import { HELP_ARTICLES_MD } from '~/composables/helpArticlesMd'
+import { renderMarkdown } from '~/composables/useMarkdown'
 const { config, load } = useSiteConfig()
 
-const overrideHtml = computed(() => (config.value.siteAboutIntroHtml || '').trim())
+const markdownSource = computed(() => {
+  const adminMd = (config.value.siteAboutIntroHtml || '').trim()
+  return adminMd || HELP_ARTICLES_MD['siteAboutIntroHtml'] || ''
+})
+const renderedHtml = computed(() => renderMarkdown(markdownSource.value))
 const siteBrand = computed(() => config.value.siteBrandName || '591家教网')
 const hotline = computed(() => config.value.siteHotline || '客服热线：待配置')
 const csEmail = computed(() => config.value.siteCsEmail || '')
