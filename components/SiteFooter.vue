@@ -6,8 +6,8 @@
           <h4 class="card-title">{{ group.group }}</h4>
           <div class="card-links">
             <NuxtLink
-              v-for="item in group.items"
-              :key="item.href"
+              v-for="(item, idx) in group.items"
+              :key="`${group.group}-${idx}`"
               :to="item.href"
               class="card-link"
             >{{ item.label }}</NuxtLink>
@@ -35,20 +35,19 @@ import { useSiteConfig } from '~/composables/useSiteConfig'
 
 const { config, load, footerMenus } = useSiteConfig()
 
-// 学员/教员 板块所有条目都指向 /help 帮助中心 (统一入口, 减少分散子页);
-// /zf 收费标准是独立功能页, 保留入口. 关于我们继续指向独立页面 (内容性质不同).
+// 每个条目指向各自 markdown 页面 (sys_config 拉不到时的兜底, admin 可在后台改).
 const DEFAULT_GROUPS = [
   { group: '我是学员', items: [
-    { label: '请家教流程', href: '/help' },
-    { label: '请家教收费标准', href: '/zf' },
-    { label: '请家教常见问题', href: '/help' },
-    { label: '怎样快速找到老师', href: '/help' }
+    { label: '请家教流程',       href: '/help/request-process' },
+    { label: '请家教收费标准',   href: '/zf' },
+    { label: '请家教常见问题',   href: '/help/request-faq' },
+    { label: '怎样快速找到老师', href: '/help/find-tutor' }
   ]},
   { group: '我是教员', items: [
-    { label: '成为家教老师', href: '/help' },
+    { label: '成为家教老师',       href: '/help/become-tutor' },
     { label: '家教课时费参考标准', href: '/zf' },
-    { label: '做家教收费标准', href: '/help' },
-    { label: '做家教常见问题', href: '/help' }
+    { label: '做家教收费标准',     href: '/help/tutor-pricing' },
+    { label: '做家教常见问题',     href: '/help/tutor-faq' }
   ]},
   { group: '关于我们', items: [
     { label: '联系我们', href: '/about/contact' },
