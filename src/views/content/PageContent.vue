@@ -82,6 +82,7 @@ import { ElMessage } from 'element-plus'
 import { Check, RefreshRight, Delete, View } from '@element-plus/icons-vue'
 import { post, get } from '@/api/index'
 import { marked } from 'marked'
+import { HELP_ARTICLES_MD } from '@/composables/helpArticlesMd'
 
 interface PageMeta {
   key: string
@@ -121,13 +122,19 @@ const renderedHtml = computed(() => {
   }
 })
 
+// 切到某 key 时填充编辑区: admin 有自定义则用之, 否则用内置默认 markdown (跟前端一致)
+const fillSourceFor = (key: string) => {
+  const adminVal = (allConfig.value[key] || '').trim()
+  source.value = adminVal || HELP_ARTICLES_MD[key] || ''
+}
+
 const load = async () => {
   loading.value = true
   try {
     const res = await get('/system/api/site/config')
     if (res?.code === 200 && res.data) {
       allConfig.value = res.data
-      source.value = (allConfig.value[currentKey.value] || '').trim()
+      fillSourceFor(currentKey.value)
       dirty.value = false
     }
   } catch (e) { console.error(e); ElMessage.error('加载失败') }
@@ -137,12 +144,10 @@ const load = async () => {
 const onChangePage = () => {
   if (dirty.value) {
     if (!confirm('当前页面有未保存修改, 切换页面会丢失. 确认切换?')) {
-      // 切回原值 (用户取消, 但 v-model 已经改了 currentKey, 这里不好回退;
-      // 简单处理: 让 dirty 标志保留, 用户重新选回去能看到旧编辑)
       return
     }
   }
-  source.value = (allConfig.value[currentKey.value] || '').trim()
+  fillSourceFor(currentKey.value)
   dirty.value = false
 }
 
@@ -150,17 +155,16 @@ const saveAll = async () => {
   if (!currentPage.value) return
   saving.value = true
   try {
-    // 存 HTML (前端 v-html 直接渲染); admin 输入是 markdown, 这里转 HTML 落库
-    const html = marked.parse(source.value || '', { breaks: true, gfm: true }) as string
+    // 存原始 markdown 源 (前端运行时 marked 渲染); 不再转 HTML 落库, 这样下次编辑还是 markdown
+    const md = source.value || ''
     const res = await post('/system/admin/sys/config/save-by-key', {
       configKey: currentKey.value,
-      configValue: html,
+      configValue: md,
       configName: '页面内容 - ' + currentPage.value.label
     })
     if (res?.code === 200) {
       ElMessage.success(`已保存「${currentPage.value.label}」, 前端立即生效`)
-      // 更新本地缓存, 切换页面回来不丢
-      allConfig.value[currentKey.value] = html
+      allConfig.value[currentKey.value] = md
       dirty.value = false
     } else {
       ElMessage.error(res?.msg || '保存失败')
