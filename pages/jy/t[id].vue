@@ -160,15 +160,24 @@
               </div>
               <ol v-else-if="tutor.successRecords && tutor.successRecords.length" class="tt-records">
                 <li v-for="(r, i) in tutor.successRecords" :key="i" class="tt-record">
-                  <div class="tt-record-main">
-                    <div class="tt-record-title">
-                      <span v-if="r.grade" class="tt-record-grade">{{ r.grade }}</span>
-                      <span v-if="r.subjects" class="tt-record-subjects">{{ formatSubjects(r.subjects) }}</span>
-                      <span v-if="r.location" class="tt-record-loc">{{ r.location }}</span>
-                    </div>
-                    <p v-if="r.detail" class="tt-record-detail">{{ r.detail }}</p>
+                  <div class="tt-rec-c1">
+                    <div class="tt-rec-title">{{ buildRecordTitle(r) }}</div>
+                    <div v-if="r.displayNo" class="tt-rec-no">{{ r.displayNo }}</div>
                   </div>
-                  <span class="tt-record-date">{{ r.date }}</span>
+                  <div class="tt-rec-c2">
+                    <span v-if="Number(r.teachingMethod) === 3" class="tt-rec-online">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="5"/><circle cx="12" cy="10" r="1.6" fill="currentColor" stroke="none"/><path d="M12 15v3M8 19h8"/></svg>
+                      网络授课
+                    </span>
+                    <span v-else class="tt-rec-region">{{ buildRecordRegion(r) }}</span>
+                  </div>
+                  <div class="tt-rec-c3">
+                    <div class="tt-rec-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+                    <div class="tt-rec-pref">{{ buildRecordTutorPref(r) }}</div>
+                  </div>
+                  <div class="tt-rec-c4">
+                    <span class="tt-record-date">{{ r.date }}</span>
+                  </div>
                 </li>
               </ol>
               <div v-else class="tt-block-empty tt-block-empty-large">暂无成功记录</div>
@@ -305,6 +314,37 @@ const successRecordCount = computed(() => {
 const formatSubjects = (csv) => {
   if (!csv) return ''
   return String(csv).split(',').map(s => s.trim()).filter(Boolean).join(' ')
+}
+
+// 成功记录卡片三大字段 — 跟 /xy 卡片风格对齐
+const csvFirst = (csv) => {
+  if (!csv) return ''
+  return String(csv).split(',').map(s => s.trim()).filter(Boolean)[0] || ''
+}
+const csvJoin = (csv) => {
+  if (!csv) return ''
+  return String(csv).split(',').map(s => s.trim()).filter(Boolean).join(' ')
+}
+const buildRecordTitle = (r) => {
+  // 优先级: 年级+科目 > admin 手填 title > 仅科目 > '历史订单'
+  const grade = r?.grade ? String(r.grade).trim() : ''
+  const subj = r?.subjects ? csvJoin(r.subjects) : ''
+  if (grade && subj) return grade + subj
+  if (r?.title && String(r.title).trim()) return r.title
+  if (subj) return subj
+  if (grade) return grade
+  return '历史订单'
+}
+const buildRecordRegion = (r) => {
+  const dn = csvFirst(r?.districtNames)
+  if (dn) return dn
+  if (r?.location) return r.location  // fallback: 老数据可能只有"上海"
+  return '区域待确认'
+}
+const buildRecordTutorPref = (r) => {
+  const gPart = r?.tutorGender === 1 ? '[男]' : r?.tutorGender === 2 ? '[女]' : '[无限制]'
+  const types = csvJoin(r?.tutorTypePref)
+  return types ? `${gPart}需要教员身份${types}` : `${gPart}不限教员类型`
 }
 
 const scrollTo = (key) => {
@@ -658,35 +698,44 @@ onMounted(() => { loadTutor() })
   font-size: 13px;
 }
 
-/* ============ RECORDS ============ */
-.tt-records {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+/* ============ RECORDS — 风格对齐 /xy 卡片 (去掉价格/详情按钮) ============ */
+.tt-records { list-style: none; margin: 0; padding: 0; }
 .tt-record {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(100px, 1fr) minmax(180px, 1.6fr) auto;
   gap: 16px;
-  padding: 14px 0;
+  align-items: center;
+  padding: 14px 4px;
   border-bottom: 1px dashed var(--tt-line-soft);
 }
 .tt-record:last-child { border-bottom: 0; }
-.tt-record-main { flex: 1; min-width: 0; }
-.tt-record-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 14px;
-  color: #1F2937;
+
+.tt-rec-c1, .tt-rec-c2, .tt-rec-c3 { min-width: 0; }
+.tt-rec-c1 { display: flex; flex-direction: column; gap: 4px; }
+.tt-rec-title { font-size: 14px; font-weight: 500; color: #1F2937; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-rec-no { font-size: 12px; color: #94a3b8; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+
+.tt-rec-c2 { font-size: 13.5px; color: #4b5563; }
+.tt-rec-region { display: inline-block; }
+.tt-rec-online {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: #d97706; font-weight: 500; font-size: 13px;
 }
-.tt-record-grade { font-weight: 500; }
-.tt-record-subjects { color: #4b5563; }
-.tt-record-loc { color: #94a3b8; font-size: 13px; }
-.tt-record-detail { font-size: 13px; color: #6b7280; margin: 4px 0 0; line-height: 1.7; }
-.tt-record-date { font-size: 12px; color: #9ca3af; white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+.tt-rec-c3 { display: flex; flex-direction: column; gap: 4px; }
+.tt-rec-req { font-size: 13px; color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-rec-pref { font-size: 12px; color: #94a3b8; }
+
+.tt-rec-c4 { text-align: right; }
+.tt-record-date { font-size: 12px; color: #9ca3af; white-space: nowrap; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+
+@media (max-width: 768px) {
+  .tt-record {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .tt-rec-c4 { text-align: left; }
+}
 
 /* ============ ACTION BAR ============ */
 .tt-action-bar {
