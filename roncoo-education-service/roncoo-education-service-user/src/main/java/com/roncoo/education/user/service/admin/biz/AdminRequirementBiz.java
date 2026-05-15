@@ -212,22 +212,51 @@ public class AdminRequirementBiz extends BaseBiz {
             }
         }
 
-        // 同步关联的 reservation (如果存在): 学员从 /reserve 走过来的请求, requirement.id 就是 reservation.requirement_id
+        // 同步/创建 reservation: 教员主页"成功记录"读此表, 不能漏
         com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample resExample =
                 new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservationExample();
         resExample.createCriteria().andRequirementIdEqualTo(reqId);
         com.roncoo.education.common.base.page.Page<com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation> resPage =
                 reservationDao.page(1, 10, resExample);
-        if (resPage != null && resPage.getList() != null) {
+        boolean hasExisting = resPage != null && resPage.getList() != null && !resPage.getList().isEmpty();
+        if (hasExisting) {
+            // 已有 reservation (学员从 /reserve 主动预约): 更新状态 + matched_at
             for (com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation res : resPage.getList()) {
                 com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation resUp =
                         new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
                 resUp.setId(res.getId());
-                // 撮合时是 CONFIRMED (已撮合, 待履约), 7 天后由 MatchExpireJob 自动 promote 到 COMPLETED
+                // 撮合时 CONFIRMED (已撮合, 待履约), 7 天后 MatchExpireJob 自动 promote 到 COMPLETED
                 resUp.setResStatus(com.roncoo.education.common.core.enums.ReservationStatusEnum.CONFIRMED.getCode());
                 resUp.setMatchedAt(now);
+                // admin 指定了具体教员且与原 reservation tutor_user_id 不一致 (例如教员变更): 改锚
+                if (tutorUserId != null && !tutorUserId.equals(res.getTutorUserId())) {
+                    resUp.setTutorUserId(tutorUserId);
+                    com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile tp2 =
+                            tutorProfileDao.getByUserId(tutorUserId);
+                    if (tp2 != null) resUp.setTutorId(tp2.getId());
+                }
                 reservationDao.updateById(resUp);
             }
+        } else if (tutorUserId != null) {
+            // 没有现存 reservation + admin 指定教员 → 新建一条
+            // (admin 手填 T 编号接单的常见路径, 教员主页"成功记录"由此而来)
+            com.roncoo.education.user.dao.impl.mapper.entity.TutorProfile tp =
+                    tutorProfileDao.getByUserId(tutorUserId);
+            com.roncoo.education.user.dao.impl.mapper.entity.Users tutorUser = usersDao.getById(tutorUserId);
+            com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation newRes =
+                    new com.roncoo.education.user.dao.impl.mapper.entity.TutorReservation();
+            newRes.setId(com.roncoo.education.common.tools.IdWorker.getId());
+            newRes.setStudentUserId(r.getUserId() == null ? 0L : r.getUserId());
+            newRes.setTutorUserId(tutorUserId);
+            if (tp != null) newRes.setTutorId(tp.getId());
+            newRes.setRequirementId(reqId);
+            if (tp != null) newRes.setContactName(tp.getRealName());
+            if (tutorUser != null) newRes.setContactMobile(tutorUser.getMobile());
+            newRes.setAddress(r.getAddress());
+            newRes.setRemark(remark);
+            newRes.setResStatus(com.roncoo.education.common.core.enums.ReservationStatusEnum.CONFIRMED.getCode());
+            newRes.setMatchedAt(now);
+            reservationDao.save(newRes);
         }
 
         // 通知接单教员 (仅当指定了 tutorUserId)
