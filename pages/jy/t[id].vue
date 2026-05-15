@@ -172,7 +172,7 @@
                     <span v-else class="tt-rec-region">{{ buildRecordRegion(r) }}</span>
                   </div>
                   <div class="tt-rec-c3">
-                    <div class="tt-rec-req">{{ r.otherRequirements || '没有额外要求' }}</div>
+                    <div class="tt-rec-req">{{ (r.otherRequirements && String(r.otherRequirements).trim()) || '没有额外要求' }}</div>
                     <div class="tt-rec-pref">{{ buildRecordTutorPref(r) }}</div>
                   </div>
                   <div class="tt-rec-c4">
@@ -342,7 +342,8 @@ const buildRecordRegion = (r) => {
   return '区域待确认'
 }
 const buildRecordTutorPref = (r) => {
-  const gPart = r?.tutorGender === 1 ? '[男]' : r?.tutorGender === 2 ? '[女]' : '[无限制]'
+  const g = Number(r?.tutorGender)
+  const gPart = g === 1 ? '[男]' : g === 2 ? '[女]' : '[无限制]'
   const types = csvJoin(r?.tutorTypePref)
   return types ? `${gPart}需要教员身份${types}` : `${gPart}不限教员类型`
 }
@@ -716,7 +717,7 @@ onMounted(() => { loadTutor() })
 .tt-rec-no { font-size: 12px; color: #94a3b8; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
 
 .tt-rec-c2 { font-size: 13.5px; color: #4b5563; }
-.tt-rec-region { display: inline-block; }
+.tt-rec-region { display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .tt-rec-online {
   display: inline-flex; align-items: center; gap: 4px;
   color: #d97706; font-weight: 500; font-size: 13px;
@@ -724,7 +725,7 @@ onMounted(() => { loadTutor() })
 
 .tt-rec-c3 { display: flex; flex-direction: column; gap: 4px; }
 .tt-rec-req { font-size: 13px; color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tt-rec-pref { font-size: 12px; color: #94a3b8; }
+.tt-rec-pref { font-size: 12px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .tt-rec-c4 { text-align: right; }
 .tt-record-date { font-size: 12px; color: #9ca3af; white-space: nowrap; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
