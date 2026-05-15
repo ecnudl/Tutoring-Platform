@@ -161,9 +161,16 @@ public class TutorDetailResp implements Serializable {
     @ApiModel(description = "成功记录(脱敏)")
     public static class SuccessRecordItem implements Serializable {
         private static final long serialVersionUID = 1L;
+        @ApiModelProperty(value = "标题 (admin 手填的需求标题, 卡片标题用)") private String title;
+        @ApiModelProperty(value = "需求展示编号 e.g. S374657") private String displayNo;
         @ApiModelProperty(value = "年级") private String grade;
         @ApiModelProperty(value = "科目 (CSV)") private String subjects;
-        @ApiModelProperty(value = "区+地点") private String location;
+        @ApiModelProperty(value = "区+地点 (fallback)") private String location;
+        @ApiModelProperty(value = "区域 (CSV, 优先用作 region 显示)") private String districtNames;
+        @ApiModelProperty(value = "其他要求") private String otherRequirements;
+        @ApiModelProperty(value = "教员性别要求 1男 2女") private Integer tutorGender;
+        @ApiModelProperty(value = "教员身份偏好 (CSV)") private String tutorTypePref;
+        @ApiModelProperty(value = "授课方式 1上门 2学员上门 3在线 4均可") private Integer teachingMethod;
         @ApiModelProperty(value = "需求摘要") private String detail;
         @ApiModelProperty(value = "撮合日期 yyyy-MM-dd") private String date;
     }

@@ -320,10 +320,17 @@ public class ApiTutorBiz extends BaseBiz {
             if (r.getRequirementId() != null) {
                 TutorRequirement req = tutorRequirementDao.getById(r.getRequirementId());
                 if (req != null) {
+                    item.setTitle(req.getTitle());
+                    item.setDisplayNo(req.getDisplayNo());
                     item.setGrade(req.getGradeName());
                     item.setSubjects(req.getSubjectIds());
                     item.setDetail(req.getRequirementDetail());
                     item.setLocation(buildLocation(req.getCityId(), req.getDistrictId(), req.getAddress()));
+                    item.setDistrictNames(req.getDistrictNames());
+                    item.setOtherRequirements(req.getOtherRequirements());
+                    item.setTutorGender(req.getTutorGender());
+                    item.setTutorTypePref(req.getTutorTypePref());
+                    item.setTeachingMethod(req.getTeachingMethod());
                 }
             }
             java.time.LocalDateTime dt = r.getMatchedAt() != null ? r.getMatchedAt() : r.getGmtCreate();
