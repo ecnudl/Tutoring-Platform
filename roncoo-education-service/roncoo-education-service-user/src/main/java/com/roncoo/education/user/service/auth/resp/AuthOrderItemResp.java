@@ -19,6 +19,9 @@ public class AuthOrderItemResp implements Serializable {
     @ApiModelProperty(value = "预约 id")
     private Long id;
 
+    @ApiModelProperty(value = "需求/订单展示编号 (S..., 教员据此辨认是哪一单)")
+    private String displayNo;
+
     @ApiModelProperty(value = "状态码 (0待匹配 1已撮合 2已完成 3已取消)")
     private Integer resStatus;
 

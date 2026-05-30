@@ -98,6 +98,7 @@ public class AuthReservationBiz extends BaseBiz {
             if (r.getRequirementId() != null) {
                 TutorRequirement reqEntity = tutorRequirementDao.getById(r.getRequirementId());
                 if (reqEntity != null) {
+                    item.setDisplayNo(reqEntity.getDisplayNo());
                     item.setGrade(reqEntity.getGradeName());
                     item.setSubjects(reqEntity.getSubjectIds());
                     item.setDetail(reqEntity.getRequirementDetail());
