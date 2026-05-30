@@ -52,7 +52,7 @@
       <el-pagination layout="total,prev,pager,next" :total="total" :page-size="20" :current-page="page" @current-change="p => { page=p; search() }" />
     </div>
 
-    <el-dialog v-model="formVisible" :title="formId ? '编辑公告' : '新增公告'" width="760px" top="4vh" destroy-on-close>
+    <el-dialog v-model="formVisible" :title="formId ? '编辑公告' : '新增公告'" width="760px" top="4vh" destroy-on-close @close="destroyEditor">
       <el-form :model="form" label-width="90px">
         <el-form-item label="分类">
           <el-select v-model="form.category" placeholder="请选择分类" style="width:100%">
@@ -109,7 +109,10 @@ import { ElMessage } from 'element-plus'
 // ===== 富文本编辑器 (wangEditor) — 所见即所得, 像 Word =====
 const editorRef = shallowRef<any>()
 const handleCreated = (editor: any) => { editorRef.value = editor }
-onBeforeUnmount(() => { editorRef.value?.destroy() })
+// wangEditor 的 vue 包装组件不会自动 destroy, 必须自己销毁。
+// 弹窗用了 destroy-on-close, 关闭时子组件卸载但实例不会自动销毁 → 每次关闭都要手动 destroy 防泄漏。
+const destroyEditor = () => { editorRef.value?.destroy(); editorRef.value = null }
+onBeforeUnmount(destroyEditor)
 const toolbarConfig: any = {}
 const editorConfig: any = {
   placeholder: '在这里输入公告正文，可加粗 / 改字号 / 换颜色 / 插入图片…',
@@ -117,17 +120,20 @@ const editorConfig: any = {
     // 图片上传 — 复用后台现成接口, 存 minio
     uploadImage: {
       async customUpload(file: File, insertFn: (url: string) => void) {
+        const token = localStorage.getItem('admin_token') || ''
+        if (!token) { ElMessage.error('登录已失效，请重新登录后再上传图片'); return }
         const fd = new FormData()
         fd.append('picFile', file)
-        const token = localStorage.getItem('admin_token') || ''
         try {
           const res = await axios.post('/system/admin/upload/pic', fd, {
             headers: { 'Content-Type': 'multipart/form-data', token }
           })
-          if (res.data?.code === 200 && res.data?.data) insertFn(res.data.data)
+          const url = res.data?.data
+          if (res.data?.code === 200 && typeof url === 'string' && url) insertFn(url)
           else ElMessage.error(res.data?.msg || '图片上传失败')
         } catch (e) {
-          ElMessage.error('图片上传失败')
+          console.error('[announcement image upload]', e)
+          ElMessage.error('图片上传失败，请重试')
         }
       }
     }
