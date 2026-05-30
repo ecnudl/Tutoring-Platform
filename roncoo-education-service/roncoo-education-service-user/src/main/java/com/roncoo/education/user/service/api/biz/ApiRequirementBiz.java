@@ -227,27 +227,36 @@ public class ApiRequirementBiz extends BaseBiz {
         RequirementDetailResp resp = BeanUtil.copyProperties(requirement, RequirementDetailResp.class);
         // 隐藏联系方式 (走客服匹配)
         resp.setContactMobile(null);
-        // 联系人姓名脱敏: 朱小红 → 朱女士
-        resp.setContactName(maskContactName(requirement.getContactName(), requirement.getStudentGender()));
+        // 联系人姓名脱敏: 朱小红 → 朱女士 (优先用 admin 选定的 contactGender)
+        resp.setContactName(maskContactName(requirement.getContactName(), requirement.getContactGender()));
         // 大致位置 (admin 录入的就是脱敏后的 — 直接展示)
         resp.setDisplayLocation(requirement.getAddress());
         return Result.success(resp);
     }
 
     /**
-     * 把联系人姓名脱敏成 "X女士/先生"。无法识别时返回 "热心家长"。
+     * 把联系人姓名脱敏成 "X先生/女士"。
+     * 优先级: admin 显式选定的 contactGender (1先生 2女士) > 姓名里的称谓词 > "X家长"。
+     * 姓名为空时返回 "热心家长"。
      */
-    private static String maskContactName(String contactName, Integer studentGender) {
+    private static String maskContactName(String contactName, Integer contactGender) {
         if (!StringUtils.hasText(contactName)) return "热心家长";
-        // 已经包含称谓的就保留首字 + 称谓
         char first = contactName.charAt(0);
+        // 1) admin 在后台显式勾选的称谓最优先
+        if (contactGender != null && contactGender == 1) {
+            return first + "先生";
+        }
+        if (contactGender != null && contactGender == 2) {
+            return first + "女士";
+        }
+        // 2) 其次按姓名里已含的称谓词推断
         if (contactName.contains("女士") || contactName.contains("阿姨") || contactName.contains("妈妈") || contactName.contains("妈")) {
             return first + "女士";
         }
         if (contactName.contains("先生") || contactName.contains("叔叔") || contactName.contains("爸爸") || contactName.contains("爸")) {
             return first + "先生";
         }
-        // 没称谓 — 显示首字 + 家长
+        // 3) 都没有 — 显示首字 + 家长
         return first + "家长";
     }
 

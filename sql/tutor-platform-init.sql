@@ -314,6 +314,7 @@ CREATE TABLE `tutor_requirement` (
   `other_requirements`  VARCHAR(500)  DEFAULT NULL            COMMENT '其它要求 (对教员的额外要求)',
   `transport_subsidy`   VARCHAR(100)  DEFAULT NULL            COMMENT '有无车贴 (自由文本)',
   `contact_name`        VARCHAR(50)   DEFAULT NULL            COMMENT '联系人姓名',
+  `contact_gender`      TINYINT       NOT NULL DEFAULT 0      COMMENT '联系人称谓 0未设置 1先生 2女士',
   `contact_mobile`      VARCHAR(20)   DEFAULT NULL            COMMENT '联系人电话',
   `contact_wechat`      VARCHAR(50)   DEFAULT NULL            COMMENT '联系人微信',
   `req_status`          TINYINT       NOT NULL DEFAULT 0      COMMENT '0草稿 1待审核 2已发布 3匹配中 4已预约 5已完成 6已关闭',

@@ -18,6 +18,7 @@
         <result column="budget_min" jdbcType="DECIMAL" property="budgetMin"/>
         <result column="budget_max" jdbcType="DECIMAL" property="budgetMax"/>
         <result column="contact_name" jdbcType="VARCHAR" property="contactName"/>
+        <result column="contact_gender" jdbcType="TINYINT" property="contactGender"/>
         <result column="contact_mobile" jdbcType="VARCHAR" property="contactMobile"/>
         <result column="req_status" jdbcType="TINYINT" property="reqStatus"/>
         <result column="audit_remark" jdbcType="VARCHAR" property="auditRemark"/>
@@ -81,7 +82,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id, student_gender, transport, frequency, requirement_type, other_requirements, transport_subsidy, district_names, grade_name, is_urgent</sql>
+    <sql id="Base_Column_List">id, gmt_create, gmt_modified, status_id, user_id, title, subject_ids, grade_id,  city_id, district_id, address, tutor_gender, tutor_type_pref, budget_min, budget_max, contact_name, contact_gender, contact_mobile, req_status, audit_remark, view_count, application_count, contact_wechat, teaching_method, display_no, matched_at, matched_tutor_remark, target_tutor_user_id, student_gender, transport, frequency, requirement_type, other_requirements, transport_subsidy, district_names, grade_name, is_urgent</sql>
     <sql id="Blob_Column_List">schedule, requirement_detail, student_info, tutor_request, traffic_info</sql>
     <select id="selectByExample" parameterType="com.roncoo.education.user.dao.impl.mapper.entity.TutorRequirementExample" resultMap="BaseResultMap">
         select <if test="distinct">distinct</if> <include refid="Base_Column_List"/> from tutor_requirement
@@ -119,6 +120,7 @@
             <if test="budgetMin != null">budget_min,</if>
             <if test="budgetMax != null">budget_max,</if>
             <if test="contactName != null">contact_name,</if>
+            <if test="contactGender != null">contact_gender,</if>
             <if test="contactMobile != null">contact_mobile,</if>
             <if test="reqStatus != null">req_status,</if>
             <if test="auditRemark != null">audit_remark,</if>
@@ -161,6 +163,7 @@
             <if test="budgetMin != null">#{budgetMin,jdbcType=DECIMAL},</if>
             <if test="budgetMax != null">#{budgetMax,jdbcType=DECIMAL},</if>
             <if test="contactName != null">#{contactName,jdbcType=VARCHAR},</if>
+            <if test="contactGender != null">#{contactGender,jdbcType=TINYINT},</if>
             <if test="contactMobile != null">#{contactMobile,jdbcType=VARCHAR},</if>
             <if test="reqStatus != null">#{reqStatus,jdbcType=TINYINT},</if>
             <if test="auditRemark != null">#{auditRemark,jdbcType=VARCHAR},</if>
@@ -204,6 +207,7 @@
             <if test="record.budgetMin != null">budget_min = #{record.budgetMin,jdbcType=DECIMAL},</if>
             <if test="record.budgetMax != null">budget_max = #{record.budgetMax,jdbcType=DECIMAL},</if>
             <if test="record.contactName != null">contact_name = #{record.contactName,jdbcType=VARCHAR},</if>
+            <if test="record.contactGender != null">contact_gender = #{record.contactGender,jdbcType=TINYINT},</if>
             <if test="record.contactMobile != null">contact_mobile = #{record.contactMobile,jdbcType=VARCHAR},</if>
             <if test="record.reqStatus != null">req_status = #{record.reqStatus,jdbcType=TINYINT},</if>
             <if test="record.auditRemark != null">audit_remark = #{record.auditRemark,jdbcType=VARCHAR},</if>
@@ -248,6 +252,7 @@
             <if test="budgetMin != null">budget_min = #{budgetMin,jdbcType=DECIMAL},</if>
             <if test="budgetMax != null">budget_max = #{budgetMax,jdbcType=DECIMAL},</if>
             <if test="contactName != null">contact_name = #{contactName,jdbcType=VARCHAR},</if>
+            <if test="contactGender != null">contact_gender = #{contactGender,jdbcType=TINYINT},</if>
             <if test="contactMobile != null">contact_mobile = #{contactMobile,jdbcType=VARCHAR},</if>
             <if test="reqStatus != null">req_status = #{reqStatus,jdbcType=TINYINT},</if>
             <if test="auditRemark != null">audit_remark = #{auditRemark,jdbcType=VARCHAR},</if>

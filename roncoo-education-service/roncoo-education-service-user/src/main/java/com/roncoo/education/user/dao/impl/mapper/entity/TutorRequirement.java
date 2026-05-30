@@ -24,6 +24,7 @@ public class TutorRequirement implements Serializable {
     private BigDecimal budgetMax;
     private String requirementDetail;
     private String contactName;
+    private Integer contactGender;
     private String contactMobile;
     private Integer reqStatus;
     private String auditRemark;
@@ -87,6 +88,8 @@ public class TutorRequirement implements Serializable {
     public void setRequirementDetail(String requirementDetail) { this.requirementDetail = requirementDetail == null ? null : requirementDetail.trim(); }
     public String getContactName() { return contactName; }
     public void setContactName(String contactName) { this.contactName = contactName == null ? null : contactName.trim(); }
+    public Integer getContactGender() { return contactGender; }
+    public void setContactGender(Integer contactGender) { this.contactGender = contactGender; }
     public String getContactMobile() { return contactMobile; }
     public void setContactMobile(String contactMobile) { this.contactMobile = contactMobile == null ? null : contactMobile.trim(); }
     public Integer getReqStatus() { return reqStatus; }
