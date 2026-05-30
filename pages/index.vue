@@ -202,7 +202,7 @@
                 </template>
                 <template v-else>
                   <div class="rc-region">{{ buildRegion(r) }}</div>
-                  <div v-if="r.address" class="rc-addr">{{ r.address }}</div>
+                  <div v-if="r.address && r.address.trim()" class="rc-addr" :title="r.address">{{ r.address }}</div>
                 </template>
               </div>
               <div class="rc-c3">
@@ -229,7 +229,7 @@
                 </template>
                 <template v-else>
                   <div class="rc-region">{{ buildRegion(r) }}</div>
-                  <div v-if="r.address" class="rc-addr">{{ r.address }}</div>
+                  <div v-if="r.address && r.address.trim()" class="rc-addr" :title="r.address">{{ r.address }}</div>
                 </template>
               </div>
               <div class="rc-c3">
