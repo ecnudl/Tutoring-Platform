@@ -80,7 +80,7 @@
       </el-form>
       <template #footer>
         <el-button @click="pwdVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitPwd">确定</el-button>
+        <el-button type="primary" :loading="pwdSaving" @click="submitPwd">确定</el-button>
       </template>
     </el-dialog>
   </div>
@@ -94,18 +94,38 @@ import { Location } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()
+const { post } = useApi()
 
 const pwdVisible = ref(false)
 const pwdForm = ref({ oldPwd: '', newPwd: '', confirmPwd: '' })
 
 const openPwd = () => { pwdVisible.value = true; pwdForm.value = { oldPwd: '', newPwd: '', confirmPwd: '' } }
 
-const submitPwd = () => {
+const pwdSaving = ref(false)
+const submitPwd = async () => {
   if (!pwdForm.value.oldPwd || !pwdForm.value.newPwd) { ElMessage.warning('请填写完整'); return }
-  if (pwdForm.value.newPwd.length < 6) { ElMessage.warning('新密码不少于 6 位'); return }
+  if (pwdForm.value.newPwd.length < 6 || pwdForm.value.newPwd.length > 20) { ElMessage.warning('新密码需 6-20 位'); return }
   if (pwdForm.value.newPwd !== pwdForm.value.confirmPwd) { ElMessage.warning('两次密码不一致'); return }
-  ElMessage.info('修改密码接口暂未接入，请拨打客服热线协助')
-  pwdVisible.value = false
+  if (pwdForm.value.newPwd === pwdForm.value.oldPwd) { ElMessage.warning('新密码不能与原密码相同'); return }
+  pwdSaving.value = true
+  try {
+    const res = await post('/user/auth/users/change-password', {
+      oldPassword: pwdForm.value.oldPwd,
+      newPassword: pwdForm.value.newPwd
+    })
+    if (res?.code === 200) {
+      pwdVisible.value = false
+      ElMessage.success('密码修改成功，请用新密码重新登录')
+      userStore.logout()
+      router.push('/login')
+    } else {
+      ElMessage.error(res?.msg || '修改失败')
+    }
+  } catch (e) {
+    ElMessage.error('网络错误, 请重试')
+  } finally {
+    pwdSaving.value = false
+  }
 }
 
 const handleLogout = () => {
