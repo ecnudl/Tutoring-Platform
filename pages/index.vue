@@ -202,6 +202,7 @@
                 </template>
                 <template v-else>
                   <div class="rc-region">{{ buildRegion(r) }}</div>
+                  <div v-if="r.address" class="rc-addr">{{ r.address }}</div>
                 </template>
               </div>
               <div class="rc-c3">
@@ -228,6 +229,7 @@
                 </template>
                 <template v-else>
                   <div class="rc-region">{{ buildRegion(r) }}</div>
+                  <div v-if="r.address" class="rc-addr">{{ r.address }}</div>
                 </template>
               </div>
               <div class="rc-c3">
@@ -1156,6 +1158,11 @@ onMounted(async () => {
   font-size: 14px;
   color: #111827;
   font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rc-addr {
+  font-size: 13px;
+  color: #64748b;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .rc-online {
