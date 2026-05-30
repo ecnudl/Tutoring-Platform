@@ -52,7 +52,7 @@
       <el-pagination layout="total,prev,pager,next" :total="total" :page-size="20" :current-page="page" @current-change="p => { page=p; search() }" />
     </div>
 
-    <el-dialog v-model="formVisible" :title="formId ? '编辑公告' : '新增公告'" width="640px" top="5vh">
+    <el-dialog v-model="formVisible" :title="formId ? '编辑公告' : '新增公告'" width="760px" top="4vh" destroy-on-close>
       <el-form :model="form" label-width="90px">
         <el-form-item label="分类">
           <el-select v-model="form.category" placeholder="请选择分类" style="width:100%">
@@ -66,7 +66,13 @@
           <el-input v-model="form.title" placeholder="公告标题" maxlength="200" show-word-limit />
         </el-form-item>
         <el-form-item label="正文">
-          <el-input v-model="form.content" type="textarea" :rows="6" placeholder="公告正文（浮球公告会显示，列表公告可留空）" />
+          <div class="ann-editor-wrap">
+            <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" mode="default" class="ann-editor-toolbar" />
+            <Editor v-model="form.content" :defaultConfig="editorConfig" mode="default" class="ann-editor-body" @onCreated="handleCreated" />
+          </div>
+          <div style="font-size:12px;color:#909399;line-height:1.5;margin-top:6px">
+            像 Word 一样编辑：选中文字点工具栏即可加粗 / 改字号 / 换颜色 / 列表 / 插入图片，不用懂代码。（浮球公告会显示正文，仅做跳转的列表公告可留空）
+          </div>
         </el-form-item>
         <el-form-item label="跳转链接">
           <el-input v-model="form.linkUrl" placeholder="留空 = 自动跳到公告详情页（展示上面的「正文」内容）；填写 = 跳到此链接（如 /zf 或 https://...）" />
@@ -93,9 +99,40 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { post, get, put, del } from '@/api/index'
 import { ElMessage } from 'element-plus'
+
+// ===== 富文本编辑器 (wangEditor) — 所见即所得, 像 Word =====
+const editorRef = shallowRef<any>()
+const handleCreated = (editor: any) => { editorRef.value = editor }
+onBeforeUnmount(() => { editorRef.value?.destroy() })
+const toolbarConfig: any = {}
+const editorConfig: any = {
+  placeholder: '在这里输入公告正文，可加粗 / 改字号 / 换颜色 / 插入图片…',
+  MENU_CONF: {
+    // 图片上传 — 复用后台现成接口, 存 minio
+    uploadImage: {
+      async customUpload(file: File, insertFn: (url: string) => void) {
+        const fd = new FormData()
+        fd.append('picFile', file)
+        const token = localStorage.getItem('admin_token') || ''
+        try {
+          const res = await axios.post('/system/admin/upload/pic', fd, {
+            headers: { 'Content-Type': 'multipart/form-data', token }
+          })
+          if (res.data?.code === 200 && res.data?.data) insertFn(res.data.data)
+          else ElMessage.error(res.data?.msg || '图片上传失败')
+        } catch (e) {
+          ElMessage.error('图片上传失败')
+        }
+      }
+    }
+  }
+}
 
 const keyword = ref('')
 const category = ref<string | null>(null)
@@ -172,3 +209,15 @@ const handleDelete = async (id: number) => {
 
 onMounted(() => { search() })
 </script>
+
+<style scoped>
+.ann-editor-wrap { border: 1px solid #dcdfe6; border-radius: 4px; overflow: hidden; width: 100%; }
+.ann-editor-toolbar { border-bottom: 1px solid #e5e7eb; }
+.ann-editor-body { height: 320px; overflow-y: auto; }
+</style>
+<style>
+/* wangEditor 下拉面板 / 弹窗在 el-dialog 内要盖住对话框 */
+.w-e-drop-panel,
+.w-e-select-list,
+.w-e-modal { z-index: 9999 !important; }
+</style>
