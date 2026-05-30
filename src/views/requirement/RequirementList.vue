@@ -93,6 +93,17 @@
           </el-col>
 
           <el-col :span="8">
+            <el-form-item label="联系人称谓">
+              <el-radio-group v-model="form.contactGender">
+                <el-radio :value="0">未设置</el-radio>
+                <el-radio :value="1">先生</el-radio>
+                <el-radio :value="2">女士</el-radio>
+              </el-radio-group>
+              <div style="width:100%;font-size:12px;color:#909399;line-height:1.4;margin-top:2px">详情页联系人显示为"姓氏+称谓"(如 鲍先生);未设置则按姓名推断,都没有则显示"家长"</div>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="8">
             <el-form-item label="学员性别">
               <el-radio-group v-model="form.studentGender">
                 <el-radio :value="0">未知</el-radio>
@@ -296,7 +307,7 @@ const originalSnapshot = ref<{ city: string; districts: string; displayNo: strin
 
 function emptyForm() {
   return {
-    title: '', contactName: '', contactMobile: '', contactWechat: '',
+    title: '', contactName: '', contactGender: 0, contactMobile: '', contactWechat: '',
     studentGender: 0, gradeName: '', requirementType: null,
     cityId: null as number | null,
     address: '', transport: '',
@@ -384,7 +395,7 @@ const openEdit = async (row: any) => {
       }
       form.value = {
         title: d.title || '',
-        contactName: d.contactName || '', contactMobile: d.contactMobile || '', contactWechat: d.contactWechat || '',
+        contactName: d.contactName || '', contactGender: d.contactGender ?? 0, contactMobile: d.contactMobile || '', contactWechat: d.contactWechat || '',
         studentGender: d.studentGender ?? 0,
         gradeName: d.gradeName || '', requirementType: d.requirementType,
         cityId: cityIdNum,
