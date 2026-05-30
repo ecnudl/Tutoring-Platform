@@ -75,6 +75,42 @@ public class AuthUsersBiz extends BaseBiz {
         return result > 0 ? Result.success("头像已更新") : Result.error("更新失败");
     }
 
+    /**
+     * 已登录用户用原密码修改为新密码。
+     * 密码为 SHA1(mobileSalt + 明文)，校验原密码后用同一个盐重算新密码（保持盐不变，避免影响依赖盐的找回逻辑）。
+     */
+    public Result<String> changePassword(java.util.Map<String, Object> req) {
+        Object oldP = req.get("oldPassword");
+        Object newP = req.get("newPassword");
+        String oldPwd = oldP == null ? "" : oldP.toString();
+        String newPwd = newP == null ? "" : newP.toString();
+        if (!StringUtils.hasText(oldPwd) || !StringUtils.hasText(newPwd)) {
+            return Result.error("原密码和新密码不能为空");
+        }
+        if (newPwd.length() < 6 || newPwd.length() > 20) {
+            return Result.error("新密码长度需为 6-20 位");
+        }
+        Users user = dao.getById(ThreadContext.userId());
+        if (user == null || !StatusIdEnum.YES.getCode().equals(user.getStatusId())) {
+            return Result.error("用户不存在或被禁用");
+        }
+        if (!StringUtils.hasText(user.getMobilePsw())) {
+            return Result.error("您还未设置登录密码，请用短信验证码登录后再设置");
+        }
+        // 校验原密码 (与登录同一套 SHA1(salt + 明文) 比对)
+        if (!cn.hutool.crypto.digest.DigestUtil.sha1Hex(user.getMobileSalt() + oldPwd).equals(user.getMobilePsw())) {
+            return Result.error("原密码不正确");
+        }
+        if (newPwd.equals(oldPwd)) {
+            return Result.error("新密码不能与原密码相同");
+        }
+        Users update = new Users();
+        update.setId(user.getId());
+        update.setMobilePsw(cn.hutool.crypto.digest.DigestUtil.sha1Hex(user.getMobileSalt() + newPwd));
+        int result = dao.updateById(update);
+        return result > 0 ? Result.success("密码修改成功") : Result.error("修改失败, 请重试");
+    }
+
     public Result<String> binding(AuthBindingReq req) throws WxErrorException {
         Users users = dao.getById(ThreadContext.userId());
         if (StringUtils.hasText(users.getUnionId()) || StringUtils.hasText(users.getOpenId())) {

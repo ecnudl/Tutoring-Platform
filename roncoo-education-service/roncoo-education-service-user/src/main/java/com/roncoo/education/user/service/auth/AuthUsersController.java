@@ -53,6 +53,12 @@ public class AuthUsersController {
         return biz.updateAvatar(url.toString());
     }
 
+    @ApiOperation(value = "修改密码", notes = "已登录用户用原密码修改为新密码 {oldPassword, newPassword}")
+    @PostMapping(value = "/change-password")
+    public Result<String> changePassword(@RequestBody java.util.Map<String, Object> req) {
+        return biz.changePassword(req);
+    }
+
     @ApiOperation(value = "绑定接口", notes = "绑定微信")
     @PostMapping(value = "/binding")
     public Result<String> binding(@RequestBody AuthBindingReq req) throws WxErrorException {
