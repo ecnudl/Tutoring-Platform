@@ -368,6 +368,8 @@ const handleSave = async () => {
     const { showSuccessRecord: _omit, ...rest } = form.value
     const payload = {
       ...rest,
+      // 工作单位仅对在职教师有效; 切到其它类型后清掉残留, 避免误存到非在职教师
+      workUnit: rest.tutorType === 3 ? (rest.workUnit || '') : '',
       subjects: JSON.stringify(subjectList.value.map(Number)),
       districts: JSON.stringify((form.value.districts || []).map(Number))
     }
