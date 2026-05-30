@@ -19,14 +19,29 @@
       <el-button type="primary" @click="search">搜索</el-button>
     </div>
     <el-table :data="list" border stripe empty-text="暂无数据" v-loading="loading">
-      <el-table-column prop="realName" label="姓名" width="100" />
-      <el-table-column prop="mobile" label="手机号" width="130" />
+      <el-table-column prop="realName" label="姓名" width="90" fixed="left" />
+      <el-table-column label="性别" width="60">
+        <template #default="{ row }">{{ genderMap[row.gender] || '-' }}</template>
+      </el-table-column>
+      <el-table-column prop="mobile" label="手机号" width="125" />
+      <el-table-column label="邮箱" width="185" show-overflow-tooltip>
+        <template #default="{ row }">{{ row.email || '-' }}</template>
+      </el-table-column>
       <el-table-column label="类型" width="80">
         <template #default="{ row }">{{ tutorTypeMap[row.tutorType] || '-' }}</template>
       </el-table-column>
-      <el-table-column prop="university" label="学校" />
+      <el-table-column prop="university" label="学校" min-width="130" show-overflow-tooltip />
+      <el-table-column label="籍贯" width="100" show-overflow-tooltip>
+        <template #default="{ row }">{{ row.hometownProvince || '-' }}</template>
+      </el-table-column>
       <el-table-column label="学历" width="70">
         <template #default="{ row }">{{ degreeMap[row.degree] || '-' }}</template>
+      </el-table-column>
+      <el-table-column label="出生年月" width="100">
+        <template #default="{ row }">{{ fmtBirth(row.birthDate) }}</template>
+      </el-table-column>
+      <el-table-column label="身份证" width="170">
+        <template #default="{ row }">{{ row.idCard || '-' }}</template>
       </el-table-column>
       <el-table-column label="审核状态" width="100">
         <template #default="{ row }">
@@ -129,6 +144,8 @@ const saving = ref(false)
 
 const tutorTypeMap: Record<number, string> = { 1: '大学生', 2: '专职', 3: '在职教师', 4: '退休教师' }
 const degreeMap: Record<number, string> = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
+const genderMap: Record<number, string> = { 1: '男', 2: '女' }
+const fmtBirth = (d: string) => d ? String(d).slice(0, 7) : '-' // 取 yyyy-MM
 const auditLabel = (s: number) => ({ 0: '草稿', 1: '待审核', 2: '已通过', 3: '已驳回', 4: '已发布' }[s] || '未知')
 const auditTagType = (s: number) => ({ 0: 'info', 1: 'warning', 2: 'success', 3: 'danger', 4: 'success' }[s] || 'info')
 
