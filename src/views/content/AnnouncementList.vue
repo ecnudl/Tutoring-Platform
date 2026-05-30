@@ -113,7 +113,8 @@ const handleCreated = (editor: any) => { editorRef.value = editor }
 // 弹窗用了 destroy-on-close, 关闭时子组件卸载但实例不会自动销毁 → 每次关闭都要手动 destroy 防泄漏。
 const destroyEditor = () => { editorRef.value?.destroy(); editorRef.value = null }
 onBeforeUnmount(destroyEditor)
-const toolbarConfig: any = {}
+// 去掉"全屏"按钮: 编辑器嵌在弹窗里, 全屏会和弹窗层叠冲突(其它表单项漏到中间), 且弹窗内全屏意义不大
+const toolbarConfig: any = { excludeKeys: ['fullScreen'] }
 const editorConfig: any = {
   placeholder: '在这里输入公告正文，可加粗 / 改字号 / 换颜色 / 插入图片…',
   MENU_CONF: {
