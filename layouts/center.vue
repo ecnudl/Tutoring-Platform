@@ -31,7 +31,6 @@
           <div class="nav-group" v-if="userStore.isTutor">
             <NuxtLink to="/center/tutor-profile">修改简历</NuxtLink>
             <NuxtLink to="/center/tutor-preview">简历预览</NuxtLink>
-            <a href="javascript:;" @click="openResume">简历控制</a>
           </div>
 
           <div class="nav-group" v-if="!userStore.isTutor">
@@ -44,7 +43,6 @@
           <div class="nav-group">
             <NuxtLink to="/center/credit" v-if="userStore.isTutor">信誉记录</NuxtLink>
             <NuxtLink to="/center/feedback">家教感言</NuxtLink>
-            <a href="javascript:;" @click="openPush">推送控制</a>
           </div>
 
           <div class="nav-group">
@@ -67,39 +65,6 @@
         </main>
       </div>
     </div>
-
-    <el-dialog v-model="resumeVisible" title="简历显示" width="420px">
-      <el-radio-group v-model="resumeStatus">
-        <el-radio :label="1">做家教，公开简历</el-radio>
-        <el-radio :label="2">做家教，但不公开简历</el-radio>
-        <el-radio :label="3">不做家教、不公开简历</el-radio>
-      </el-radio-group>
-      <template #footer>
-        <el-button @click="resumeVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitResume">确定</el-button>
-      </template>
-    </el-dialog>
-
-    <el-dialog v-model="pushVisible" title="推送控制" width="420px">
-      <div style="margin-bottom:16px">
-        <div style="font-size:14px;color:#374151;margin-bottom:6px">接受"手机短信"订单推荐</div>
-        <el-radio-group v-model="smsAccept">
-          <el-radio :label="1">接受</el-radio>
-          <el-radio :label="2">不接受</el-radio>
-        </el-radio-group>
-      </div>
-      <div>
-        <div style="font-size:14px;color:#374151;margin-bottom:6px">接受"微信推送"订单推荐</div>
-        <el-radio-group v-model="wxAccept">
-          <el-radio :label="1">接受</el-radio>
-          <el-radio :label="2">不接受</el-radio>
-        </el-radio-group>
-      </div>
-      <template #footer>
-        <el-button @click="pushVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitPush">确定</el-button>
-      </template>
-    </el-dialog>
 
     <el-dialog v-model="pwdVisible" title="修改密码" width="420px">
       <el-form :model="pwdForm" label-width="80px">
@@ -130,27 +95,10 @@ import { Location } from '@element-plus/icons-vue'
 const userStore = useUserStore()
 const router = useRouter()
 
-const resumeVisible = ref(false)
-const resumeStatus = ref(1)
-const pushVisible = ref(false)
-const smsAccept = ref(1)
-const wxAccept = ref(1)
 const pwdVisible = ref(false)
 const pwdForm = ref({ oldPwd: '', newPwd: '', confirmPwd: '' })
 
-const openResume = () => { resumeVisible.value = true }
-const openPush = () => { pushVisible.value = true }
 const openPwd = () => { pwdVisible.value = true; pwdForm.value = { oldPwd: '', newPwd: '', confirmPwd: '' } }
-
-const submitResume = () => {
-  ElMessage.success('申请已提交，待审核后生效')
-  resumeVisible.value = false
-}
-
-const submitPush = () => {
-  ElMessage.success('已保存推送偏好')
-  pushVisible.value = false
-}
 
 const submitPwd = () => {
   if (!pwdForm.value.oldPwd || !pwdForm.value.newPwd) { ElMessage.warning('请填写完整'); return }
