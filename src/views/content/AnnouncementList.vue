@@ -113,8 +113,7 @@ const handleCreated = (editor: any) => { editorRef.value = editor }
 // 弹窗用了 destroy-on-close, 关闭时子组件卸载但实例不会自动销毁 → 每次关闭都要手动 destroy 防泄漏。
 const destroyEditor = () => { editorRef.value?.destroy(); editorRef.value = null }
 onBeforeUnmount(destroyEditor)
-// 去掉"全屏"按钮: 编辑器嵌在弹窗里, 全屏会和弹窗层叠冲突(其它表单项漏到中间), 且弹窗内全屏意义不大
-const toolbarConfig: any = { excludeKeys: ['fullScreen'] }
+const toolbarConfig: any = {}
 const editorConfig: any = {
   placeholder: '在这里输入公告正文，可加粗 / 改字号 / 换颜色 / 插入图片…',
   MENU_CONF: {
@@ -227,4 +226,7 @@ onMounted(() => { search() })
 .w-e-drop-panel,
 .w-e-select-list,
 .w-e-modal { z-index: 9999 !important; }
+/* 全屏容器: wangEditor 默认没给 z-index(=auto), 会被弹窗里排在后面的表单项(跳转链接/置顶/排序/状态)漏到中间。
+   给个高于 el-dialog(~2001) 的层级, 让全屏真正盖住整个弹窗。 */
+.w-e-full-screen-container { z-index: 3000 !important; }
 </style>
