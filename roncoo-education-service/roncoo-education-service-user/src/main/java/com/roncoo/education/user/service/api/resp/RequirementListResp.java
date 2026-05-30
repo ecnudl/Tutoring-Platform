@@ -71,6 +71,9 @@ public class RequirementListResp implements Serializable {
     @ApiModelProperty(value = "区域 CSV (源字段, 多区域逗号分隔)")
     private String districtNames;
 
+    @ApiModelProperty(value = "大致位置 (源字段, 区域下方展示)")
+    private String address;
+
     @ApiModelProperty(value = "科目 CSV (源字段, 与 subjectNames 不同)")
     private String subjectIds;
 
