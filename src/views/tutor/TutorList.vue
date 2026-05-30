@@ -30,6 +30,9 @@
       <el-table-column label="类型" width="80">
         <template #default="{ row }">{{ tutorTypeMap[row.tutorType] || '-' }}</template>
       </el-table-column>
+      <el-table-column label="工作单位" width="150" show-overflow-tooltip>
+        <template #default="{ row }">{{ row.workUnit || '-' }}</template>
+      </el-table-column>
       <el-table-column prop="university" label="学校" min-width="130" show-overflow-tooltip />
       <el-table-column label="籍贯" width="100" show-overflow-tooltip>
         <template #default="{ row }">{{ row.hometownProvince || '-' }}</template>
