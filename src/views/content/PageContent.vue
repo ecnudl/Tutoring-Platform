@@ -117,8 +117,8 @@ const onEditorChange = (editor: any) => {
 const toHtml = (src: string): string => {
   const t = (src || '').trim()
   if (!t) return ''
-  // 富文本存的就是 HTML(以块级标签开头), 直接用; 否则按 markdown 解析(兼容内置默认 + 老数据)
-  if (/^<(p|h[1-6]|ul|ol|div|blockquote|table|img|hr|strong|em|span|a|br)[\s>/]/i.test(t)) return t
+  // 富文本存的就是 HTML(以 "<标签" 开头), 直接用; 否则按 markdown 解析(兼容内置默认 + 老数据)
+  if (/^<[a-z!]/i.test(t)) return t
   try {
     return marked.parse(t, { breaks: true, gfm: true }) as string
   } catch (e) {
@@ -165,7 +165,9 @@ const saveAll = async () => {
   if (!currentPage.value || !editorRef.value) return
   saving.value = true
   try {
-    const html = editorRef.value.getHtml() || ''
+    let html = editorRef.value.getHtml() || ''
+    // 编辑器被清空时 getHtml() 是 "<p><br></p>" 之类(非空), 视为空 → 落库空串, 前端回退到内置默认文案
+    if (!html.replace(/<[^>]*>/g, '').replace(/&nbsp;| /g, '').trim()) html = ''
     const res = await post('/system/admin/sys/config/save-by-key', {
       configKey: currentKey.value,
       configValue: html,
