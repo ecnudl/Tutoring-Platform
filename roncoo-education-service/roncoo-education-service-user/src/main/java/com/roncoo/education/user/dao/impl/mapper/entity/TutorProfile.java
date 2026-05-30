@@ -34,6 +34,8 @@ public class TutorProfile implements Serializable {
 
     private String university;
 
+    private String workUnit;
+
     private String major;
 
     private String gradeYear;
@@ -231,6 +233,14 @@ public class TutorProfile implements Serializable {
 
     public void setUniversity(String university) {
         this.university = university == null ? null : university.trim();
+    }
+
+    public String getWorkUnit() {
+        return workUnit;
+    }
+
+    public void setWorkUnit(String workUnit) {
+        this.workUnit = workUnit == null ? null : workUnit.trim();
     }
 
     public String getMajor() {

@@ -20,6 +20,7 @@ public class AuthTutorProfileSaveReq implements Serializable {
     private String identityDetail;
     private Integer degree;
     private String university;
+    private String workUnit;
     private Long universityId;
     private String major;
     private String gradeYear;

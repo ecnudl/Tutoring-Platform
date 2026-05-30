@@ -89,6 +89,7 @@ public class AuthTutorProfileBiz extends BaseBiz {
         update.setIdentityDetail(req.getIdentityDetail());
         update.setDegree(req.getDegree());
         update.setUniversity(req.getUniversity());
+        update.setWorkUnit(req.getWorkUnit());
         update.setUniversityId(req.getUniversityId());
         update.setMajor(req.getMajor());
         update.setGradeYear(req.getGradeYear());

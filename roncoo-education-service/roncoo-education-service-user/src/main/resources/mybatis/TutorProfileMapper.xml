@@ -16,6 +16,7 @@
         <result column="tutor_type" jdbcType="TINYINT" property="tutorType"/>
         <result column="degree" jdbcType="TINYINT" property="degree"/>
         <result column="university" jdbcType="VARCHAR" property="university"/>
+        <result column="work_unit" jdbcType="VARCHAR" property="workUnit"/>
         <result column="major" jdbcType="VARCHAR" property="major"/>
         <result column="grade_year" jdbcType="VARCHAR" property="gradeYear"/>
         <result column="tags" jdbcType="VARCHAR" property="tags"/>
@@ -117,7 +118,7 @@
     </sql>
     <sql id="Base_Column_List">
         id, gmt_create, gmt_modified, status_id, user_id, display_no, real_name, gender, birth_date, avatar,
-        mobile, id_card, tutor_type, degree, university, university_id, major, grade_year, identity_detail,
+        mobile, id_card, tutor_type, degree, university, university_id, work_unit, major, grade_year, identity_detail,
         high_school, hometown_province, email, wechat, tags, city_id, district_id, address, latitude, longitude,
         teaching_method, price_min, price_max, salary_remark, free_trial,
         audit_status, audit_remark, is_star, is_verified, sort, view_count, success_count,
@@ -260,6 +261,9 @@
             </if>
             <if test="university != null">
                 university,
+            </if>
+            <if test="workUnit != null">
+                work_unit,
             </if>
             <if test="major != null">
                 major,
@@ -406,6 +410,9 @@
             </if>
             <if test="university != null">
                 #{university,jdbcType=VARCHAR},
+            </if>
+            <if test="workUnit != null">
+                #{workUnit,jdbcType=VARCHAR},
             </if>
             <if test="major != null">
                 #{major,jdbcType=VARCHAR},
@@ -562,6 +569,9 @@
             </if>
             <if test="record.university != null">
                 university = #{record.university,jdbcType=VARCHAR},
+            </if>
+            <if test="record.workUnit != null">
+                work_unit = #{record.workUnit,jdbcType=VARCHAR},
             </if>
             <if test="record.major != null">
                 major = #{record.major,jdbcType=VARCHAR},
@@ -808,6 +818,9 @@
             </if>
             <if test="university != null">
                 university = #{university,jdbcType=VARCHAR},
+            </if>
+            <if test="workUnit != null">
+                work_unit = #{workUnit,jdbcType=VARCHAR},
             </if>
             <if test="major != null">
                 major = #{major,jdbcType=VARCHAR},

@@ -159,6 +159,7 @@ CREATE TABLE `tutor_profile` (
   `tutor_type`          TINYINT       NOT NULL DEFAULT 1      COMMENT '1大学生 2专职 3在职教师 4海归外教 5其他',
   `degree`              TINYINT       NOT NULL DEFAULT 0      COMMENT '0未设置 1高中 2大专 3本科 4硕士 5博士',
   `university`          VARCHAR(100)  DEFAULT NULL            COMMENT '毕业/在读院校名称',
+  `work_unit`           VARCHAR(100)  DEFAULT NULL            COMMENT '在职教师工作单位/现任职学校',
   `university_id`       BIGINT        DEFAULT NULL            COMMENT '关联dict_university',
   `major`               VARCHAR(100)  DEFAULT NULL            COMMENT '专业',
   `grade_year`          VARCHAR(20)   DEFAULT NULL            COMMENT '年级 如大一大二',
