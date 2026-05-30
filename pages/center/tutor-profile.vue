@@ -74,6 +74,9 @@
     <el-form-item label="所在大学">
       <el-input v-model="form.university" placeholder="请输入学校名称" :disabled="isLocked" maxlength="100" />
     </el-form-item>
+    <el-form-item v-if="form.tutorType === 3" label="工作单位">
+      <el-input v-model="form.workUnit" placeholder="现任职学校/单位, 如: 上海市XX中学" :disabled="isLocked" maxlength="100" />
+    </el-form-item>
     <el-form-item label="专业">
       <el-input v-model="form.major" placeholder="请输入专业" :disabled="isLocked" maxlength="100" />
     </el-form-item>
@@ -189,7 +192,7 @@ const { get, post } = useApi()
 const profile = ref({})
 const form = ref({
   avatar: '', realName: '', gender: 1, tutorType: null, degree: null,
-  university: '', major: '', selfIntroduction: '',
+  university: '', workUnit: '', major: '', selfIntroduction: '',
   priceMin: 0, priceMax: 0, showSuccessRecord: 1,
   // 新增 11 字段
   birthDate: '', hometownProvince: '', idCard: '', identityDetail: '',
@@ -280,6 +283,7 @@ const loadProfile = async () => {
       f.tutorType = res.data.tutorType || null
       f.degree = res.data.degree || null
       f.university = res.data.university || ''
+      f.workUnit = res.data.workUnit || ''
       f.major = res.data.major || ''
       f.selfIntroduction = res.data.selfIntroduction || ''
       f.priceMin = res.data.priceMin || 0
