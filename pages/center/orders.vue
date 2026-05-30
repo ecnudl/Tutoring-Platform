@@ -18,6 +18,7 @@
 
   <div v-else class="orders-list">
     <div v-for="o in orders" :key="o.id" class="order-card">
+      <div v-if="o.displayNo" class="order-no">订单号 <span class="order-no-val">{{ o.displayNo }}</span></div>
       <div class="order-row">
         <div class="order-title">
           <span v-if="o.grade">{{ o.grade }}</span>
@@ -100,6 +101,17 @@ onMounted(async () => {
 }
 .order-card:hover {
   border-color: var(--color-primary-light);
+}
+.order-no {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+.order-no-val {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  color: var(--color-text);
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 .order-row {
   display: flex;
