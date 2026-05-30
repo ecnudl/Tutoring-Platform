@@ -10,8 +10,9 @@
  */
 import { marked } from 'marked'
 
-// 富文本编辑器输出的 HTML 以块级/常见标签开头, 据此判断内容是否已是 HTML
-const HTML_LEADING = /^<(p|h[1-6]|ul|ol|div|blockquote|table|img|hr|strong|em|span|a|br|section|figure|pre)[\s>/]/i
+// 富文本编辑器输出的就是 HTML(以 "<标签" 开头, 含注释 <!--); markdown 则以 #/-/数字/文字/> 等开头。
+// 用 "trim 后以 < + 字母或 ! 开头" 判断是否已是 HTML, 比枚举标签白名单更稳。
+const HTML_LEADING = /^<[a-z!]/i
 
 export function renderMarkdown(src: string | null | undefined): string {
   if (!src) return ''
