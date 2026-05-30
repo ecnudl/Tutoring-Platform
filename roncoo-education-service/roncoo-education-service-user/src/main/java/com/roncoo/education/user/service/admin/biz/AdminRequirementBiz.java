@@ -276,7 +276,11 @@ public class AdminRequirementBiz extends BaseBiz {
         // 标题 / 联系信息
         if (req.containsKey("title")) r.setTitle(strOrNull(req.get("title")));
         if (req.containsKey("contactName")) r.setContactName(strOrNull(req.get("contactName")));
-        if (req.containsKey("contactGender")) r.setContactGender(intOrNull(req.get("contactGender")));
+        if (req.containsKey("contactGender")) {
+            Integer cg = intOrNull(req.get("contactGender"));
+            // 仅允许 0未设置 / 1先生 / 2女士, 其余非法值一律归 0
+            r.setContactGender(cg != null && (cg == 1 || cg == 2) ? cg : 0);
+        }
         if (req.containsKey("contactMobile")) r.setContactMobile(strOrNull(req.get("contactMobile")));
         if (req.containsKey("contactWechat")) r.setContactWechat(strOrNull(req.get("contactWechat")));
 
