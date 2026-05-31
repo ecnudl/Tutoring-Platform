@@ -40,7 +40,8 @@ public class AdminGlobalFilter implements GlobalFilter, Ordered {
      * admin不需要权限校验的接口
      */
     private static final List<String> EXCLUDE_URL = List.of(
-            "/system/admin/sys/user/current"
+            "/system/admin/sys/user/current",
+            "/system/admin/sys/user/change-password"
     );
 
     @Resource

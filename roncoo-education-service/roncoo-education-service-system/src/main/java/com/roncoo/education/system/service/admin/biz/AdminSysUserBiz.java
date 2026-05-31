@@ -190,6 +190,42 @@ public class AdminSysUserBiz extends BaseBiz {
     }
 
     /**
+     * 当前管理员自助修改密码: 校验原密码(明文, 与登录同套 SHA1+盐), 通过后用新盐重算落库。
+     */
+    public Result<String> changeMyPassword(Long userId, java.util.Map<String, Object> req) {
+        if (userId == null) {
+            return Result.error("登录已失效，请重新登录");
+        }
+        Object oldP = req.get("oldPassword");
+        Object newP = req.get("newPassword");
+        String oldPwd = oldP == null ? "" : oldP.toString();
+        String newPwd = newP == null ? "" : newP.toString();
+        if (!StringUtils.hasText(oldPwd) || !StringUtils.hasText(newPwd)) {
+            return Result.error("原密码和新密码不能为空");
+        }
+        if (newPwd.length() < 6 || newPwd.length() > 20) {
+            return Result.error("新密码长度需为 6-20 位");
+        }
+        if (newPwd.equals(oldPwd)) {
+            return Result.error("新密码不能与原密码相同");
+        }
+        SysUser user = dao.getById(userId);
+        if (user == null) {
+            return Result.error("管理员不存在");
+        }
+        // 校验原密码 (与登录同一套 SHA1(mobileSalt + 明文) 比对)
+        if (!Sha1Util.getSign(user.getMobileSalt() + oldPwd).equals(user.getMobilePsw())) {
+            return Result.error("原密码不正确");
+        }
+        SysUser record = new SysUser();
+        record.setId(userId);
+        record.setMobileSalt(IdUtil.simpleUUID());
+        record.setMobilePsw(Sha1Util.getSign(record.getMobileSalt() + newPwd));
+        dao.updateById(record);
+        return Result.success("密码修改成功");
+    }
+
+    /**
      * 菜单层级处理
      */
     private List<AdminSysMenuUserResp> filters(Long parentId, List<SysMenu> menuList) {

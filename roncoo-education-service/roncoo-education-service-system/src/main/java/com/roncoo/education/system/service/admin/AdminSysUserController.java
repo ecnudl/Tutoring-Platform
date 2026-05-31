@@ -92,6 +92,13 @@ public class AdminSysUserController {
         return biz.updatePassword(sysUserUpdatePasswordREQ);
     }
 
+    @ApiOperation(value = "当前管理员自助修改密码", notes = "校验原密码后修改自己的密码 {oldPassword, newPassword}")
+    @SysLog(value = "管理员自助修改密码")
+    @PutMapping(value = "/change-password")
+    public Result<String> changeMyPassword(@RequestBody java.util.Map<String, Object> req) {
+        return biz.changeMyPassword(ThreadContext.userId(), req);
+    }
+
     @ApiOperation(value = "获取当前登录用户", notes = "获取当前登录用户")
     @GetMapping(value = "/current")
     public Result<AdminSysUserViewResp> currentView() {
