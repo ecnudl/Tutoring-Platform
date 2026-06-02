@@ -15,11 +15,12 @@
         <el-option label="已启用" :value="1" />
         <el-option label="已禁用" :value="0" />
       </el-select>
-      <el-input v-model="keyword" placeholder="姓名搜索" style="width:200px" clearable @keyup.enter="search" />
+      <el-input v-model="keyword" placeholder="姓名 / 编号 / 邮箱 / 籍贯 / 学校 / 工作单位" style="width:300px" clearable @keyup.enter="search" />
       <el-button type="primary" @click="search">搜索</el-button>
     </div>
     <el-table :data="list" border stripe empty-text="暂无数据" v-loading="loading">
       <el-table-column prop="realName" label="姓名" width="90" fixed="left" />
+      <el-table-column prop="displayNo" label="教师编号" width="100" fixed="left" />
       <el-table-column label="性别" width="60">
         <template #default="{ row }">{{ genderMap[row.gender] || '-' }}</template>
       </el-table-column>
