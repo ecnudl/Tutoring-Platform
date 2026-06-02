@@ -51,8 +51,8 @@ public class AdminTutorBiz extends BaseBiz {
             all = new java.util.ArrayList<>();
         }
         final String kw = keyword.toLowerCase();
-        // 教师编号常带 T 前缀, 去掉 T 也能匹配 (输 374657 / T374657 都行)
-        final String kwNoT = kw.startsWith("t") ? kw.substring(1) : kw;
+        // 教师编号常带 T 前缀, 去掉 T 也能匹配 (输 374657 / T374657 都行); 仅去前缀后仍非空才用, 避免单字 "t" 变空串恒匹配
+        final String kwNoT = (kw.startsWith("t") && kw.length() > 1) ? kw.substring(1) : kw;
         List<TutorProfile> matched = all.stream().filter(t ->
                 likeField(t.getRealName(), kw)
                         || likeField(t.getEmail(), kw)
