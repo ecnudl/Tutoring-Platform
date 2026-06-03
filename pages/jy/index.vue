@@ -142,7 +142,7 @@
             <div class="tutor-intro" v-if="t.selfIntroduction">自我介绍：{{ t.selfIntroduction }}</div>
             <div class="tutor-subjects-row" v-if="t.subjects">
               <span class="ts-label">家教科目：</span>
-              <el-tag v-for="sub in t.subjects.split(',').slice(0, 4)" :key="sub" size="small" type="info">{{ sub }}</el-tag>
+              <el-tag v-for="sub in t.subjects.split(',').filter(Boolean).slice(0, 4)" :key="sub" size="small" type="info">{{ sub }}</el-tag>
             </div>
             <div class="tutor-districts" v-if="t.districtNames || t.teachingMethod">
               <span v-if="t.districtNames">授课区域：{{ t.districtNames }}</span>
