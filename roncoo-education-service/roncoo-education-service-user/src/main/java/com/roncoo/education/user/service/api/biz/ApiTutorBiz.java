@@ -148,9 +148,7 @@ public class ApiTutorBiz extends BaseBiz {
             // 院校"不限"时前端不传该字段 → 不加条件, 自由文本(如"湖南大学")的教员自然落入"不限"结果
             c.andUniversityLike(PageUtil.like(req.getUniversity()));
         }
-        if (StringUtils.hasText(req.getKeyword())) {
-            c.andRealNameLike(PageUtil.like(req.getKeyword()));
-        }
+        // 关键词不在此处加到 SQL — 改为多字段(姓名/编号/科目/院校/工作单位/身份)在 Java 端模糊匹配, 见下方
         // 动态排序：默认按最近登录时间降序（活跃教员优先），再按权重
         String orderBy = "last_login_time desc, sort asc, id desc";
         if (StringUtils.hasText(req.getSortField())) {
@@ -162,12 +160,96 @@ public class ApiTutorBiz extends BaseBiz {
             }
         }
         example.setOrderByClause(orderBy);
-        Page<TutorProfile> page = tutorProfileDao.page(req.getPageCurrent(), req.getPageSize(), example);
-        Page<TutorSearchResp> outPage = PageUtil.transform(page, TutorSearchResp.class);
-        // 翻译 subjects: entity 存的是 JSON id 数组(如 "[2013, 2014]") → resp 改写为 name CSV ("小学全科,数学")
-        // 前端卡片直接 t.subjects.split(',') 渲染, 不需要前端改
-        translateSubjectsForList(page.getList(), outPage.getList());
-        return Result.success(outPage);
+
+        // 无关键词: 原 SQL 分页
+        if (!StringUtils.hasText(req.getKeyword())) {
+            Page<TutorProfile> page = tutorProfileDao.page(req.getPageCurrent(), req.getPageSize(), example);
+            Page<TutorSearchResp> outPage = PageUtil.transform(page, TutorSearchResp.class);
+            // 翻译 subjects: entity 存的是 JSON id 数组(如 "[2013, 2014]") → resp 改写为 name CSV ("小学全科,数学")
+            translateSubjectsForList(page.getList(), outPage.getList());
+            enrichTeachingAreas(outPage.getList()); // 授课区域 CSV
+            return Result.success(outPage);
+        }
+
+        // 有关键词: 取出(结构化筛选后的)全部, 翻译科目, 在 Java 端对 姓名/编号/科目/院校/工作单位/身份 做模糊匹配, 再切片分页
+        // (教员量级小; 结构化筛选仍为 AND, 关键词跨字段为 OR; 与后台教员列表同套做法)
+        int pc = req.getPageCurrent() <= 0 ? 1 : req.getPageCurrent();
+        int ps = req.getPageSize() <= 0 ? 15 : req.getPageSize();
+        java.util.List<TutorProfile> allRows = tutorProfileDao.page(1, 100000, example).getList();
+        if (allRows == null) {
+            allRows = new java.util.ArrayList<>();
+        }
+        java.util.List<TutorSearchResp> allResp = BeanUtil.copyProperties(allRows, TutorSearchResp.class);
+        translateSubjectsForList(allRows, allResp); // 填科目名(用于匹配 + 展示)
+        final String kw = req.getKeyword().trim().toLowerCase();
+        // 教师编号常带 T 前缀, 去前缀后仍非空时也参与匹配 (输 374657 / T374657 都行)
+        final String kwNoT = (kw.startsWith("t") && kw.length() > 1) ? kw.substring(1) : kw;
+        java.util.List<TutorSearchResp> matched = new java.util.ArrayList<>();
+        for (TutorSearchResp r : allResp) {
+            if (likeField(r.getRealName(), kw)
+                    || likeField(r.getUniversity(), kw)
+                    || likeField(r.getWorkUnit(), kw)
+                    || likeField(r.getIdentityDetail(), kw)
+                    || likeField(r.getSubjects(), kw)
+                    || likeDisplayNo(r.getDisplayNo(), kw, kwNoT)) {
+                matched.add(r);
+            }
+        }
+        int total = matched.size();
+        int totalPage = (int) Math.ceil(total / (double) ps);
+        int from = Math.max(0, (pc - 1) * ps);
+        int to = Math.min(from + ps, total);
+        java.util.List<TutorSearchResp> slice = from < to ? matched.subList(from, to) : new java.util.ArrayList<>();
+        enrichTeachingAreas(slice); // 仅本页教员查授课区域
+        return Result.success(new Page<>(total, totalPage, pc, ps, slice));
+    }
+
+    /** 批量补充授课区域名 CSV (按本页教员逐个查 tutor_teaching_area, 区域名做请求内缓存) */
+    private void enrichTeachingAreas(java.util.List<TutorSearchResp> resps) {
+        if (resps == null || resps.isEmpty()) {
+            return;
+        }
+        java.util.Map<Long, String> distCache = new java.util.HashMap<>();
+        for (TutorSearchResp r : resps) {
+            if (r.getId() == null) {
+                continue;
+            }
+            java.util.List<TutorTeachingArea> areas = tutorTeachingAreaDao.listByTutorId(r.getId());
+            if (areas == null || areas.isEmpty()) {
+                continue;
+            }
+            java.util.List<String> names = new java.util.ArrayList<>();
+            for (TutorTeachingArea a : areas) {
+                Long did = a.getDistrictId();
+                if (did == null) {
+                    continue;
+                }
+                String name = distCache.computeIfAbsent(did, k -> {
+                    DictDistrict d = dictDistrictDao.getById(k);
+                    return d != null ? d.getDistrictName() : null;
+                });
+                if (name != null && !names.contains(name)) {
+                    names.add(name);
+                }
+            }
+            if (!names.isEmpty()) {
+                r.setDistrictNames(String.join(" · ", names));
+            }
+        }
+    }
+
+    /** 字段不区分大小写包含关键词 */
+    private static boolean likeField(String field, String kwLower) {
+        return field != null && field.toLowerCase().contains(kwLower);
+    }
+
+    /** 教师编号匹配: 原串或去掉 T 前缀的串命中即可 */
+    private static boolean likeDisplayNo(String displayNo, String kw, String kwNoT) {
+        if (displayNo == null) {
+            return false;
+        }
+        String d = displayNo.toLowerCase();
+        return d.contains(kw) || d.contains(kwNoT);
     }
 
     /** 提前返回的空 page (subject 翻译失败 / 子表 0 行的快路径) */

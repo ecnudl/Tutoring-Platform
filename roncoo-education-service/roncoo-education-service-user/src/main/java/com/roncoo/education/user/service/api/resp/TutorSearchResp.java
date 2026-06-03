@@ -88,4 +88,16 @@ public class TutorSearchResp implements Serializable {
 
     @ApiModelProperty(value = "是否明星教员(0:否,1:是)")
     private Integer isStar;
+
+    @ApiModelProperty(value = "授课方式(1:教员上门,2:学员上门,3:线上,4:均可)")
+    private Integer teachingMethod;
+
+    @ApiModelProperty(value = "详细身份(本科大四/在职初中教师等)")
+    private String identityDetail;
+
+    @ApiModelProperty(value = "工作单位(在职教师)")
+    private String workUnit;
+
+    @ApiModelProperty(value = "授课区域 (CSV, 如 浦东 · 黄浦 · 徐汇)")
+    private String districtNames;
 }
