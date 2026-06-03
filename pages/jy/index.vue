@@ -13,6 +13,19 @@
 
     <!-- 筛选栏 -->
     <div class="filter-section">
+      <div class="filter-row filter-search-row">
+        <span class="filter-label">搜索：</span>
+        <el-input
+          v-model="kw"
+          placeholder="教师编号 / 科目 / 院校 / 工作单位 / 姓氏"
+          clearable
+          class="kw-input"
+          @keyup.enter="doKeywordSearch"
+          @clear="doKeywordSearch"
+        >
+          <template #append><el-button @click="doKeywordSearch">搜索</el-button></template>
+        </el-input>
+      </div>
       <div class="filter-row">
         <span class="filter-label">区域：</span>
         <div class="filter-tags">
@@ -106,22 +119,34 @@
           </div>
           <div class="tutor-body">
             <div class="tutor-top">
-              <span class="tutor-name">{{ t.surname || (t.realName ? t.realName.charAt(0) : '') }}老师</span>
-              <TutorIcons :tutor="t" :size="16" />
-              <el-tag size="small" v-if="t.tutorType">{{ tutorTypeMap[t.tutorType] }}</el-tag>
-              <el-tag size="small" type="info" v-if="t.gender === 1">男</el-tag>
-              <el-tag size="small" type="danger" v-if="t.gender === 2">女</el-tag>
+              <div class="tt-left">
+                <span class="tutor-name">{{ t.surname || (t.realName ? t.realName.charAt(0) : '') }}老师</span>
+                <TutorIcons :tutor="t" :size="16" />
+                <el-tag size="small" v-if="t.tutorType">{{ tutorTypeMap[t.tutorType] }}</el-tag>
+                <el-tag size="small" type="info" v-if="t.gender === 1">男</el-tag>
+                <el-tag size="small" type="danger" v-if="t.gender === 2">女</el-tag>
+                <span v-if="t.identityDetail" class="tutor-identity">{{ t.identityDetail }}</span>
+              </div>
+              <div class="tt-meta">
+                <span v-if="t.displayNo" class="tm-no">{{ t.displayNo }}</span>
+                <span v-if="t.successCount" class="tm-stat">成{{ t.successCount }}单</span>
+                <span v-if="t.isStar === 1" class="tm-star">★ 明星</span>
+                <span v-if="t.lastLoginTime" class="tm-date">{{ fmtActive(t.lastLoginTime) }}</span>
+              </div>
             </div>
             <div class="tutor-detail">
               <span v-if="t.university">{{ t.university }}</span>
               <span v-if="t.major">{{ t.major }}</span>
               <span v-if="t.degree">{{ degreeMap[t.degree] }}</span>
             </div>
+            <div class="tutor-intro" v-if="t.selfIntroduction">自我介绍：{{ t.selfIntroduction }}</div>
             <div class="tutor-subjects-row" v-if="t.subjects">
+              <span class="ts-label">家教科目：</span>
               <el-tag v-for="sub in t.subjects.split(',').slice(0, 4)" :key="sub" size="small" type="info">{{ sub }}</el-tag>
             </div>
-            <div class="tutor-districts" v-if="t.teachingAreas">
-              可授区域：{{ t.teachingAreas }}
+            <div class="tutor-districts" v-if="t.districtNames || t.teachingMethod">
+              <span v-if="t.districtNames">授课区域：{{ t.districtNames }}</span>
+              <span v-if="t.teachingMethod" class="tutor-method">{{ teachingMethodMap[t.teachingMethod] }}</span>
             </div>
           </div>
           <div class="tutor-right">
@@ -164,6 +189,14 @@ const { post } = useApi()
 
 const tutorTypeMap = { 1: '大学生', 2: '专职教员', 3: '在职教师', 4: '海归外教' }
 const degreeMap = { 1: '高中', 2: '大专', 3: '本科', 4: '硕士', 5: '博士' }
+const teachingMethodMap = { 1: '教师上门', 2: '学生上门', 3: '在线辅导', 4: '上门/在线' }
+// 关键词搜索框(独立于结构化筛选)
+const kw = ref('')
+// 最近活跃日期 yyyy-MM-dd
+const fmtActive = (dt) => {
+  if (!dt) return ''
+  return String(dt).slice(0, 10)
+}
 
 const { districts, universities } = useCityData()
 
@@ -202,6 +235,13 @@ const initFiltersFromQuery = () => {
 
 const setFilter = (key, val) => {
   filters.value[key] = val
+  pageCurrent.value = 1
+  updateQuery()
+  search()
+}
+
+const doKeywordSearch = () => {
+  filters.value.keyword = (kw.value || '').trim() || null
   pageCurrent.value = 1
   updateQuery()
   search()
@@ -264,6 +304,7 @@ const onPageChange = (page) => {
 
 onMounted(() => {
   initFiltersFromQuery()
+  kw.value = filters.value.keyword || '' // 搜索框回填(支持 URL 直链带 keyword)
   search()
 })
 </script>
@@ -417,9 +458,17 @@ onMounted(() => {
 .tutor-top {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 6px;
+  flex-wrap: wrap;
 }
+.tt-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.tt-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; font-size: 12px; color: var(--color-text-muted); }
+.tm-no { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+.tm-stat { color: #047857; }
+.tm-star { color: #d97706; font-weight: 600; }
+.tutor-identity { font-size: 12.5px; color: var(--color-text-secondary); }
 
 .tutor-name {
   font-size: var(--font-size-lg);
@@ -435,17 +484,37 @@ onMounted(() => {
   gap: var(--space-md);
 }
 
+.tutor-intro {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .tutor-subjects-row {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 4px;
 }
+.ts-label { font-size: var(--font-size-xs); color: var(--color-text-muted); }
 
 .tutor-districts {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
 }
+.tutor-method { color: var(--color-primary); }
+
+.filter-search-row .kw-input { max-width: 380px; }
 
 .tutor-right {
   flex-shrink: 0;
