@@ -356,7 +356,7 @@ const loadAnnouncements = async () => {
 
 // 轮播图数据
 const slides = ref([
-  { id: 1, title: '专业家教上门辅导', imageUrl: '/banners/banner-1.svg', link: '/qjj' },
+  { id: 1, title: '专业家教上门辅导', imageUrl: '/banners/banner-1.svg?v=2', link: '/qjj' },
   { id: 2, title: '优质教员等你来', imageUrl: '/banners/banner-2.svg', link: '/jy' },
   { id: 3, title: '新学期辅导计划', imageUrl: '/banners/banner-3.svg', link: '/qjj' }
 ])
