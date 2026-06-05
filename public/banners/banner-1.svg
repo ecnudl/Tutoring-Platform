@@ -19,7 +19,7 @@
   <line x1="140" y1="340" x2="380" y2="340" stroke="#F97316" stroke-width="4" stroke-linecap="round"/>
 
   <!-- 副标语 -->
-  <text x="140" y="395" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="26" fill="#64748b" letter-spacing="3">严选高校教员 · 零中介费 · 1v1定制方案</text>
+  <text x="140" y="395" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="26" fill="#64748b" letter-spacing="3">严选高校教员 · 1v1定制方案</text>
 
   <!-- 右侧装饰：书本堆叠（简笔） -->
   <g transform="translate(1050,180)">
