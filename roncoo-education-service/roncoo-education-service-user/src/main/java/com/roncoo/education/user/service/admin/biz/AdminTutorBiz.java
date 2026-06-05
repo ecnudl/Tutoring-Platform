@@ -46,9 +46,17 @@ public class AdminTutorBiz extends BaseBiz {
 
         // 有关键词: 取出状态过滤后的全部, 在 Java 端对 姓名/教师编号/邮箱/籍贯/工作单位 做模糊匹配, 再切片分页
         // (教员量级小, 与学员需求搜索同样的做法; 避免改生成的 Example 或拼易错的 OR 条件)
-        List<TutorProfile> all = tutorProfileDao.page(1, 100000, example).getList();
-        if (all == null) {
-            all = new java.util.ArrayList<>();
+        // 取结构化筛选后的全部 (DAO 单页上限 PageUtil.MAX_PAGE_SIZE=1000, 循环取直到取完, 教员量大也不漏)
+        List<TutorProfile> all = new java.util.ArrayList<>();
+        for (int p = 1; ; p++) {
+            List<TutorProfile> batch = tutorProfileDao.page(p, PageUtil.MAX_PAGE_SIZE, example).getList();
+            if (batch == null || batch.isEmpty()) {
+                break;
+            }
+            all.addAll(batch);
+            if (batch.size() < PageUtil.MAX_PAGE_SIZE) {
+                break;
+            }
         }
         final String kw = keyword.toLowerCase();
         // 教师编号常带 T 前缀, 去掉 T 也能匹配 (输 374657 / T374657 都行); 仅去前缀后仍非空才用, 避免单字 "t" 变空串恒匹配

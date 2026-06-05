@@ -175,9 +175,17 @@ public class ApiTutorBiz extends BaseBiz {
         // (教员量级小; 结构化筛选仍为 AND, 关键词跨字段为 OR; 与后台教员列表同套做法)
         int pc = req.getPageCurrent() <= 0 ? 1 : req.getPageCurrent();
         int ps = req.getPageSize() <= 0 ? 15 : req.getPageSize();
-        java.util.List<TutorProfile> allRows = tutorProfileDao.page(1, 100000, example).getList();
-        if (allRows == null) {
-            allRows = new java.util.ArrayList<>();
+        // 取结构化筛选后的全部 (DAO 单页上限 PageUtil.MAX_PAGE_SIZE=1000, 循环取直到取完, 教员量大也不漏)
+        java.util.List<TutorProfile> allRows = new java.util.ArrayList<>();
+        for (int p = 1; ; p++) {
+            java.util.List<TutorProfile> batch = tutorProfileDao.page(p, PageUtil.MAX_PAGE_SIZE, example).getList();
+            if (batch == null || batch.isEmpty()) {
+                break;
+            }
+            allRows.addAll(batch);
+            if (batch.size() < PageUtil.MAX_PAGE_SIZE) {
+                break;
+            }
         }
         java.util.List<TutorSearchResp> allResp = BeanUtil.copyProperties(allRows, TutorSearchResp.class);
         translateSubjectsForList(allRows, allResp); // 填科目名(用于匹配 + 展示)
