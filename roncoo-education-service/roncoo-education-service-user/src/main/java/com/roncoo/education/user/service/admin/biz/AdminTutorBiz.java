@@ -24,6 +24,12 @@ public class AdminTutorBiz extends BaseBiz {
     public Result<?> page(Map<String, Object> req) {
         int pageCurrent = req.get("pageCurrent") != null ? Integer.parseInt(req.get("pageCurrent").toString()) : 1;
         int pageSize = req.get("pageSize") != null ? Integer.parseInt(req.get("pageSize").toString()) : 20;
+        if (pageCurrent <= 0) {
+            pageCurrent = 1;
+        }
+        if (pageSize <= 0) {
+            pageSize = 20;
+        }
         Integer auditStatus = req.get("auditStatus") != null ? Integer.parseInt(req.get("auditStatus").toString()) : null;
         Integer statusId = req.get("statusId") != null ? Integer.parseInt(req.get("statusId").toString()) : null;
 

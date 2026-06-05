@@ -80,6 +80,9 @@ public class AuthUsersBiz extends BaseBiz {
      * 密码为 SHA1(mobileSalt + 明文)，校验原密码后用同一个盐重算新密码（保持盐不变，避免影响依赖盐的找回逻辑）。
      */
     public Result<String> changePassword(java.util.Map<String, Object> req) {
+        if (req == null) {
+            return Result.error("参数不能为空");
+        }
         Object oldP = req.get("oldPassword");
         Object newP = req.get("newPassword");
         String oldPwd = oldP == null ? "" : oldP.toString();
@@ -94,7 +97,7 @@ public class AuthUsersBiz extends BaseBiz {
         if (user == null || !StatusIdEnum.YES.getCode().equals(user.getStatusId())) {
             return Result.error("用户不存在或被禁用");
         }
-        if (!StringUtils.hasText(user.getMobilePsw())) {
+        if (!StringUtils.hasText(user.getMobilePsw()) || !StringUtils.hasText(user.getMobileSalt())) {
             return Result.error("您还未设置登录密码，请用短信验证码登录后再设置");
         }
         // 校验原密码 (与登录同一套 SHA1(salt + 明文) 比对)

@@ -196,6 +196,9 @@ public class AdminSysUserBiz extends BaseBiz {
         if (userId == null) {
             return Result.error("登录已失效，请重新登录");
         }
+        if (req == null) {
+            return Result.error("参数不能为空");
+        }
         Object oldP = req.get("oldPassword");
         Object newP = req.get("newPassword");
         String oldPwd = oldP == null ? "" : oldP.toString();
@@ -213,6 +216,9 @@ public class AdminSysUserBiz extends BaseBiz {
         if (user == null) {
             return Result.error("管理员不存在");
         }
+        if (!StringUtils.hasText(user.getMobilePsw()) || !StringUtils.hasText(user.getMobileSalt())) {
+            return Result.error("账号未设置登录密码，请联系超级管理员重置");
+        }
         // 校验原密码 (与登录同一套 SHA1(mobileSalt + 明文) 比对)
         if (!Sha1Util.getSign(user.getMobileSalt() + oldPwd).equals(user.getMobilePsw())) {
             return Result.error("原密码不正确");
@@ -221,8 +227,8 @@ public class AdminSysUserBiz extends BaseBiz {
         record.setId(userId);
         record.setMobileSalt(IdUtil.simpleUUID());
         record.setMobilePsw(Sha1Util.getSign(record.getMobileSalt() + newPwd));
-        dao.updateById(record);
-        return Result.success("密码修改成功");
+        int result = dao.updateById(record);
+        return result > 0 ? Result.success("密码修改成功") : Result.error("修改失败, 请重试");
     }
 
     /**
