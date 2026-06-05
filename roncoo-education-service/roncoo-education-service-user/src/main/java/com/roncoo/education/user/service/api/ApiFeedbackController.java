@@ -29,7 +29,7 @@ import java.util.List;
  *
  * 展示规则:
  *   - 教员: 姓氏 + "教员"
- *   - 家长(学员账号): 姓氏 + (女士|男士)  // 依据 users.user_sex
+ *   - 家长(学员账号): 姓氏 + (先生|女士)  // 依据 users.user_sex; 保密/未设置 → 姓氏 + "家长"
  *   - 无法识别姓氏: "热心用户"
  */
 @RestController
@@ -88,7 +88,13 @@ public class ApiFeedbackController extends BaseBiz {
             role = "教员"; suffix = "教员";
         } else if (UserTypeEnum.STUDENT.getCode().equals(userType)) {
             role = "学生家长";
-            suffix = UserSexEnum.FEMALE.getCode().equals(userSex) ? "女士" : "男士";
+            if (UserSexEnum.MALE.getCode().equals(userSex)) {
+                suffix = "先生";
+            } else if (UserSexEnum.FEMALE.getCode().equals(userSex)) {
+                suffix = "女士";
+            } else {
+                suffix = "家长"; // 保密/未设置 — 中性, 不臆测性别
+            }
         } else {
             role = "热心用户"; suffix = "";
         }
